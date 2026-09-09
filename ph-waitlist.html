@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join the Waitlist — Home Loan Simulator Philippines</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #1e3a5f;
+  --ink-2:     #334e6e;
+  --ink-3:     #64748b;
+  --ink-4:     #94a3b8;
+  --line:      #dde3ea;
+  --surface:   #ffffff;
+  --bg:        #f0f4f8;
+  --bg-2:      #f8fafc;
+  --navy-pale: #e8f0fe;
+  --green:     #16a34a;
+  --green-pale:#f0fdf4;
+  --amber:     #d97706;
+  --amber-pale:#fffbeb;
+  --red:       #dc2626;
+  --red-pale:  #fef2f2;
+  --radius: 4px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.header-brand  { color: #fff; font-weight: 600; font-size: 14px; }
+.header-kayako { color: rgba(255,255,255,0.22); font-size: 11px; letter-spacing: 0.5px; }
+.header-back {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  transition: color 0.12s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.header-back:hover { color: #fff; }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+}
+
+/* Top accent bar — colored by path */
+.card-accent {
+  height: 4px;
+  background: var(--ink);
+}
+.card-accent.approved { background: var(--green); }
+.card-accent.marginal { background: var(--amber); }
+.card-accent.declined { background: var(--ink-4); }
+
+.card-body { padding: 36px 32px 32px; }
+
+/* Icon */
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.card-icon.approved { background: var(--green-pale); }
+.card-icon.marginal { background: var(--amber-pale); }
+.card-icon.declined { background: var(--bg-2); }
+
+/* Headline */
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.card-label.approved { color: var(--green); }
+.card-label.marginal { color: var(--amber); }
+.card-label.declined { color: var(--ink-4); }
+
+.card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--ink-3);
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+.card-desc strong { color: var(--ink-2); font-weight: 600; }
+
+/* Form */
+.form-field { margin-bottom: 14px; }
+.form-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin-bottom: 5px;
+}
+.form-field input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.form-field input:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(30,58,95,0.08);
+}
+.form-field input.error { border-color: var(--red); }
+.field-error {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 4px;
+  display: none;
+}
+.field-error.visible { display: block; }
+
+.submit-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s;
+  margin-top: 6px;
+  position: relative;
+}
+.submit-btn:hover:not(:disabled) { background: #163050; }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.submit-note {
+  font-size: 11px;
+  color: var(--ink-4);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ── SUCCESS STATE ── */
+.success-state {
+  display: none;
+  text-align: center;
+  padding: 36px 32px 32px;
+}
+.success-state.visible { display: block; }
+.card-body.hidden { display: none; }
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--green-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.success-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.success-desc {
+  font-size: 14px;
+  color: var(--ink-3);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+.back-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.12s;
+  text-decoration: none;
+}
+.back-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ── ERROR BANNER ── */
+.error-banner {
+  background: var(--red-pale);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--red);
+  margin-bottom: 14px;
+  display: none;
+}
+.error-banner.visible { display: block; }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-4);
+  padding: 16px;
+  flex-shrink: 0;
+}
+
+/* ── SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── WHAT WE'RE BUILDING ── */
+.building-strip {
+  background: var(--bg-2);
+  border-top: 1px solid var(--line);
+  padding: 16px 32px;
+}
+.building-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-4);
+  margin-bottom: 10px;
+}
+.building-items {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.building-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.building-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  flex-shrink: 0;
+}
+
+@media (max-width: 520px) {
+  .card-body { padding: 24px 20px 20px; }
+  .building-strip { padding: 14px 20px; }
+  .card-title { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-brand">Home Loan Simulator</div>
+  </div>
+  <div class="header-kayako">KayaKo.ph</div>
+  <button class="header-back" onclick="goBack()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to simulator
+  </button>
+</div>
+
+<div class="main">
+  <div class="card">
+    <div class="card-accent" id="card-accent"></div>
+
+    <!-- FORM STATE -->
+    <div class="card-body" id="card-body">
+      <div class="card-icon" id="card-icon">
+        <svg id="card-icon-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"></svg>
+      </div>
+      <div class="card-label" id="card-label"></div>
+      <div class="card-title" id="card-title"></div>
+      <div class="card-desc" id="card-desc"></div>
+
+      <div class="error-banner" id="error-banner">
+        Something went wrong. Please try again or email us directly.
+      </div>
+
+      <form id="waitlist-form" onsubmit="handleSubmit(event)">
+        <!-- Hidden context fields — not visible in URL -->
+        <input type="hidden" id="f-path"     name="path">
+        <input type="hidden" id="f-property" name="property_price">
+        <input type="hidden" id="f-income"   name="monthly_income">
+        <input type="hidden" id="f-dsr"      name="net_dsr">
+
+        <div class="form-field">
+          <label for="f-name">Your Name</label>
+          <input type="text" id="f-name" name="name" placeholder="Juan dela Cruz" autocomplete="name">
+          <div class="field-error" id="err-name">Please enter your name</div>
+        </div>
+
+        <div class="form-field">
+          <label for="f-email">Email Address</label>
+          <input type="email" id="f-email" name="email" placeholder="juan@email.com" autocomplete="email">
+          <div class="field-error" id="err-email">Please enter a valid email</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          Join the Waitlist
+        </button>
+        <div class="submit-note">No spam. No commitments. Just a heads-up when we're ready.</div>
+      </form>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-state" id="success-state">
+      <div class="success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+          <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="success-title">You're on the list.</div>
+      <div class="success-desc" id="success-desc"></div>
+      <a class="back-btn" onclick="goBack()" href="#">Run another scenario</a>
+    </div>
+
+    <!-- WHAT WE'RE BUILDING -->
+    <div class="building-strip" id="building-strip">
+      <div class="building-label">What we're building</div>
+      <div class="building-items">
+        <div class="building-item"><span class="building-dot"></span>Verified broker matching</div>
+        <div class="building-item"><span class="building-dot"></span>Bank pre-qualification</div>
+        <div class="building-item"><span class="building-dot"></span>Property search tools</div>
+        <div class="building-item"><span class="building-dot"></span>OFW-specific guidance</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Home Loan Simulator &mdash; For educational purposes only. Not financial advice.
+</div>
+
+<script>
+// ─── GOOGLE APPS SCRIPT ENDPOINT ──────────────────────────────────────────────
+// Deploy your Apps Script as a web app and paste the URL here.
+// See setup instructions in the comment block at the bottom of this file.
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwglSFs6nJjsCGULv9m_LWWZYSpt2X8ADh6XHz7qJmHFQsA-uej5pl2cC8Fd0pZAho/exec';
+
+// ─── DECODE URL PAYLOAD ───────────────────────────────────────────────────────
+// Encoded as base64 JSON under param 'd' — not human-readable in the URL bar
+let path          = 'approved';
+let propertyPrice = '';
+let monthlyIncome = '';
+let netDSR        = '';
+let verdict       = '';
+
+try {
+  const raw = new URLSearchParams(window.location.search).get('d');
+  if (raw) {
+    const decoded = JSON.parse(atob(raw));
+    path          = decoded.p || 'approved';
+    propertyPrice = decoded.v ? decoded.v.toString() : '';
+    monthlyIncome = decoded.i ? decoded.i.toString() : '';
+    netDSR        = decoded.r ? decoded.r.toString() : '';
+    // verdict not passed — keeps URL clean, we derive messaging from path
+  }
+} catch (e) {
+  // malformed payload — default to approved path silently
+}
+
+// ─── CONTENT BY PATH ──────────────────────────────────────────────────────────
+const content = {
+  approved: {
+    label:   'Approved',
+    title:   "You're ready. Be first in line.",
+    desc:    "Your numbers qualify. <strong>We're building the platform</strong> that connects Filipinos with the right broker for their exact financial profile. Join the waitlist and be first to know when we're ready.",
+    icon:    '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>',
+    success: "We'll reach out as soon as the platform is ready. Your spot is reserved.",
+  },
+  marginal: {
+    label:   'Almost there',
+    title:   "You're closer than you think.",
+    desc:    "The numbers are borderline but workable. <strong>We're building tools</strong> to help Filipinos navigate exactly this situation — structuring the right loan, finding the right partner. Join the waitlist and be first to know when we're ready.",
+    icon:    '<circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01" stroke-linecap="round"/>',
+    success: "You're on the list. We'll let you know when the platform launches.",
+  },
+  declined: {
+    label:   'Not yet',
+    title:   "The numbers change. Come back ready.",
+    desc:    "Right now the loan doesn't work — but that's a current snapshot, not a verdict on your future. <strong>We're building a platform</strong> to guide Filipinos step by step toward homeownership. Join the list and we'll be here when your situation has improved.",
+    icon:    '<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-7v2m0-10v6" stroke-linecap="round"/>',
+    success: "You're on the list. Run the simulator again anytime your numbers change — it's always free.",
+  },
+};
+
+const c = content[path] || content.approved;
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+document.getElementById('card-accent').className = 'card-accent ' + path;
+document.getElementById('card-icon').className   = 'card-icon ' + path;
+document.getElementById('card-icon-svg').innerHTML = c.icon;
+document.getElementById('card-label').className  = 'card-label ' + path;
+document.getElementById('card-label').textContent = c.label;
+document.getElementById('card-title').textContent = c.title;
+document.getElementById('card-desc').innerHTML    = c.desc;
+
+// Pre-fill hidden context fields
+document.getElementById('f-path').value     = path;
+document.getElementById('f-property').value = propertyPrice;
+document.getElementById('f-income').value   = monthlyIncome;
+document.getElementById('f-dsr').value      = netDSR;
+
+// ─── FORM SUBMIT ──────────────────────────────────────────────────────────────
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  const name  = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  let valid = true;
+
+  // Validate
+  if (!name) {
+    document.getElementById('err-name').classList.add('visible');
+    document.getElementById('f-name').classList.add('error');
+    valid = false;
+  } else {
+    document.getElementById('err-name').classList.remove('visible');
+    document.getElementById('f-name').classList.remove('error');
+  }
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRe.test(email)) {
+    document.getElementById('err-email').classList.add('visible');
+    document.getElementById('f-email').classList.add('error');
+    valid = false;
+  } else {
+    document.getElementById('err-email').classList.remove('visible');
+    document.getElementById('f-email').classList.remove('error');
+  }
+
+  if (!valid) return;
+
+  // Loading state
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Joining...';
+  document.getElementById('error-banner').classList.remove('visible');
+
+  try {
+    const payload = {
+      name,
+      email,
+      path,
+      property_price: propertyPrice,
+      monthly_income: monthlyIncome,
+      net_dsr:        netDSR,
+      timestamp:      new Date().toISOString(),
+      source:         'ph-home-loan-simulator',
+    };
+
+    // Check if Apps Script URL is configured
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+      // Dev mode — log to console and show success anyway
+      console.log('Waitlist submission (no endpoint configured):', payload);
+      showSuccess(name);
+      return;
+    }
+
+    await fetch(APPS_SCRIPT_URL, {
+      method:  'POST',
+      mode:    'no-cors', // Apps Script requires no-cors
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+
+    // no-cors means we can't read the response — assume success if no error thrown
+    showSuccess(name);
+
+  } catch (err) {
+    console.error('Submission error:', err);
+    btn.disabled = false;
+    btn.innerHTML = 'Join the Waitlist';
+    document.getElementById('error-banner').classList.add('visible');
+  }
+}
+
+function showSuccess(name) {
+  document.getElementById('card-body').classList.add('hidden');
+  document.getElementById('building-strip').style.display = 'none';
+  const successEl = document.getElementById('success-state');
+  successEl.classList.add('visible');
+  document.getElementById('success-desc').textContent = c.success;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  if (document.referrer && (document.referrer.includes('index') || document.referrer.includes('github.io'))) {
+    history.back();
+  } else {
+    window.location.href = 'index.html';
+  }
+}
+
+/*
+──────────────────────────────────────────────────────────────────────────────
+GOOGLE SHEETS SETUP — one-time, ~5 minutes
+
+1. Create a new Google Sheet (name it "PH Waitlist")
+   Columns: Timestamp | Name | Email | Path | Property Price | Monthly Income | Verdict | Net DSR | Source
+
+2. Go to Extensions → Apps Script
+
+3. Paste this code:
+
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    data.timestamp,
+    data.name,
+    data.email,
+    data.path,
+    data.property_price,
+    data.monthly_income,
+    data.verdict,
+    data.net_dsr,
+    data.source,
+  ]);
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+4. Click Deploy → New Deployment
+   Type: Web App
+   Execute as: Me
+   Who has access: Anyone
+   → Deploy → Copy the Web App URL
+
+5. Paste the URL into APPS_SCRIPT_URL at the top of this file.
+
+That's it. Every waitlist submission lands in your Google Sheet with full context
+(path, property price, income, approval verdict, DSR) — a qualified lead database
+from day one.
+──────────────────────────────────────────────────────────────────────────────
+*/
+</script>
+</body>
+</html>

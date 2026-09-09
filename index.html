@@ -1,0 +1,3489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Loan Simulator Philippines — Can You Afford It?</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Deep navy palette — trust / finance */
+  --ink:       #1e3a5f;   /* deep navy — header, buttons, key chrome */
+  --ink-2:     #334e6e;   /* mid navy — secondary labels, table headers */
+  --ink-3:     #64748b;   /* slate — tertiary text, hints */
+  --ink-4:     #94a3b8;   /* light slate — placeholders, muted */
+  --line:      #dde3ea;   /* slightly cool border */
+  --surface:   #ffffff;
+  --bg:        #f0f4f8;   /* cool off-white — financial dashboard feel */
+  --bg-2:      #f8fafc;
+  --navy-pale: #e8f0fe;   /* tint for hover states, active backgrounds */
+
+  /* Semantic only — unchanged */
+  --green:     #16a34a;
+  --green-pale:#f0fdf4;
+  --red:       #dc2626;
+  --red-pale:  #fef2f2;
+  --amber:     #d97706;
+  --amber-pale:#fffbeb;
+
+  /* Aliases for backward compat */
+  --blue:      #1e3a5f;
+  --blue-mid:  #1e3a5f;
+  --blue-pale: #e8f0fe;
+  --orange:    #d97706;
+  --orange-pale:#fffbeb;
+  --gray-50:   #f8fafc;
+  --gray-100:  #f0f4f8;
+  --gray-200:  #dde3ea;
+  --gray-300:  #c4ced9;
+  --gray-500:  #64748b;
+  --gray-600:  #334e6e;
+  --gray-700:  #243d58;
+  --gray-800:  #1e3a5f;
+
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(30,58,95,0.07);
+  --shadow-md: 0 2px 8px rgba(30,58,95,0.10);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-brand { color: #fff; font-weight: 600; font-size: 14px; }
+.header-sub    { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 1px; }
+.header-kayako { color: rgba(255,255,255,0.22); font-size: 11px; letter-spacing: 0.5px; }
+
+/* ── PAGE WRAP ── */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+/* ── PROGRESS STEPS ── */
+.steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 0;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.step { display: flex; align-items: center; gap: 8px; flex: 1; }
+.step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  flex-shrink: 0;
+  border: 1.5px solid var(--line);
+  color: var(--ink-4);
+  background: var(--surface);
+  transition: all 0.15s;
+}
+.step-num.active { border-color: var(--ink); background: var(--ink); color: #fff; }
+.step-num.done   { border-color: var(--green); background: var(--green); color: #fff; font-size: 0; }
+.step-num.done::after { content: ''; display: block; width: 8px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); }
+.step-label { font-size: 12px; font-weight: 500; color: var(--ink-4); white-space: nowrap; }
+.step-label.active { color: var(--ink); font-weight: 600; }
+.step-label.done   { color: var(--ink-3); }
+.step-line {
+  flex: 1; height: 1px;
+  background: var(--line);
+  margin: 0 8px;
+  transition: background 0.2s;
+}
+.step-line.done { background: var(--green); }
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-title { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.card-desc  { font-size: 13px; color: var(--ink-3); margin-bottom: 20px; line-height: 1.55; }
+
+/* ── FIELD ── */
+.field { margin-bottom: 18px; }
+.field:last-child { margin-bottom: 0; }
+
+.field-label {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 5px;
+}
+.field-label label      { font-size: 13px; font-weight: 500; color: var(--ink); }
+.field-label .field-hint{ font-size: 12px; color: var(--ink-4); font-weight: 400; }
+
+/* ── INPUT ── */
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-wrap .prefix,
+.input-wrap .suffix {
+  position: absolute; font-size: 13px; color: var(--ink-3);
+  pointer-events: none; z-index: 1;
+}
+.input-wrap .prefix { left: 11px; }
+.input-wrap .suffix { right: 11px; }
+
+.input-wrap input,
+.input-wrap select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  transition: border-color 0.12s;
+  outline: none;
+}
+.input-wrap.has-prefix input { padding-left: 26px; }
+.input-wrap.has-suffix input { padding-right: 36px; }
+.input-wrap input:focus,
+.input-wrap select:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(30,58,95,0.10); }
+.input-wrap input.error  { border-color: var(--red); }
+.input-wrap input.ok     { border-color: var(--green); }
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px !important;
+  cursor: pointer;
+}
+
+.field-error { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+.field-error.visible { display: block; }
+.field-note  { font-size: 12px; color: var(--ink-3); margin-top: 4px; line-height: 1.4; }
+
+/* ── PILL SELECTOR ── */
+.pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-2);
+  cursor: pointer;
+  background: var(--surface);
+  transition: all 0.12s;
+  user-select: none;
+}
+.pill:hover  { border-color: var(--ink); color: var(--ink); background: var(--navy-pale); }
+.pill.selected { border-color: var(--ink); background: var(--ink); color: #fff; font-weight: 500; }
+.pill.selected:hover { background: #163050; }
+
+/* ── DERIVED DISPLAY ── */
+.derived-box {
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-top: 8px;
+}
+.derived-box .d-label { font-size: 12px; color: var(--ink-3); }
+.derived-box .d-value { font-size: 15px; font-weight: 600; color: var(--ink); }
+
+/* ── INLINE INFO ROW ── */
+.info-row { display: flex; gap: 8px; margin-top: 12px; }
+.info-chip {
+  flex: 1; background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 10px 12px; text-align: center;
+}
+.info-chip .ic-val   { font-size: 15px; font-weight: 600; color: var(--ink); }
+.info-chip .ic-label { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+
+/* ── RATE OPTION CARDS ── */
+.rate-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.rate-option {
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 12px;
+  cursor: pointer; background: var(--surface); transition: all 0.12s;
+}
+.rate-option:hover    { border-color: var(--ink); background: var(--navy-pale); }
+.rate-option.selected { border-color: var(--ink); background: var(--ink); }
+.rate-option .ro-name { font-size: 11px; font-weight: 500; color: var(--ink-2); margin-bottom: 4px; }
+.rate-option .ro-rate { font-size: 18px; font-weight: 700; color: var(--ink); }
+.rate-option .ro-desc { font-size: 11px; color: var(--ink-3); margin-top: 3px; line-height: 1.3; }
+.rate-option.selected .ro-name,
+.rate-option.selected .ro-rate,
+.rate-option.selected .ro-desc { color: #fff; }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: var(--radius); padding: 10px 12px; font-size: 12px; line-height: 1.5;
+  margin-top: 10px; display: flex; gap: 8px; align-items: flex-start;
+}
+.callout.info   { background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
+.callout.warn   { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--amber); color: var(--ink-2); }
+.callout.danger { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--red); color: var(--ink-2); }
+.callout .co-icon { flex-shrink: 0; margin-top: 1px; }
+.callout strong { font-weight: 600; }
+
+/* ── NAV BUTTONS ── */
+.nav-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn-back {
+  padding: 10px 20px; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); color: var(--ink-2); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: border-color 0.12s;
+}
+.btn-back:hover { border-color: var(--ink-2); color: var(--ink); }
+.btn-next {
+  flex: 1; padding: 11px 20px; border: none; border-radius: var(--radius);
+  background: var(--ink); color: #fff; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.12s;
+}
+.btn-next:hover { background: #163050; }
+.btn-next:disabled { background: var(--line); color: var(--ink-4); cursor: not-allowed; }
+.btn-calculate {
+  flex: 1; padding: 12px 20px; border: none; border-radius: var(--radius);
+  background: var(--ink); color: #fff; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.12s;
+}
+.btn-calculate:hover { background: #163050; }
+
+/* ── RESULTS ── */
+.results { display: none; }
+
+/* ── VERDICT BANNER ── */
+.verdict-banner {
+  border-radius: var(--radius); padding: 0; margin-bottom: 16px;
+  border: 1px solid var(--line); overflow: hidden;
+}
+.verdict-banner.ok     { border-left: 3px solid var(--green); }
+.verdict-banner.warn   { border-left: 3px solid var(--amber); }
+.verdict-banner.danger { border-left: 3px solid var(--red); }
+.vb-stripe { display: none; }
+.vb-inner  { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; }
+.vb-icon   { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-top: 2px; background: var(--bg); }
+.vb-content { flex: 1; }
+.verdict-banner .vb-tag  { font-size: 11px; font-weight: 600; margin-bottom: 3px; }
+.verdict-banner.ok .vb-tag     { color: var(--green); }
+.verdict-banner.warn .vb-tag   { color: var(--amber); }
+.verdict-banner.danger .vb-tag { color: var(--red); }
+.verdict-banner .vb-title { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
+.verdict-banner .vb-body  { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+
+/* ── METRICS ── */
+.metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.metric  { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 0; overflow: hidden; }
+.metric-bar         { height: 2px; background: var(--line); }
+.metric-bar.ok      { background: var(--green); }
+.metric-bar.warn    { background: var(--amber); }
+.metric-bar.danger  { background: var(--red); }
+.metric-bar.neutral { background: var(--ink-4); }
+.metric-inner { padding: 14px 14px 12px; }
+.metric .m-label   { font-size: 11px; color: var(--ink-3); font-weight: 400; margin-bottom: 5px; }
+.metric .m-val     { font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1; }
+.metric .m-val.ok  { color: var(--green); }
+.metric .m-val.warn{ color: var(--amber); }
+.metric .m-val.danger { color: var(--red); }
+.metric .m-sub     { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+.metric .m-explain { font-size: 12px; color: var(--ink-2); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); line-height: 1.45; }
+.dti-bar-wrap { height: 5px; background: var(--line); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.dti-bar      { height: 100%; border-radius: 2px; transition: width 0.4s; }
+
+/* ── SECTION LABEL ── */
+.section-label { font-size: 13px; font-weight: 500; color: var(--ink-2); margin-bottom: 10px; margin-top: 28px; }
+
+/* ── CHART CARD ── */
+.chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+.chart-card h3 { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.chart-card .chart-narrative { font-size: 12px; color: var(--ink-3); margin-bottom: 12px; line-height: 1.5; }
+.chart-card canvas { max-height: 200px; }
+.charts-row { display: flex; flex-direction: column; gap: 0; margin-bottom: 16px; }
+
+/* ── BUY vs RENT ── */
+.bvr-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+.bvr-card h3 { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+.bvr-narrative { font-size: 13px; color: var(--ink-2); margin-bottom: 14px; line-height: 1.55; padding: 10px 12px; background: var(--bg-2); border-radius: var(--radius); border-left: 2px solid var(--ink-4); }
+.bvr-narrative strong { color: var(--ink); font-weight: 600; }
+.bvr-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.bvr-table th { background: var(--bg-2); color: var(--ink-3); padding: 8px 12px; text-align: center; font-weight: 500; font-size: 11px; border-bottom: 1px solid var(--line); }
+.bvr-table th:first-child { text-align: left; width: 40%; }
+.bvr-table td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: center; color: var(--ink-2); }
+.bvr-table td:first-child { text-align: left; color: var(--ink); }
+.bvr-table tr:last-child td { border-bottom: none; font-weight: 600; background: var(--bg-2); }
+.bvr-table .good { color: var(--green); font-weight: 600; }
+.bvr-table .bad  { color: var(--red);   font-weight: 600; }
+
+/* ── AMORT TABLE ── */
+.amort-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+.amort-card-header { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.amort-card-header h3 { font-size: 13px; font-weight: 500; color: var(--ink); }
+.amort-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.amort-legend { display: flex; gap: 10px; font-size: 11px; color: var(--ink-3); }
+.amort-legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 3px; vertical-align: middle; }
+.toggle-detail-btn { font-size: 11px; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: var(--radius); padding: 3px 9px; cursor: pointer; white-space: nowrap; }
+.toggle-detail-btn:hover { border-color: var(--ink-2); }
+.amort-scroll { overflow-x: auto; }
+.amort-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.amort-table th { background: var(--bg-2); color: var(--ink-3); padding: 7px 12px; text-align: right; font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; position: sticky; top: 0; z-index: 1; white-space: nowrap; border-bottom: 1px solid var(--line); }
+.amort-table th:nth-child(-n+2) { text-align: center; }
+.amort-table td { padding: 6px 12px; border-bottom: 1px solid var(--line); text-align: right; color: var(--ink-2); white-space: nowrap; }
+.amort-table td:nth-child(-n+2) { text-align: center; }
+.amort-table tr:nth-child(even) td { background: var(--bg-2); }
+.amort-table tr:hover td { background: var(--bg) !important; }
+.amort-table tr.repriced td { background: var(--amber-pale) !important; }
+.amort-table tr.loan-end td { background: var(--green-pale) !important; }
+.amort-table .neg { color: var(--red) !important; font-weight: 500; }
+.amort-table .interest-col { color: var(--red); }
+.amort-table .equity-col   { color: var(--green); }
+.col-detail { display: none; }
+.amort-table.show-detail .col-detail { display: table-cell; }
+.amort-table.show-detail { font-size: 11px; white-space: nowrap; }
+
+/* ── EDIT / SUMMARY BAR ── */
+.results-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.edit-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink-2); font-size: 12px; cursor: pointer; transition: border-color 0.12s; white-space: nowrap; }
+.edit-btn:hover { border-color: var(--ink-2); color: var(--ink); }
+
+/* ── SUMMARY CHIPS ── */
+.summary-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.summary-chip  { background: var(--bg-2); border: 1px solid var(--line); border-radius: 2px; padding: 3px 10px; font-size: 12px; color: var(--ink-3); }
+
+/* ── RESULTS TWO-COLUMN LAYOUT ── */
+.results-layout {
+  display: grid;
+  grid-template-columns: 1fr 264px;
+  gap: 24px;
+  align-items: start;
+}
+.results-main { min-width: 0; } /* prevents grid blowout */
+
+/* ── STICKY SIDEBAR ── */
+.results-sidebar {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rsb-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Verdict mini-card */
+.rsb-verdict {
+  border-left: 4px solid var(--ink-4);
+}
+.rsb-verdict.ok     { border-left-color: var(--green); }
+.rsb-verdict.warn   { border-left-color: var(--amber); }
+.rsb-verdict.danger { border-left-color: var(--red); }
+.rsb-verdict-tag  { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+.rsb-verdict.ok .rsb-verdict-tag     { color: var(--green); }
+.rsb-verdict.warn .rsb-verdict-tag   { color: var(--amber); }
+.rsb-verdict.danger .rsb-verdict-tag { color: var(--red); }
+.rsb-verdict-title { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.4; }
+
+/* KPI row */
+.rsb-kpi-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rsb-kpi {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+.rsb-kpi:last-child { border-bottom: none; }
+.rsb-kpi-label { font-size: 11px; color: var(--ink-3); }
+.rsb-kpi-val   { font-size: 14px; font-weight: 700; color: var(--ink); }
+.rsb-kpi-val.ok     { color: var(--green); }
+.rsb-kpi-val.warn   { color: var(--amber); }
+.rsb-kpi-val.danger { color: var(--red); }
+
+/* Payment highlight */
+.rsb-payment { text-align: center; }
+.rsb-payment-label { font-size: 11px; color: var(--ink-3); margin-bottom: 4px; }
+.rsb-payment-val   { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; }
+.rsb-payment-sub   { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+/* CTA button */
+.rsb-cta {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.12s;
+  display: block;
+}
+.rsb-cta:hover { background: #163050; }
+.rsb-cta.warn-cta { background: var(--amber); }
+.rsb-cta.warn-cta:hover { background: #b45309; }
+.rsb-cta-sub {
+  font-size: 10px;
+  color: var(--ink-4);
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* Section divider label inside sidebar */
+.rsb-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-4);
+  margin-bottom: 8px;
+}
+
+/* Wizard steps keep centered narrow column */
+.wizard-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── BANK APPROVAL GATE ── */
+.bank-gate { border-radius: var(--radius); margin-bottom: 12px; border: 1px solid var(--line); background: var(--surface); }
+.bank-gate.approved { border-left: 3px solid var(--green); }
+.bank-gate.marginal { border-left: 3px solid var(--amber); }
+.bank-gate.declined { border-left: 3px solid var(--red); }
+.bg-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 10px; }
+.bg-icon   { font-size: 18px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+.bg-title  { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.bg-sub    { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+.bg-reasons { display: flex; flex-direction: column; gap: 4px; padding: 0 16px 14px 46px; }
+.bg-reason  { font-size: 12px; color: var(--ink-2); display: flex; align-items: baseline; gap: 6px; line-height: 1.5; }
+.bg-reason::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; background: var(--ink-4); }
+.bg-reason.pass::before      { background: var(--green); }
+.bg-reason.fail::before      { background: var(--red); }
+.bg-reason.warn-item::before { background: var(--amber); }
+.bg-reason.fail      { color: var(--ink); font-weight: 500; }
+.bg-reason.pass      { color: var(--ink-2); }
+.bg-reason.warn-item { color: var(--ink-2); }
+
+/* ── DECISION ENGINE KPIs ── */
+.decision-engine { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.de-kpi {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  text-align: left;
+}
+.de-kpi.ok     { border-top: 3px solid var(--green); }
+.de-kpi.warn   { border-top: 3px solid var(--amber); }
+.de-kpi.danger { border-top: 3px solid var(--red); }
+.de-divider    { display: none; }
+.de-label  { font-size: 11px; font-weight: 400; color: var(--ink-3); margin-bottom: 6px; }
+.de-val    { font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1.2; margin-bottom: 4px; }
+.de-val.ok    { color: var(--green); }
+.de-val.warn  { color: var(--amber); }
+.de-val.danger{ color: var(--red); }
+.de-note   { font-size: 11px; color: var(--ink-3); line-height: 1.5; margin-top: 2px; }
+
+/* ── FORCED SALE BOX ── */
+.forced-sale-box { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+.fsb-inner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 10px; }
+.fsb-icon  { font-size: 20px; flex-shrink: 0; line-height: 1; }
+.fsb-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.fsb-body  { font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+.fsb-timeline { padding: 0 16px 14px; }
+.timeline-track { display: flex; height: 22px; border-radius: 2px; overflow: hidden; background: var(--line); margin-bottom: 6px; }
+.tl-seg { display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.9); overflow: hidden; white-space: nowrap; transition: width 0.4s; }
+.tl-seg.green  { background: var(--green); }
+.tl-seg.yellow { background: var(--amber); }
+.tl-seg.red    { background: var(--red); }
+.tl-seg.gray   { background: var(--gray-300); color: var(--ink-3); }
+.timeline-legend { display: flex; gap: 12px; font-size: 11px; color: var(--ink-3); flex-wrap: wrap; }
+.tl-dot { width: 8px; height: 8px; border-radius: 1px; display: inline-block; margin-right: 3px; vertical-align: middle; }
+
+/* ── TOTAL COST BOX ── */
+.total-cost-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+.tcb-headline { background: var(--bg-2); border-bottom: 1px solid var(--line); padding: 16px 18px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.tcb-headline .tcb-total { font-size: 26px; font-weight: 700; color: var(--ink); display: block; margin-top: 4px; }
+.tcb-body { padding: 14px 18px; }
+.tcb-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; margin-bottom: 10px; }
+.tcb-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.tcb-row:last-child { border-bottom: none; }
+.tcb-row .tcb-item { color: var(--ink-2); }
+.tcb-row .tcb-amt  { font-weight: 500; color: var(--ink); }
+.tcb-row.highlight .tcb-item { color: var(--ink); font-weight: 500; }
+.tcb-row.highlight .tcb-amt  { color: var(--ink); font-size: 14px; font-weight: 700; }
+.tcb-note { font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 10px; line-height: 1.6; }
+
+/* ── CLOSING COST BREAKDOWN (step 1) ── */
+.cc-breakdown { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; margin-top: 8px; font-size: 12px; }
+.cc-row { display: flex; justify-content: space-between; padding: 4px 0; color: var(--ink-2); border-bottom: 1px solid var(--line); }
+.cc-row:last-child { border-bottom: none; font-weight: 500; color: var(--ink); padding-top: 7px; margin-top: 3px; border-top: 1px solid var(--ink-4); }
+.cc-row .cc-val { font-weight: 500; color: var(--ink); }
+
+/* ── BROKER CTA ── */
+.broker-cta { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px; border: 1px solid var(--line); background: var(--bg-2); }
+.broker-cta.warn-cta     { border-color: var(--line); background: var(--bg-2); }
+.broker-cta.redirect-cta { border-color: var(--line); background: var(--bg-2); }
+.bc-text  { flex: 1; }
+.bc-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.bc-sub   { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+.bc-btn { white-space: nowrap; padding: 9px 18px; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; background: var(--ink); color: #fff; transition: background 0.12s; }
+.bc-btn:hover { background: #163050; }
+.broker-cta.warn-cta .bc-btn     { background: var(--ink); color: #fff; }
+.broker-cta.warn-cta .bc-btn:hover { background: #163050; }
+.broker-cta.redirect-cta .bc-btn { background: var(--ink); }
+
+/* ── WHAT WOULD IT TAKE ── */
+.what-it-takes { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
+.wit-title { font-size: 13px; font-weight: 500; color: var(--ink-2); margin-bottom: 12px; }
+.wit-grid  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.wit-card  { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.wit-card .wc-label { font-size: 11px; color: var(--ink-3); margin-bottom: 6px; font-weight: 500; }
+.wit-card .wc-val   { font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1; margin-bottom: 5px; }
+.wit-card .wc-note  { font-size: 12px; color: var(--ink-2); line-height: 1.4; }
+.wit-note { font-size: 12px; color: var(--ink-3); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* ── PURCHASE GAP ALERT ── */
+.purchase-gap { display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 14px; }
+.pg-icon  { font-size: 16px; flex-shrink: 0; line-height: 1.5; color: var(--amber); }
+.pg-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.pg-body  { font-size: 12px; color: var(--ink-2); line-height: 1.55; }
+
+/* ── DISCLAIMER ── */
+.disclaimer { font-size: 11px; color: var(--ink-4); border-top: 1px solid var(--line); padding-top: 14px; line-height: 1.6; margin-top: 8px; }
+
+/* ── EQUITY HERO PANEL ── */
+.equity-hero {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 16px;
+  background: var(--green-pale);
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.eq-hero-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 6px; }
+.eq-hero-val   { font-size: 36px; font-weight: 700; color: var(--green); line-height: 1; margin-bottom: 6px; }
+.eq-hero-sub   { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+.eq-hero-explain { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+
+/* Interest row below equity hero */
+.eq-interest-row {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 0;
+}
+.eq-int-label { font-size: 11px; color: var(--ink-3); margin-bottom: 4px; }
+.eq-int-val   { font-size: 20px; font-weight: 700; color: var(--ink); line-height: 1; }
+.eq-int-sub   { font-size: 11px; color: var(--ink-3); margin-top: 3px; margin-bottom: 8px; }
+.eq-int-bar-wrap { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+.eq-int-bar   { height: 100%; background: var(--amber); border-radius: 2px; transition: width 0.5s; }
+.eq-int-explain { font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+
+@media (max-width: 640px) {
+  .equity-hero { grid-template-columns: 1fr; }
+  .eq-hero-val { font-size: 28px; }
+}
+
+/* ── SYNTHESIS VERDICT MARK ── */
+.syn-verdict-mark {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 28px;
+  margin: -28px -28px 28px -28px; /* bleed to card edges */
+  border-bottom: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.syn-verdict-mark.ok     { background: var(--green-pale); }
+.syn-verdict-mark.warn   { background: var(--amber-pale); }
+.syn-verdict-mark.danger { background: var(--red-pale); }
+
+.svm-ring {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+}
+.svm-svg { width: 100%; height: 100%; }
+
+.svm-text { flex: 1; }
+.svm-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.syn-verdict-mark.ok   .svm-label { color: var(--green); }
+.syn-verdict-mark.warn .svm-label { color: var(--amber); }
+.syn-verdict-mark.danger .svm-label { color: var(--red); }
+
+.svm-verdict {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .syn-verdict-mark { padding: 18px; margin: -14px -14px 18px -14px; gap: 14px; }
+  .svm-ring { width: 56px; height: 56px; }
+  .svm-verdict { font-size: 18px; }
+}
+
+/* ── SYNTHESIS BOX ── */
+.synthesis-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.syn-header { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.syn-title  { font-size: 26px; font-weight: 700; color: var(--ink); margin-bottom: 4px; line-height: 1.2; }
+.syn-sub    { font-size: 13px; color: var(--ink-3); }
+.syn-signals {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.syn-signal {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid var(--line);
+}
+.syn-signal:last-child { border-bottom: none; }
+.syn-signal.ok     { border-left-color: var(--green); }
+.syn-signal.warn   { border-left-color: var(--amber); }
+.syn-signal.danger { border-left-color: var(--red); }
+.syn-signal.ok     { background: #fafffe; }
+.syn-signal.warn   { background: var(--bg-2); }
+.syn-signal.danger { background: var(--bg-2); }
+.syn-sig-icon  { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.syn-sig-body  { flex: 1; }
+.syn-sig-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+.syn-sig-text  { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.syn-conclusion {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.75;
+  padding: 18px 20px;
+  background: var(--bg-2);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--ink);
+  margin-bottom: 24px;
+}
+.syn-conclusion strong { color: var(--ink); font-weight: 600; }
+.syn-cta-wrap { display: flex; flex-direction: column; gap: 8px; }
+.syn-cta {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s;
+  letter-spacing: 0.2px;
+}
+.syn-cta:hover { background: #163050; }
+.syn-cta.warn  { background: var(--amber); color: #fff; }
+.syn-cta.warn:hover { background: #b45309; }
+.syn-cta.neutral { background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); }
+.syn-cta.neutral:hover { border-color: var(--ink); }
+.syn-cta-note { font-size: 12px; color: var(--ink-4); text-align: center; }
+
+/* ── STORY CHAPTERS ── */
+.story-chapter {
+  margin-bottom: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.story-chapter-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  gap: 12px;
+}
+.story-chapter-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+}
+.story-chapter-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-4);
+  letter-spacing: 1px;
+  padding-top: 2px;
+  flex-shrink: 0;
+  width: 20px;
+}
+.story-chapter-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+.story-chapter-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.story-illo {
+  width: 96px;
+  height: 72px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+/* Remove double borders — chapters contain their own cards */
+.story-chapter .metric       { box-shadow: none; }
+.story-chapter .chart-card   { box-shadow: none; border-color: var(--line); }
+.story-chapter .bank-gate    { margin-bottom: 10px; }
+.story-chapter .verdict-banner { margin-bottom: 10px; }
+.story-chapter .broker-cta   { margin-bottom: 10px; }
+.story-chapter .what-it-takes{ margin-bottom: 10px; }
+.story-chapter .purchase-gap { margin-bottom: 10px; }
+.story-chapter .total-cost-box{ margin-bottom: 10px; }
+.story-chapter .decision-engine { margin-bottom: 10px; }
+.story-chapter .forced-sale-box { margin-bottom: 10px; }
+.story-chapter .amort-card   { box-shadow: none; border-color: var(--line); margin-bottom: 0; }
+.story-chapter .bvr-card     { border: none; padding: 0; box-shadow: none; margin-bottom: 0; }
+
+@media (max-width: 640px) {
+  .story-chapter { padding: 14px; }
+  .story-illo    { width: 48px; height: 36px; }
+  .story-chapter-title { font-size: 14px; }
+}
+
+/* ── UTILITY ── */
+.hidden  { display: none !important; }
+.divider { border: none; border-top: 1px solid var(--line); margin: 14px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── STICKY MOBILE ACTION BAR ── */
+.mobile-action-bar {
+  display: none; /* shown only on ≤900px via media query */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -2px 12px rgba(30,58,95,0.10);
+  padding: 10px 16px 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* iPhone notch */
+  transition: transform 0.25s ease;
+}
+.mobile-action-bar.hidden-bar {
+  transform: translateY(100%);
+}
+.mab-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.mab-info {
+  flex: 1;
+  min-width: 0;
+}
+.mab-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 1px;
+}
+.mab-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mab-dot.ok     { background: var(--green); }
+.mab-dot.warn   { background: var(--amber); }
+.mab-dot.danger { background: var(--red); }
+.mab-status-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mab-payment {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.mab-payment-sub {
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.mab-cta {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+.mab-cta:hover   { background: #163050; }
+.mab-cta.warn    { background: var(--amber); }
+.mab-cta.warn:hover { background: #b45309; }
+
+/* Prevent content from being hidden behind the bar */
+.results.has-bar { padding-bottom: 80px; }
+
+@media (max-width: 900px) {
+  /* Collapse to single column on tablet and below */
+  .results-layout { grid-template-columns: 1fr; }
+  .results-sidebar { display: none; }
+  .wizard-wrap { max-width: 100%; }
+  .mobile-action-bar { display: block; }
+}
+
+@media (max-width: 640px) {
+  /* ── PAGE ── */
+  .page { padding: 16px 12px 40px; }
+
+  /* ── STEPS ── */
+  .step-label { font-size: 11px; }
+
+  /* ── INPUTS ── */
+  .rate-options { grid-template-columns: 1fr; }
+  .two-col      { grid-template-columns: 1fr; gap: 0; }
+
+  /* ── RESULTS TOPBAR ── */
+  .results-topbar { flex-direction: row; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .summary-chips  { display: none; } /* hidden on mobile — verdict body carries the context */
+
+  /* ── DECISION ENGINE — stack to 1 col ── */
+  .decision-engine { grid-template-columns: 1fr; gap: 6px; }
+  .de-kpi { padding: 12px 14px; }
+  .de-val { font-size: 17px; }
+
+  /* ── METRICS — 1 col on mobile ── */
+  .metrics { grid-template-columns: 1fr; gap: 6px; }
+  .metric-inner { padding: 10px 14px; }
+  .metric .m-label   { font-size: 12px; font-weight: 400; color: var(--ink-2); margin-bottom: 4px; }
+  .metric .m-val     { font-size: 20px; }
+  .metric .m-sub     { font-size: 11px; margin-top: 3px; }
+  .metric .m-explain { display: none; }
+  .dti-bar-wrap      { margin-top: 6px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label { margin-top: 20px; }
+
+  /* ── WIT GRID — 1 col ── */
+  .wit-grid { grid-template-columns: 1fr; }
+
+  /* ── BROKER CTA — stack button below text ── */
+  .broker-cta { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .bc-btn     { width: 100%; text-align: center; }
+
+  /* ── VERDICT BANNER ── */
+  .vb-title { font-size: 15px; }
+  .vb-inner { padding: 12px 14px; gap: 10px; }
+  .vb-icon  { width: 26px; height: 26px; font-size: 13px; }
+
+  /* ── BANK GATE ── */
+  .bg-reasons { padding-left: 16px; }
+  .bg-title   { font-size: 13px; }
+
+  /* ── FORCED SALE ── */
+  .timeline-legend { gap: 8px; font-size: 10px; }
+
+  /* ── TOTAL COST BOX ── */
+  .tcb-breakdown        { grid-template-columns: 1fr; gap: 0; }
+  .tcb-headline .tcb-total { font-size: 22px; }
+
+  /* ── BVR TABLE — 2 data cols on mobile: 5yr + At End ── */
+  .bvr-table { font-size: 11px; }
+  .bvr-table th:first-child { width: 45%; }
+  .bvr-table th,
+  .bvr-table td { padding: 7px 6px; }
+  .bvr-table th:nth-child(3),
+  .bvr-table td:nth-child(3),
+  .bvr-table th:nth-child(4),
+  .bvr-table td:nth-child(4),
+  .bvr-table th:nth-child(5),
+  .bvr-table td:nth-child(5) { display: none; }
+  .bvr-table .good,
+  .bvr-table .bad { font-size: 12px; }
+
+  /* ── CHARTS ── */
+  .chart-card         { padding: 12px; }
+  .chart-card canvas  { max-height: 170px; }
+  .chart-narrative    { font-size: 11px; }
+
+  /* ── AMORT TABLE — force slim, tighter padding ── */
+  .amort-table.show-detail { font-size: 10px; }
+  .amort-table th,
+  .amort-table td { padding: 5px 8px; font-size: 11px; }
+  .toggle-detail-btn { font-size: 10px; padding: 2px 7px; }
+  .amort-card-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-brand">Home Loan Simulator</div>
+    <div class="header-sub">Philippines — Bank, Pag-IBIG, In-House</div>
+  </div>
+  <div class="header-kayako">KayaKo.ph</div>
+</div>
+
+<div class="page">
+
+  <!-- PROGRESS -->
+  <div class="steps" id="steps-bar">
+    <div class="step">
+      <div class="step-num active" id="sn-1">1</div>
+      <div class="step-label active" id="sl-1">Property &amp; Loan</div>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step">
+      <div class="step-num" id="sn-2">2</div>
+      <div class="step-label" id="sl-2">Your Income</div>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step">
+      <div class="step-num" id="sn-3">3</div>
+      <div class="step-label" id="sl-3">Loan Details</div>
+    </div>
+  </div>
+
+  <div class="wizard-wrap">
+  <!-- ═══ STEP 1: PROPERTY & LOAN ═══ -->
+  <div id="step-1">
+    <div class="card">
+      <div class="card-title">What property are you looking at?</div>
+      <div class="card-desc">Enter the asking price and how much you plan to put down.</div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="prop-price">Property Price</label>
+          <span class="field-hint">Total purchase price</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="prop-price" inputmode="numeric" placeholder="e.g. 5,000,000" oninput="fmtInput(this); step1Update()">
+        </div>
+        <div class="field-error" id="err-price">Enter a valid price (min ₱500,000)</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label>Property Type</label>
+        </div>
+        <div class="pill-group" id="prop-type-group">
+          <div class="pill selected" data-val="condo" onclick="selectPill(this,'prop-type-group'); step1Update()">Condominium</div>
+          <div class="pill" data-val="house" onclick="selectPill(this,'prop-type-group'); step1Update()">House &amp; Lot</div>
+          <div class="pill" data-val="townhouse" onclick="selectPill(this,'prop-type-group'); step1Update()">Townhouse</div>
+          <div class="pill" data-val="affordable" onclick="selectPill(this,'prop-type-group'); step1Update()">Affordable Housing</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="dp-pct">Down Payment</label>
+          <span class="field-hint" id="dp-pct-hint">20% is standard</span>
+        </div>
+        <div class="pill-group" style="margin-bottom:10px" id="dp-quick-group">
+          <div class="pill" data-val="10" onclick="selectPill(this,'dp-quick-group'); setDP(10); step1Update()">10%</div>
+          <div class="pill selected" data-val="20" onclick="selectPill(this,'dp-quick-group'); setDP(20); step1Update()">20%</div>
+          <div class="pill" data-val="30" onclick="selectPill(this,'dp-quick-group'); setDP(30); step1Update()">30%</div>
+          <div class="pill" data-val="40" onclick="selectPill(this,'dp-quick-group'); setDP(40); step1Update()">40%</div>
+          <div class="pill" data-val="custom" onclick="selectPill(this,'dp-quick-group'); focusDPInput(); step1Update()">Custom %</div>
+        </div>
+        <div id="dp-custom-wrap" class="hidden">
+          <div class="input-wrap has-suffix">
+            <input type="text" id="dp-pct-input" inputmode="numeric" placeholder="e.g. 25" oninput="fmtInput(this,true); step1Update()">
+            <span class="suffix">%</span>
+          </div>
+          <div class="field-error" id="err-dp">Down payment must be 5%–80%</div>
+        </div>
+      </div>
+
+      <!-- Derived summary -->
+      <div id="step1-derived">
+        <div class="info-row">
+          <div class="info-chip">
+            <div class="ic-val" id="d-down">—</div>
+            <div class="ic-label">Down Payment</div>
+          </div>
+          <div class="info-chip">
+            <div class="ic-val" id="d-loan">—</div>
+            <div class="ic-label">Loan Amount</div>
+          </div>
+          <div class="info-chip">
+            <div class="ic-val" id="d-costs">—</div>
+            <div class="ic-label">Est. Closing Costs</div>
+          </div>
+        </div>
+        <div id="cc-breakdown-wrap" class="cc-breakdown hidden">
+          <div class="cc-row"><span>Documentary Stamp Tax (DST)</span><span class="cc-val" id="cc-dst">—</span></div>
+          <div class="cc-row"><span>Transfer Tax (LGU)</span><span class="cc-val" id="cc-tx">—</span></div>
+          <div class="cc-row"><span>Registration Fee (RD)</span><span class="cc-val" id="cc-reg">—</span></div>
+          <div class="cc-row"><span>Notarial / Deed of Sale</span><span class="cc-val" id="cc-not">—</span></div>
+          <div class="cc-row"><span>Bank / Appraisal Fees</span><span class="cc-val" id="cc-bank">—</span></div>
+          <div class="cc-row"><span>Total Closing Costs</span><span class="cc-val" id="cc-total">—</span></div>
+        </div>
+        <div id="callout-pagibig" class="callout info hidden">
+          <span class="co-icon">i</span>
+          <span>Pag-IBIG max loan is <strong>₱6.5M</strong>. Your loan amount exceeds this — you'll need a bank loan for the difference.</span>
+        </div>
+        <div id="callout-dp-low" class="callout warn hidden">
+          <span class="co-icon">!</span>
+          <span>A down payment below 20% usually means a higher interest rate and requires mortgage insurance (MRI).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-next" id="btn-step1" onclick="goStep(2)">Next: Your Income</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2: INCOME ═══ -->
+  <div id="step-2" class="hidden">
+    <div class="card">
+      <div class="card-title">What is your monthly income?</div>
+      <div class="card-desc">Used to check if the loan is affordable. We'll estimate taxes and mandatory deductions (SSS, PhilHealth, Pag-IBIG) automatically.</div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="salary">Your Monthly Gross Salary</label>
+          <span class="field-hint">Before tax &amp; deductions</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="salary" inputmode="numeric" placeholder="e.g. 80,000" oninput="fmtInput(this); step2Update()">
+        </div>
+        <div class="field-error" id="err-salary">Enter your monthly gross salary</div>
+        <div id="salary-takeHome" class="field-note hidden"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="spouse-salary">Spouse / Co-borrower Monthly Salary</label>
+          <span class="field-hint">Optional — leave 0 if none</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="spouse-salary" inputmode="numeric" placeholder="0" oninput="fmtInput(this); step2Update()">
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="other-income">Other Monthly Income</label>
+          <span class="field-hint">Freelance, OFW, business, rental</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="other-income" inputmode="numeric" placeholder="0" oninput="fmtInput(this); step2Update()">
+        </div>
+        <div class="field-note">OFW remittance, freelance, business income. <strong>Banks apply a 20–30% haircut on non-regular income</strong> and require 2 years of documentation.</div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label>Employment Type</label>
+        </div>
+        <div class="pill-group" id="emp-type-group">
+          <div class="pill selected" data-val="employed" onclick="selectPill(this,'emp-type-group'); onEmpTypeChange()">Employed</div>
+          <div class="pill" data-val="self-employed" onclick="selectPill(this,'emp-type-group'); onEmpTypeChange()">Self-Employed</div>
+          <div class="pill" data-val="ofw" onclick="selectPill(this,'emp-type-group'); onEmpTypeChange()">OFW</div>
+        </div>
+        <div id="emp-type-note" class="callout info hidden" style="margin-top:8px"></div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field">
+        <div class="field-label">
+          <label for="existing-loans">Existing Monthly Loan Payments</label>
+          <span class="field-hint">Other loans you are already paying</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="existing-loans" inputmode="numeric" placeholder="0" oninput="fmtInput(this); step2Update()">
+        </div>
+        <div class="field-note">Car loans, personal loans, credit card minimums, SSS/Pag-IBIG salary loans. Banks add these to your home loan payment when computing your total debt obligations.</div>
+        <div id="existing-loans-impact" class="field-note hidden" style="margin-top:6px;font-weight:500;color:var(--ink)"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <div class="field-label">
+            <label for="living-exp">Monthly Living Expenses</label>
+            <span class="field-hint">Excl. rent &amp; loans</span>
+          </div>
+          <div class="input-wrap has-prefix">
+            <span class="prefix">₱</span>
+            <input type="text" id="living-exp" inputmode="numeric" placeholder="e.g. 30,000" oninput="fmtInput(this); step2Update()">
+          </div>
+          <div class="field-error" id="err-living">Enter your estimated monthly expenses</div>
+          <div class="field-note">Food, transport, utilities, clothing</div>
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="current-rent">Current Monthly Rent</label>
+            <span class="field-hint">Buy vs. Rent</span>
+          </div>
+          <div class="input-wrap has-prefix">
+            <span class="prefix">₱</span>
+            <input type="text" id="current-rent" inputmode="numeric" placeholder="e.g. 20,000" oninput="fmtInput(this)">
+          </div>
+          <div class="field-note">Leave blank to auto-estimate</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <div class="field-label">
+            <label for="age">Your Current Age</label>
+            <span class="field-hint">For the schedule table</span>
+          </div>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="age" inputmode="numeric" min="18" max="60" placeholder="e.g. 30" oninput="step2Update()">
+            <span class="suffix">yrs</span>
+          </div>
+          <div class="field-error" id="err-age">Enter your age (18–60)</div>
+        </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="savings">Current Total Savings</label>
+            <span class="field-hint">Emergency fund + cash</span>
+          </div>
+          <div class="input-wrap has-prefix">
+            <span class="prefix">₱</span>
+            <input type="text" id="savings" inputmode="numeric" placeholder="e.g. 500,000" oninput="fmtInput(this); step2Update()">
+          </div>
+          <div class="field-note">Used to calculate how long you can survive a financial shock</div>
+        </div>
+      </div>
+
+      <!-- Combined income summary -->
+      <div id="income-summary" class="hidden">
+        <div class="info-row">
+          <div class="info-chip">
+            <div class="ic-val" id="d-gross">—</div>
+            <div class="ic-label">Total Gross Income</div>
+          </div>
+          <div class="info-chip">
+            <div class="ic-val" id="d-net">—</div>
+            <div class="ic-label">Est. Monthly Take-Home</div>
+          </div>
+          <div class="info-chip">
+            <div class="ic-val" id="d-disposable">—</div>
+            <div class="ic-label">After Living Expenses</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(1)">Back</button>
+      <button class="btn-next" id="btn-step2" onclick="goStep(3)">Next: Loan Details</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3: LOAN DETAILS ═══ -->
+  <div id="step-3" class="hidden">
+    <div class="card">
+      <div class="card-title">Loan details</div>
+      <div class="card-desc">Choose how you want to finance and pick a rate scenario. Defaults are set to typical Philippine market values.</div>
+
+      <div class="field">
+        <div class="field-label"><label>Financing Type</label></div>
+        <div class="pill-group" id="loan-type-group">
+          <div class="pill selected" data-val="bank" onclick="selectPill(this,'loan-type-group'); onLoanTypeChange()">Bank Loan</div>
+          <div class="pill" data-val="pagibig" onclick="selectPill(this,'loan-type-group'); onLoanTypeChange()">Pag-IBIG</div>
+          <div class="pill" data-val="inhouse" onclick="selectPill(this,'loan-type-group'); onLoanTypeChange()">In-House</div>
+        </div>
+        <div id="loan-type-note" class="field-note" style="margin-top:8px"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="loan-term-sel">Loan Term</label>
+        </div>
+        <div class="pill-group" id="loan-term-group">
+          <div class="pill" data-val="10" onclick="selectPill(this,'loan-term-group'); step3Update()">10 yrs</div>
+          <div class="pill" data-val="15" onclick="selectPill(this,'loan-term-group'); step3Update()">15 yrs</div>
+          <div class="pill selected" data-val="20" onclick="selectPill(this,'loan-term-group'); step3Update()">20 yrs</div>
+          <div class="pill" data-val="25" onclick="selectPill(this,'loan-term-group'); step3Update()">25 yrs</div>
+          <div class="pill" data-val="30" onclick="selectPill(this,'loan-term-group'); step3Update()">30 yrs</div>
+        </div>
+      </div>
+
+      <div class="field" id="fixed-period-field">
+        <div class="field-label">
+          <label>Fixed Rate Period</label>
+          <span class="field-hint">Rate is locked before repricing</span>
+        </div>
+        <div class="pill-group" id="fixed-period-group">
+          <div class="pill" data-val="1" onclick="selectPill(this,'fixed-period-group'); step3Update()">1 yr</div>
+          <div class="pill" data-val="2" onclick="selectPill(this,'fixed-period-group'); step3Update()">2 yrs</div>
+          <div class="pill selected" data-val="3" onclick="selectPill(this,'fixed-period-group'); step3Update()">3 yrs</div>
+          <div class="pill" data-val="5" onclick="selectPill(this,'fixed-period-group'); step3Update()">5 yrs</div>
+          <div class="pill" data-val="10" onclick="selectPill(this,'fixed-period-group'); step3Update()">10 yrs</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label>Interest Rate Scenario</label>
+          <span class="field-hint">Pick one — rates are pre-filled</span>
+        </div>
+        <div class="rate-options" id="rate-scenario-group">
+          <div class="rate-option selected" data-scenario="optimistic" onclick="selectRateScenario(this)">
+            <div class="ro-name">Optimistic</div>
+            <div class="ro-rate" id="ropt-rate">6.5%</div>
+            <div class="ro-desc">Rates drop after fixed period</div>
+          </div>
+          <div class="rate-option" data-scenario="base" onclick="selectRateScenario(this)">
+            <div class="ro-name">Base Case</div>
+            <div class="ro-rate" id="rbase-rate">7.5%</div>
+            <div class="ro-desc">Stable — stays near current</div>
+          </div>
+          <div class="rate-option" data-scenario="stress" onclick="selectRateScenario(this)">
+            <div class="ro-name">Stress Test</div>
+            <div class="ro-rate" id="rstress-rate">9.5%</div>
+            <div class="ro-desc">BSP hikes, rate spikes after fix</div>
+          </div>
+        </div>
+        <div id="rate-scenario-note" class="field-note" style="margin-top:6px"></div>
+      </div>
+
+      <!-- Derived: monthly payment preview -->
+      <div id="step3-derived" class="hidden">
+        <div class="info-row">
+          <div class="info-chip">
+            <div class="ic-val" id="d-amort-fixed">—</div>
+            <div class="ic-label">Monthly (fixed period)</div>
+          </div>
+          <div class="info-chip">
+            <div class="ic-val" id="d-amort-repriced">—</div>
+            <div class="ic-label">Monthly (after repricing)</div>
+          </div>
+          <div class="info-chip">
+            <div class="ic-val" id="d-dti-preview">—</div>
+            <div class="ic-label">DTI Ratio</div>
+          </div>
+        </div>
+        <div id="step3-callout" class="hidden"></div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(2)">Back</button>
+      <button class="btn-calculate" onclick="calculate()">Calculate</button>
+    </div>
+  </div>
+  </div><!-- /wizard-wrap -->
+
+  <!-- ═══ RESULTS ═══ -->
+  <div id="results" class="results">
+
+    <div class="results-layout">
+    <div class="results-main">
+
+    <div class="results-topbar">
+      <button class="edit-btn" onclick="goStep(1)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit Inputs
+      </button>
+      <div class="summary-chips" id="summary-chips"></div>
+    </div>
+
+    <!-- ═══ CHAPTER 1: CAN YOU GET THIS LOAN? ═══ -->
+    <div class="story-chapter">
+      <div class="story-chapter-header">
+        <div class="story-chapter-left">
+          <div class="story-chapter-num">01</div>
+          <div>
+            <div class="story-chapter-title">Can you get this loan?</div>
+            <div class="story-chapter-sub">Banks check your income, obligations, and savings before approving.</div>
+          </div>
+        </div>
+        <!-- Ch01: Bank document with approval stamp -->
+        <svg class="story-illo" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- document -->
+          <rect x="12" y="6" width="40" height="50" rx="3" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect x="12" y="6" width="40" height="9" rx="3" fill="var(--ink)"/>
+          <!-- lines of text -->
+          <rect x="18" y="22" width="22" height="2.5" rx="1" fill="var(--line)"/>
+          <rect x="18" y="28" width="18" height="2.5" rx="1" fill="var(--line)"/>
+          <rect x="18" y="34" width="24" height="2.5" rx="1" fill="var(--line)"/>
+          <rect x="18" y="40" width="14" height="2.5" rx="1" fill="var(--line)"/>
+          <!-- approval stamp circle -->
+          <circle cx="60" cy="42" r="14" fill="var(--green-pale)" stroke="var(--green)" stroke-width="1.5"/>
+          <!-- checkmark -->
+          <path d="M53 42 l4.5 4.5 l9-9" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Bank Approval Gate -->
+      <div id="bank-gate" class="bank-gate hidden">
+        <div class="bg-header">
+          <span class="bg-icon" id="bg-icon"></span>
+          <div>
+            <div class="bg-title" id="bg-title"></div>
+            <div class="bg-sub" id="bg-sub"></div>
+          </div>
+        </div>
+        <div class="bg-reasons" id="bg-reasons"></div>
+      </div>
+
+      <!-- Decision Engine — 3 KPIs -->
+      <div id="decision-engine" class="decision-engine hidden">
+        <div class="de-kpi" id="de-approval">
+          <div class="de-label">Bank Approval</div>
+          <div class="de-val" id="de-approval-val">—</div>
+          <div class="de-note" id="de-approval-note"></div>
+        </div>
+        <div class="de-divider"></div>
+        <div class="de-kpi" id="de-breakpoint">
+          <div class="de-label">Cash Flow</div>
+          <div class="de-val" id="de-breakpoint-val">—</div>
+          <div class="de-note" id="de-breakpoint-note"></div>
+        </div>
+        <div class="de-divider"></div>
+        <div class="de-kpi" id="de-runway">
+          <div class="de-label">Savings Runway</div>
+          <div class="de-val" id="de-runway-val">—</div>
+          <div class="de-note" id="de-runway-note"></div>
+        </div>
+      </div>
+
+      <!-- Forced Sale Warning -->
+      <div id="forced-sale-box" class="forced-sale-box hidden">
+        <div class="fsb-inner">
+          <div class="fsb-icon">!</div>
+          <div>
+            <div class="fsb-title" id="fsb-title"></div>
+            <div class="fsb-body" id="fsb-body"></div>
+          </div>
+        </div>
+        <div class="fsb-timeline" id="fsb-timeline"></div>
+      </div>
+
+      <!-- Verdict -->
+      <div id="verdict-banner" class="verdict-banner ok">
+        <div class="vb-stripe"></div>
+        <div class="vb-inner">
+          <div class="vb-icon" id="vb-icon">—</div>
+          <div class="vb-content">
+            <div class="vb-tag" id="vb-tag"></div>
+            <div class="vb-title" id="vb-title"></div>
+            <div class="vb-body" id="vb-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Broker CTA -->
+      <div id="broker-cta" class="broker-cta hidden">
+        <div class="bc-text">
+          <div class="bc-title" id="bc-title"></div>
+          <div class="bc-sub" id="bc-sub"></div>
+        </div>
+        <button class="bc-btn" id="bc-btn" onclick="brokerCTAClick()"></button>
+      </div>
+
+      <!-- What Would It Take -->
+      <div id="what-it-takes" class="what-it-takes hidden">
+        <div class="wit-title">What would it take to qualify?</div>
+        <div class="wit-grid" id="wit-grid"></div>
+        <div class="wit-note" id="wit-note"></div>
+      </div>
+    </div>
+
+    <!-- ═══ CHAPTER 2: WHAT WILL THIS ACTUALLY COST? ═══ -->
+    <div class="story-chapter">
+      <div class="story-chapter-header">
+        <div class="story-chapter-left">
+          <div class="story-chapter-num">02</div>
+          <div>
+            <div class="story-chapter-title">What will this actually cost you?</div>
+            <div class="story-chapter-sub">The price tag on the listing is just the beginning.</div>
+          </div>
+        </div>
+        <!-- Ch02: Price tag + stacked cost bars -->
+        <svg class="story-illo" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- price tag -->
+          <path d="M8 8 L8 28 L26 46 L46 26 L28 8 Z" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="22" cy="16" r="3" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>
+          <!-- horizontal cost bars growing in size = stacking costs -->
+          <rect x="52" y="12" width="20" height="5" rx="2" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="52" y="21" width="16" height="5" rx="2" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="52" y="30" width="24" height="5" rx="2" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="52" y="39" width="20" height="5" rx="2" fill="var(--ink)"/>
+          <!-- total label line -->
+          <line x1="52" y1="37" x2="76" y2="37" stroke="var(--ink)" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <!-- Purchase Gap Alert -->
+      <div id="purchase-gap" class="purchase-gap hidden">
+        <div class="pg-icon">₱</div>
+        <div>
+          <div class="pg-title" id="pg-title"></div>
+          <div class="pg-body" id="pg-body"></div>
+        </div>
+      </div>
+
+      <!-- Total Cost Shock Box -->
+      <div class="total-cost-box" id="total-cost-box">
+        <div class="tcb-headline" id="tcb-headline"></div>
+        <div class="tcb-body">
+          <div class="tcb-breakdown" id="tcb-breakdown"></div>
+          <div class="tcb-note" id="tcb-note"></div>
+        </div>
+      </div>
+
+      <!-- Monthly payment metrics -->
+      <div class="metrics" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="metric">
+          <div class="metric-bar" id="mb-fixed"></div>
+          <div class="metric-inner">
+            <div class="m-label">Monthly Payment — Fixed</div>
+            <div class="m-val" id="r-amort-fixed">—</div>
+            <div class="m-sub" id="r-amort-fixed-sub"></div>
+            <div class="m-explain" id="r-amort-fixed-explain"></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-bar" id="mb-repriced"></div>
+          <div class="metric-inner">
+            <div class="m-label">After Repricing</div>
+            <div class="m-val" id="r-amort-repriced">—</div>
+            <div class="m-sub" id="r-amort-repriced-sub"></div>
+            <div class="m-explain" id="r-amort-repriced-explain"></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-bar" id="mb-dti"></div>
+          <div class="metric-inner">
+            <div class="m-label">Debt-to-Income Ratio</div>
+            <div class="m-val" id="r-dti">—</div>
+            <div class="dti-bar-wrap"><div class="dti-bar" id="r-dti-bar"></div></div>
+            <div class="m-sub">Recommended max: 30–35%</div>
+            <div class="m-explain" id="r-dti-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CHAPTER 3: WHAT WEALTH ARE YOU BUILDING? ═══ -->
+    <div class="story-chapter">
+      <div class="story-chapter-header">
+        <div class="story-chapter-left">
+          <div class="story-chapter-num">03</div>
+          <div>
+            <div class="story-chapter-title">What wealth are you building?</div>
+            <div class="story-chapter-sub">Every payment grows your equity. Here is what you will own over time.</div>
+          </div>
+        </div>
+        <!-- Ch03: House with equity/debt split and upward bars -->
+        <svg class="story-illo" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- house roof only — sits above the bars -->
+          <path d="M18 30 L38 12 L58 30" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+          <!-- house body split: left=loan (light), right=equity (green) -->
+          <rect x="20" y="30" width="36" height="24" rx="1" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect x="38" y="30" width="18" height="24" rx="1" fill="var(--green)" opacity="0.25"/>
+          <!-- dividing line -->
+          <line x1="38" y1="30" x2="38" y2="54" stroke="var(--green)" stroke-width="1" stroke-dasharray="2 2"/>
+          <!-- door -->
+          <rect x="31" y="42" width="8" height="12" rx="1" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+          <!-- rising bars outside right = value growth -->
+          <rect x="64" y="44" width="5" height="10" rx="1" fill="var(--line)"/>
+          <rect x="71" y="36" width="5" height="18" rx="1" fill="var(--green)" opacity="0.5"/>
+        </svg>
+      </div>
+
+      <!-- Equity hero panel -->
+      <div class="equity-hero">
+        <div class="eq-hero-left">
+          <div class="eq-hero-label">Your equity at year 10</div>
+          <div class="eq-hero-val" id="r-equity10">—</div>
+          <div class="eq-hero-sub" id="r-equity10-sub"></div>
+          <div class="eq-hero-explain" id="r-equity10-explain"></div>
+        </div>
+        <div class="eq-hero-right">
+          <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <!-- ground -->
+            <line x1="8" y1="70" x2="112" y2="70" stroke="var(--line)" stroke-width="1"/>
+            <!-- roof — sits cleanly above the body -->
+            <path d="M22 36 L60 10 L98 36" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" fill="none"/>
+            <!-- house body — clean white -->
+            <rect x="26" y="36" width="68" height="34" rx="2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>
+            <!-- equity fill: bottom-to-top fill inside body using clipPath, no overlap with outline -->
+            <clipPath id="house-clip">
+              <rect x="27" y="37" width="66" height="32"/>
+            </clipPath>
+            <rect x="27" y="37" width="66" height="32" fill="var(--green)" opacity="0.12" id="eq-fill-rect"/>
+            <!-- windows — sit ON TOP of fill so always visible -->
+            <rect x="31" y="42" width="13" height="10" rx="1" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+            <rect x="76" y="42" width="13" height="10" rx="1" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+            <!-- door -->
+            <rect x="51" y="50" width="18" height="20" rx="2" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+            <!-- percent label below -->
+            <text x="60" y="64" font-size="9" fill="var(--green)" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="700" id="eq-pct-label">—% yours</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Interest cost row -->
+      <div class="eq-interest-row">
+        <div class="eq-int-label">The cost of borrowing — total interest over the loan</div>
+        <div class="eq-int-val" id="r-interest">—</div>
+        <div class="eq-int-sub" id="r-interest-sub"></div>
+        <div class="eq-int-bar-wrap"><div class="eq-int-bar" id="eq-int-bar"></div></div>
+        <div class="eq-int-explain" id="r-interest-explain"></div>
+      </div>
+
+      <div class="chart-card" style="margin-top:12px">
+        <h3>Your Loan Balance vs. Property Value</h3>
+        <div class="chart-narrative" id="chart-balance-narrative"></div>
+        <canvas id="chart-balance"></canvas>
+      </div>
+    </div>
+
+    <!-- ═══ CHAPTER 4: MONTH TO MONTH, WHAT IS YOUR LIFE LIKE? ═══ -->
+    <div class="story-chapter">
+      <div class="story-chapter-header">
+        <div class="story-chapter-left">
+          <div class="story-chapter-num">04</div>
+          <div>
+            <div class="story-chapter-title">Month to month, what is your life like?</div>
+            <div class="story-chapter-sub">After paying the mortgage and all expenses, here is what you have left.</div>
+          </div>
+        </div>
+        <!-- Ch04: Wallet/cash = monthly budget -->
+        <svg class="story-illo" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- wallet body -->
+          <rect x="8" y="16" width="52" height="34" rx="4" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1.5"/>
+          <!-- wallet fold line -->
+          <line x1="8" y1="28" x2="60" y2="28" stroke="var(--ink)" stroke-width="1"/>
+          <!-- coin slot -->
+          <rect x="52" y="20" width="18" height="20" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle cx="61" cy="30" r="5" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1"/>
+          <!-- cash lines inside wallet -->
+          <rect x="14" y="33" width="20" height="2.5" rx="1" fill="var(--green)" opacity="0.6"/>
+          <rect x="14" y="39" width="14" height="2.5" rx="1" fill="var(--line)"/>
+          <rect x="14" y="45" width="17" height="2.5" rx="1" fill="var(--line)"/>
+        </svg>
+      </div>
+
+      <div class="metrics" style="grid-template-columns:1fr 1fr">
+        <div class="metric">
+          <div class="metric-bar" id="mb-buffer"></div>
+          <div class="metric-inner">
+            <div class="m-label">Monthly Buffer</div>
+            <div class="m-val" id="r-buffer">—</div>
+            <div class="m-sub">After amort + living expenses</div>
+            <div class="m-explain" id="r-buffer-explain"></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-bar ok"></div>
+          <div class="metric-inner">
+            <div class="m-label">Years Until Loan is Paid</div>
+            <div class="m-val ok" id="r-years-paid">—</div>
+            <div class="m-sub" id="r-years-paid-sub"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:12px">
+        <h3>Monthly Cash Left After All Expenses</h3>
+        <div class="chart-narrative" id="chart-cashflow-narrative"></div>
+        <canvas id="chart-cashflow"></canvas>
+      </div>
+    </div>
+
+    <!-- ═══ CHAPTER 5: IS BUYING SMARTER THAN RENTING? ═══ -->
+    <div class="story-chapter">
+      <div class="story-chapter-header">
+        <div class="story-chapter-left">
+          <div class="story-chapter-num">05</div>
+          <div>
+            <div class="story-chapter-title">Is buying smarter than renting?</div>
+            <div class="story-chapter-sub">Compare the true cost of owning vs. continuing to rent over time.</div>
+          </div>
+        </div>
+        <!-- Ch05: House vs apartment building — balanced -->
+        <svg class="story-illo" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- house (left) -->
+          <path d="M4 30 L16 18 L28 30" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+          <rect x="6" y="30" width="20" height="22" rx="1" fill="var(--navy-pale)" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect x="13" y="40" width="6" height="12" rx="1" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+          <!-- vs badge -->
+          <circle cx="40" cy="40" r="8" fill="var(--bg-2)" stroke="var(--line)" stroke-width="1"/>
+          <text x="40" y="44" font-size="7" fill="var(--ink-3)" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600">vs</text>
+          <!-- apartment building (right) — taller, more floors -->
+          <rect x="52" y="14" width="24" height="38" rx="2" fill="var(--bg-2)" stroke="var(--ink-4)" stroke-width="1.5"/>
+          <rect x="56" y="19" width="5" height="4" rx="1" fill="var(--line)"/>
+          <rect x="65" y="19" width="5" height="4" rx="1" fill="var(--line)"/>
+          <rect x="56" y="27" width="5" height="4" rx="1" fill="var(--line)"/>
+          <rect x="65" y="27" width="5" height="4" rx="1" fill="var(--line)"/>
+          <rect x="56" y="35" width="5" height="4" rx="1" fill="var(--line)"/>
+          <rect x="65" y="35" width="5" height="4" rx="1" fill="var(--line)"/>
+          <rect x="62" y="43" width="6" height="9" rx="1" fill="var(--line)"/>
+        </svg>
+      </div>
+
+      <!-- Buy vs Rent -->
+      <div class="bvr-card" style="margin-bottom:0">
+        <div class="bvr-narrative" id="bvr-narrative"></div>
+        <table class="bvr-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>5 yrs</th>
+              <th>10 yrs</th>
+              <th>15 yrs</th>
+              <th>20 yrs</th>
+              <th>At End</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cost of Buying (minus equity gained)</td>
+              <td id="bvr-buy-5">—</td><td id="bvr-buy-10">—</td>
+              <td id="bvr-buy-15">—</td><td id="bvr-buy-20">—</td>
+              <td id="bvr-buy-end">—</td>
+          </tr>
+          <tr>
+            <td>Cost of Renting (3%/yr rent increase)</td>
+            <td id="bvr-rent-5">—</td><td id="bvr-rent-10">—</td>
+            <td id="bvr-rent-15">—</td><td id="bvr-rent-20">—</td>
+            <td id="bvr-rent-end">—</td>
+          </tr>
+          <tr>
+            <td>Better financially</td>
+            <td id="bvr-w-5"></td><td id="bvr-w-10"></td>
+            <td id="bvr-w-15"></td><td id="bvr-w-20"></td>
+            <td id="bvr-w-end"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout info" style="margin-top:10px">
+        <span class="co-icon">i</span>
+        <span>Buying cost = total payments + taxes + HOA fees + closing costs, minus estimated property appreciation. This compares total money spent — not including the down payment opportunity cost.</span>
+      </div>
+      </div><!-- /bvr-card -->
+    </div><!-- /chapter 5 -->
+
+    <!-- ═══ CHAPTER 6: YOUR COMPLETE PAYMENT PLAN ═══ -->
+    <div class="story-chapter">
+      <div class="story-chapter-header">
+        <div class="story-chapter-left">
+          <div class="story-chapter-num">06</div>
+          <div>
+            <div class="story-chapter-title">Your complete payment plan</div>
+            <div class="story-chapter-sub">Year by year — every peso paid, every peso owned.</div>
+          </div>
+        </div>
+        <!-- Ch06: Clean amortization schedule table -->
+        <svg class="story-illo" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- table frame -->
+          <rect x="4" y="8" width="72" height="46" rx="3" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>
+          <!-- header row -->
+          <rect x="4" y="8" width="72" height="10" rx="3" fill="var(--ink)"/>
+          <!-- column header ticks -->
+          <rect x="10" y="11" width="12" height="3" rx="1" fill="rgba(255,255,255,0.5)"/>
+          <rect x="30" y="11" width="10" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
+          <rect x="48" y="11" width="10" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
+          <rect x="64" y="11" width="8" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
+          <!-- row 1 -->
+          <rect x="10" y="23" width="8" height="3" rx="1" fill="var(--line)"/>
+          <rect x="30" y="23" width="12" height="3" rx="1" fill="var(--line)"/>
+          <rect x="48" y="23" width="10" height="3" rx="1" fill="#fca5a5" opacity="0.7"/>
+          <rect x="64" y="23" width="8" height="3" rx="1" fill="var(--line)"/>
+          <!-- row 2 -->
+          <rect x="10" y="31" width="8" height="3" rx="1" fill="var(--line)"/>
+          <rect x="30" y="31" width="12" height="3" rx="1" fill="var(--line)"/>
+          <rect x="48" y="31" width="10" height="3" rx="1" fill="#fca5a5" opacity="0.5"/>
+          <rect x="64" y="31" width="8" height="3" rx="1" fill="var(--line)"/>
+          <!-- row 3 highlighted = repriced year -->
+          <rect x="6" y="38" width="68" height="8" rx="1" fill="#fffbeb"/>
+          <rect x="10" y="40" width="8" height="3" rx="1" fill="var(--line)"/>
+          <rect x="30" y="40" width="12" height="3" rx="1" fill="var(--line)"/>
+          <rect x="48" y="40" width="10" height="3" rx="1" fill="#fca5a5" opacity="0.4"/>
+          <rect x="64" y="40" width="8" height="3" rx="1" fill="var(--green)" opacity="0.5"/>
+          <!-- row dividers -->
+          <line x1="4" y1="28" x2="76" y2="28" stroke="var(--line)" stroke-width="0.5"/>
+          <line x1="4" y1="36" x2="76" y2="36" stroke="var(--line)" stroke-width="0.5"/>
+        </svg>
+      </div>
+
+    <!-- Amort table -->
+    <div class="amort-card">
+      <div class="amort-card-header">
+        <h3>Year-by-Year Schedule</h3>
+        <div class="amort-header-right">
+          <div class="amort-legend">
+            <span><span class="dot" style="background:#fef08a;border:1px solid #ca8a04"></span>Repriced</span>
+            <span><span class="dot" style="background:#dcfce7;border:1px solid #86efac"></span>Paid off</span>
+          </div>
+          <button class="toggle-detail-btn" onclick="toggleAmortDetail(this)">Show all columns</button>
+        </div>
+      </div>
+      <div class="amort-scroll">
+      <table class="amort-table" id="amort-table">
+        <thead>
+          <tr>
+            <th>Yr</th>
+            <th>Age</th>
+            <th class="col-detail">Note</th>
+            <th class="col-detail">Gross Salary</th>
+            <th class="col-detail">Take-Home</th>
+            <th>Mo. Payment</th>
+            <th class="col-detail">Annual Total</th>
+            <th class="col-detail">Principal</th>
+            <th>Interest Paid</th>
+            <th>Remaining Balance</th>
+            <th class="col-detail">Prop. Value</th>
+            <th>Equity</th>
+            <th>Monthly Buffer</th>
+          </tr>
+        </thead>
+        <tbody id="amort-tbody"></tbody>
+      </table>
+      </div><!-- /amort-scroll -->
+    </div><!-- /amort-card -->
+    </div><!-- /chapter 6 -->
+
+    <!-- ═══ SYNTHESIS: SHOULD YOU BUY? ═══ -->
+    <div class="synthesis-box" id="synthesis-box">
+      <div class="syn-verdict-mark" id="syn-verdict-mark">
+        <div class="svm-ring" id="svm-ring">
+          <svg class="svm-svg" id="svm-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="svm-text">
+          <div class="svm-label" id="svm-label">—</div>
+          <div class="svm-verdict" id="svm-verdict">—</div>
+        </div>
+      </div>
+      <div class="syn-header">
+        <div class="syn-title">So — should you buy?</div>
+        <div class="syn-sub">Based on everything above, here is the short version.</div>
+      </div>
+      <div class="syn-signals" id="syn-signals"></div>
+      <div class="syn-conclusion" id="syn-conclusion"></div>
+      <div class="syn-cta-wrap">
+        <button class="syn-cta" id="syn-cta" onclick="brokerCTAClick()">—</button>
+        <div class="syn-cta-note" id="syn-cta-note"></div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This tool is for educational purposes only and does not constitute financial advice. Actual loan terms, interest rates, taxes, and property values may differ. Interest rate scenarios are illustrative. Consult a licensed financial advisor and your bank or Pag-IBIG before making any property purchase decision.
+    </div>
+
+    </div><!-- /results-main -->
+
+    <!-- ── STICKY SIDEBAR ── -->
+    <div class="results-sidebar" id="results-sidebar">
+
+      <!-- Verdict mini -->
+      <div class="rsb-card rsb-verdict" id="rsb-verdict-card">
+        <div class="rsb-verdict-tag" id="rsb-verdict-tag">—</div>
+        <div class="rsb-verdict-title" id="rsb-verdict-title">—</div>
+      </div>
+
+      <!-- Monthly payment -->
+      <div class="rsb-card rsb-payment">
+        <div class="rsb-payment-label">Monthly Payment</div>
+        <div class="rsb-payment-val" id="rsb-payment-val">—</div>
+        <div class="rsb-payment-sub" id="rsb-payment-sub">—</div>
+      </div>
+
+      <!-- 3 KPIs -->
+      <div class="rsb-card">
+        <div class="rsb-section-label">At a Glance</div>
+        <div class="rsb-kpi-row">
+          <div class="rsb-kpi">
+            <span class="rsb-kpi-label">Bank Approval</span>
+            <span class="rsb-kpi-val" id="rsb-approval">—</span>
+          </div>
+          <div class="rsb-kpi">
+            <span class="rsb-kpi-label">Cash Flow</span>
+            <span class="rsb-kpi-val" id="rsb-cashflow">—</span>
+          </div>
+          <div class="rsb-kpi">
+            <span class="rsb-kpi-label">Savings Runway</span>
+            <span class="rsb-kpi-val" id="rsb-runway">—</span>
+          </div>
+          <div class="rsb-kpi">
+            <span class="rsb-kpi-label">Equity at Year 10</span>
+            <span class="rsb-kpi-val ok" id="rsb-equity">—</span>
+          </div>
+          <div class="rsb-kpi">
+            <span class="rsb-kpi-label">Total Interest</span>
+            <span class="rsb-kpi-val" id="rsb-interest">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <button class="rsb-cta" id="rsb-cta-btn" onclick="brokerCTAClick()">—</button>
+      <div class="rsb-cta-sub" id="rsb-cta-sub"></div>
+
+    </div><!-- /results-sidebar -->
+
+    </div><!-- /results-layout -->
+
+  </div><!-- /results -->
+
+</div><!-- /page -->
+
+<!-- ── STICKY MOBILE ACTION BAR ── -->
+<div class="mobile-action-bar hidden-bar" id="mobile-action-bar">
+  <div class="mab-inner">
+    <div class="mab-info">
+      <div class="mab-status">
+        <span class="mab-dot" id="mab-dot"></span>
+        <span class="mab-status-text" id="mab-status-text">—</span>
+      </div>
+      <div class="mab-payment" id="mab-payment">—</div>
+      <div class="mab-payment-sub" id="mab-payment-sub">monthly payment</div>
+    </div>
+    <button class="mab-cta" id="mab-cta" onclick="brokerCTAClick()">—</button>
+  </div>
+</div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const PAGIBIG_MAX = 6500000;
+const DEFAULT_RATES = {
+  bank:    { optimistic: [6.5, 5.5], base: [7.0, 7.5], stress: [7.0, 9.5] },
+  pagibig: { optimistic: [6.0, 6.0], base: [6.375, 6.375], stress: [6.5, 6.5] },
+  inhouse: { optimistic: [14.0, 14.0], base: [16.0, 16.0], stress: [18.0, 18.0] },
+};
+
+// ─── ACCURATE PH CLOSING COSTS ───────────────────────────────────────────────
+// DST: 0.5% of LOAN AMOUNT (BIR RR, not of price) for bank mortgages
+//      1.0% of LOAN AMOUNT for Pag-IBIG (HDMF schedule)
+// Transfer Tax: 0.5% of selling price (LGU-dependent, 0.5–0.75%)
+// Registration Fee: tiered per Registry of Deeds, ~₱8k–₱25k on ₱3M–₱10M
+// Notarial/DOAS fee: ~0.5–1% of price, standard 1%
+// Bank appraisal + processing: ~₱10k–₱30k
+// CGT 6%: SELLER cost — excluded from buyer calculation
+function computeClosingCosts(price, loan, loanType) {
+  const dst        = loan * (loanType === 'pagibig' ? 0.01 : 0.005);
+  const transferTx = price * 0.005;                                    // 0.5% LGU average
+  const regFee     = price < 1750000 ? 8000 :
+                     price < 3500000 ? 12000 :
+                     price < 7000000 ? 20000 : 25000;                  // RD tiered schedule
+  const notarial   = Math.min(price * 0.01, 50000);                    // 1% capped at ₱50k
+  const bankFees   = loanType === 'bank' ? 20000 : 5000;              // appraisal + processing
+  return { dst, transferTx, regFee, notarial, bankFees,
+           total: dst + transferTx + regFee + notarial + bankFees };
+}
+
+// ─── ACCURATE ONGOING COSTS ──────────────────────────────────────────────────
+// MRI: ~0.07% of outstanding balance/yr (HDMF/bank standard)
+// Fire insurance: ~0.1–0.15% of property value/yr (required by all lenders)
+// RPT: Metro Manila — assessed value = 20% of market, rate = 2% (1% basic + 1% SEF)
+//      Effective: price × 0.20 × 0.02 = 0.4% of market value per year
+const MRI_RATE   = 0.0007;   // per year of outstanding balance
+const FIRE_RATE  = 0.001;    // per year of property value
+const RPT_RATE   = 0.004;    // effective rate on market value (Metro Manila typical)
+
+// ─── GLOBAL STATE ─────────────────────────────────────────────────────────────
+let chartBalance = null, chartCashflow = null;
+let currentStep = 1;
+
+// ─── FORMAT INPUT AS NUMBER WITH COMMAS ──────────────────────────────────────
+function fmtInput(el, noComma = false) {
+  const raw = el.value.replace(/[^\d.]/g, '');
+  if (!noComma) {
+    const n = parseFloat(raw);
+    el.value = isNaN(n) ? raw : n.toLocaleString('en-PH', { maximumFractionDigits: 0 });
+  } else {
+    el.value = raw;
+  }
+}
+
+function parseVal(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat(el.value.replace(/,/g, '')) || 0;
+}
+
+function fmt(n) {
+  return Math.abs(Math.round(n)).toLocaleString('en-PH');
+}
+
+function fmtM(n) {
+  if (Math.abs(n) >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1000) return (n / 1000).toFixed(0) + 'K';
+  return Math.round(n).toString();
+}
+
+// ─── PILL / OPTION HELPERS ────────────────────────────────────────────────────
+function selectPill(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function getSelectedPill(groupId) {
+  const sel = document.querySelector('#' + groupId + ' .pill.selected');
+  return sel ? sel.dataset.val : null;
+}
+
+function selectRateScenario(el) {
+  document.querySelectorAll('#rate-scenario-group .rate-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  step3Update();
+}
+
+function getSelectedScenario() {
+  const sel = document.querySelector('#rate-scenario-group .rate-option.selected');
+  return sel ? sel.dataset.scenario : 'base';
+}
+
+// ─── DOWN PAYMENT QUICK SET ───────────────────────────────────────────────────
+function setDP(pct) {
+  document.getElementById('dp-custom-wrap').classList.add('hidden');
+  document.getElementById('dp-pct-input').value = pct;
+}
+
+function focusDPInput() {
+  document.getElementById('dp-custom-wrap').classList.remove('hidden');
+  document.getElementById('dp-pct-input').focus();
+}
+
+function getDPPct() {
+  const quick = getSelectedPill('dp-quick-group');
+  if (quick === 'custom') {
+    return parseFloat(document.getElementById('dp-pct-input').value.replace(/,/g, '')) || 0;
+  }
+  return parseFloat(quick) || 20;
+}
+
+// ─── STEP NAVIGATION ──────────────────────────────────────────────────────────
+function goStep(n) {
+  // Validate before advancing
+  if (n > currentStep) {
+    if (currentStep === 1 && !validateStep1()) return;
+    if (currentStep === 2 && !validateStep2()) return;
+  }
+
+  [1, 2, 3].forEach(i => {
+    document.getElementById('step-' + i).classList.toggle('hidden', i !== n);
+    const sn = document.getElementById('sn-' + i);
+    const sl = document.getElementById('sl-' + i);
+    if (i < n) {
+      sn.className = 'step-num done'; sn.textContent = '';
+      sl.className = 'step-label done';
+    } else if (i === n) {
+      sn.className = 'step-num active'; sn.textContent = i;
+      sl.className = 'step-label active';
+    } else {
+      sn.className = 'step-num'; sn.textContent = i;
+      sl.className = 'step-label';
+    }
+    if (i < 3) {
+      document.getElementById('line-' + i).className = 'step-line' + (i < n ? ' done' : '');
+    }
+  });
+
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').classList.remove('has-bar');
+  // Always hide the mobile bar when navigating to any wizard step
+  document.getElementById('mobile-action-bar').classList.add('hidden-bar');
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────────────────
+function showErr(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('visible', show);
+}
+
+function setInputState(inputId, state) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  el.classList.remove('error', 'ok');
+  if (state) el.classList.add(state);
+}
+
+function validateStep1() {
+  const price = parseVal('prop-price');
+  let ok = true;
+
+  if (price < 500000) {
+    showErr('err-price', true);
+    setInputState('prop-price', 'error');
+    ok = false;
+  } else {
+    showErr('err-price', false);
+    setInputState('prop-price', 'ok');
+  }
+
+  const dpPct = getDPPct();
+  if (dpPct < 5 || dpPct > 80) {
+    showErr('err-dp', true);
+    ok = false;
+  } else {
+    showErr('err-dp', false);
+  }
+
+  return ok;
+}
+
+function validateStep2() {
+  const salary = parseVal('salary');
+  const living = parseVal('living-exp');
+  const age = parseInt(document.getElementById('age').value) || 0;
+  let ok = true;
+
+  if (salary < 5000) {
+    showErr('err-salary', true);
+    setInputState('salary', 'error');
+    ok = false;
+  } else {
+    showErr('err-salary', false);
+    setInputState('salary', 'ok');
+  }
+
+  if (living < 1000) {
+    showErr('err-living', true);
+    setInputState('living-exp', 'error');
+    ok = false;
+  } else {
+    showErr('err-living', false);
+    setInputState('living-exp', 'ok');
+  }
+
+  if (age < 18 || age > 60) {
+    showErr('err-age', true);
+    setInputState('age', 'error');
+    ok = false;
+  } else {
+    showErr('err-age', false);
+    setInputState('age', 'ok');
+  }
+
+  return ok;
+}
+
+// ─── STEP 1 LIVE UPDATE ───────────────────────────────────────────────────────
+function step1Update() {
+  const price = parseVal('prop-price');
+  if (price < 500000) {
+    document.getElementById('d-down').textContent = '—';
+    document.getElementById('d-loan').textContent = '—';
+    document.getElementById('d-costs').textContent = '—';
+    return;
+  }
+
+  const dpPct = getDPPct();
+  const dp = price * dpPct / 100;
+  const loan = price - dp;
+
+  const loanType = getSelectedPill('loan-type-group') || 'bank';
+  const cc = computeClosingCosts(price, loan, loanType);
+
+  document.getElementById('d-down').textContent = '₱' + fmtM(dp);
+  document.getElementById('d-loan').textContent = '₱' + fmtM(loan);
+  document.getElementById('d-costs').textContent = '~₱' + fmtM(cc.total);
+
+  // Populate itemized closing costs
+  document.getElementById('cc-breakdown-wrap').classList.remove('hidden');
+  document.getElementById('cc-dst').textContent  = '₱' + fmt(Math.round(cc.dst));
+  document.getElementById('cc-tx').textContent   = '₱' + fmt(Math.round(cc.transferTx));
+  document.getElementById('cc-reg').textContent  = '₱' + fmt(Math.round(cc.regFee));
+  document.getElementById('cc-not').textContent  = '₱' + fmt(Math.round(cc.notarial));
+  document.getElementById('cc-bank').textContent = '₱' + fmt(Math.round(cc.bankFees));
+  document.getElementById('cc-total').textContent = '₱' + fmt(Math.round(cc.total));
+
+  const pagibigVisible = loan > PAGIBIG_MAX;
+  document.getElementById('callout-pagibig').classList.toggle('hidden', !pagibigVisible);
+  document.getElementById('callout-dp-low').classList.toggle('hidden', dpPct >= 20);
+
+  // Set Pag-IBIG pill eligibility note
+  const propType = getSelectedPill('prop-type-group');
+  if (propType === 'affordable') {
+    document.getElementById('dp-pct-hint').textContent = 'Min 10% for Pag-IBIG';
+  } else {
+    document.getElementById('dp-pct-hint').textContent = '20% is standard';
+  }
+}
+
+// ─── STEP 2 LIVE UPDATE ───────────────────────────────────────────────────────
+function step2Update() {
+  const salary = parseVal('salary');
+  const spouse = parseVal('spouse-salary');
+  const other = parseVal('other-income');
+  const living = parseVal('living-exp');
+  const existingLoans = parseVal('existing-loans') || 0;
+
+  if (salary < 5000) {
+    document.getElementById('income-summary').classList.add('hidden');
+    document.getElementById('salary-takeHome').classList.add('hidden');
+    return;
+  }
+
+  const net = netTakeHome(salary) + netTakeHome(spouse) + other;
+  const gross = salary + spouse + other;
+  const disposable = net - living - existingLoans;
+
+  document.getElementById('income-summary').classList.remove('hidden');
+  document.getElementById('d-gross').textContent = '₱' + fmt(Math.round(gross));
+  document.getElementById('d-net').textContent = '₱' + fmt(Math.round(net));
+  document.getElementById('d-disposable').textContent = disposable >= 0 ? '₱' + fmt(Math.round(disposable)) : '-₱' + fmt(Math.round(-disposable));
+  document.getElementById('d-disposable').style.color = disposable < 0 ? 'var(--red)' : '';
+
+  document.getElementById('salary-takeHome').classList.remove('hidden');
+  document.getElementById('salary-takeHome').textContent =
+    `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary)))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`;
+
+  // Show existing loan impact on DSR headroom
+  const impactEl = document.getElementById('existing-loans-impact');
+  if (existingLoans > 0 && net > 0) {
+    const existingDSR = (existingLoans / net * 100).toFixed(0);
+    const remaining = Math.max(0, net * 0.35 - existingLoans);
+    impactEl.classList.remove('hidden');
+    impactEl.textContent = `Your existing loans already use ${existingDSR}% of your take-home. Banks will approve a home loan only if the combined total stays below 35% — leaving you ₱${fmt(Math.round(remaining))}/mo for the new mortgage.`;
+    impactEl.style.color = existingLoans > net * 0.35 ? 'var(--red)' : 'var(--ink-2)';
+  } else {
+    impactEl.classList.add('hidden');
+  }
+}
+
+// ─── STEP 3 UPDATE ────────────────────────────────────────────────────────────
+function onEmpTypeChange() {
+  const type = getSelectedPill('emp-type-group') || 'employed';
+  const note = document.getElementById('emp-type-note');
+  const msgs = {
+    employed: '',
+    'self-employed': 'Self-employed borrowers: banks require 2 years of ITR (Income Tax Return) and audited financials. Enter your average monthly income — but note that banks use your declared taxable income, not your actual cash flow. If your ITR shows less than what you earn, your approved loan may be smaller.',
+    ofw: 'OFW borrowers: banks require POEA documentation, valid contract, and 2–3 months of remittance slips. Most banks apply a 20–30% haircut on foreign-sourced income. Consider entering 70–80% of your actual remittance for a more realistic approval estimate.',
+  };
+  if (msgs[type]) {
+    note.textContent = msgs[type];
+    note.classList.remove('hidden');
+  } else {
+    note.classList.add('hidden');
+  }
+}
+
+function brokerCTAClick() {
+  // Collect current result context to pass to the waitlist page
+  const price   = parseVal('prop-price') || '';
+  const income  = parseVal('salary') + parseVal('spouse-salary') + parseVal('other-income');
+  const verdictEl = document.getElementById('vb-tag');
+  const verdict = verdictEl ? verdictEl.textContent : '';
+  const dtiEl   = document.getElementById('r-dti');
+  const dsr     = dtiEl ? dtiEl.textContent.replace('%','').trim() : '';
+
+  // Determine path from current verdict class
+  const banner  = document.getElementById('verdict-banner');
+  let path = 'approved';
+  if (banner) {
+    if (banner.classList.contains('danger')) path = 'declined';
+    else if (banner.classList.contains('warn')) path = 'marginal';
+  }
+
+  const payload = {
+    p: path,                                    // path: approved | marginal | declined
+    v: price   ? Math.round(price)   : 0,       // property value
+    i: income  ? Math.round(income)  : 0,       // monthly income
+    r: dsr     ? parseFloat(dsr)     : 0,       // dsr ratio
+    t: Date.now(),                              // timestamp
+  };
+
+  const encoded = btoa(JSON.stringify(payload));
+  window.location.href = 'ph-waitlist.html?d=' + encoded;
+}
+
+function onLoanTypeChange() {
+  const type = getSelectedPill('loan-type-group');
+  const fixedField = document.getElementById('fixed-period-field');
+  const notes = {
+    bank: 'Bank loans reprice after the fixed period. Typical current rates: 6.5–7.5% fixed.',
+    pagibig: 'Pag-IBIG rates are fixed for the full term: 6.0% (1yr) to 6.5% (30yr). Max loan: ₱6.5M.',
+    inhouse: 'In-house financing is easier to qualify for but significantly more expensive — typically 14–18% p.a.',
+  };
+  document.getElementById('loan-type-note').textContent = notes[type] || '';
+  fixedField.classList.toggle('hidden', type !== 'bank');
+  updateRateDisplays();
+  step3Update();
+}
+
+function updateRateDisplays() {
+  const type = getSelectedPill('loan-type-group') || 'bank';
+  const rates = DEFAULT_RATES[type] || DEFAULT_RATES.bank;
+  document.getElementById('ropt-rate').textContent = rates.optimistic[0] + '%';
+  document.getElementById('rbase-rate').textContent = rates.base[1] + '%';
+  document.getElementById('rstress-rate').textContent = rates.stress[1] + '%';
+
+  const scen = getSelectedScenario();
+  const scen_rates = rates[scen] || rates.base;
+  const notes = {
+    optimistic: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates improve)`,
+    base: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates stable)`,
+    stress: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (BSP rate spike)`,
+  };
+  document.getElementById('rate-scenario-note').textContent = notes[scen] || '';
+}
+
+function step3Update() {
+  updateRateDisplays();
+
+  const price = parseVal('prop-price');
+  const dpPct = getDPPct();
+  const loan = price * (1 - dpPct / 100);
+  const salary = parseVal('salary');
+  const spouse = parseVal('spouse-salary');
+  const other = parseVal('other-income');
+  const totalGross = salary + spouse + other;
+
+  if (loan <= 0 || totalGross <= 0) {
+    document.getElementById('step3-derived').classList.add('hidden');
+    return;
+  }
+
+  const type = getSelectedPill('loan-type-group') || 'bank';
+  const scen = getSelectedScenario();
+  const term = parseInt(getSelectedPill('loan-term-group') || '20');
+  const rates = (DEFAULT_RATES[type] || DEFAULT_RATES.bank)[scen];
+  const initRate = rates[0];
+  const repricedRate = rates[1];
+
+  const existingLoans = parseVal('existing-loans') || 0;
+  const fixedAmort = monthlyPayment(loan, initRate, term);
+  const repricedAmort = monthlyPayment(loan, repricedRate, term);
+  // Total DSR = (new amort + existing loans) / gross — what banks actually check
+  const totalDSI = fixedAmort + existingLoans;
+  const dti = totalDSI / totalGross * 100;
+
+  document.getElementById('d-amort-fixed').textContent = '₱' + fmt(Math.round(fixedAmort));
+  document.getElementById('d-amort-repriced').textContent = '₱' + fmt(Math.round(repricedAmort));
+
+  const dtiEl = document.getElementById('d-dti-preview');
+  dtiEl.textContent = dti.toFixed(1) + '%' + (existingLoans > 0 ? ' (combined)' : '');
+  dtiEl.style.color = dti > 40 ? 'var(--red)' : dti > 30 ? 'var(--orange)' : 'var(--green)';
+
+  document.getElementById('step3-derived').classList.remove('hidden');
+
+  const callout = document.getElementById('step3-callout');
+  const existingNote = existingLoans > 0 ? ` (includes ₱${fmtM(existingLoans)}/mo in existing loans)` : '';
+  if (dti > 40) {
+    callout.className = 'callout danger';
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Total debt too high:</strong> Combined obligations are ${dti.toFixed(0)}% of gross income${existingNote}. Banks cap this at 40%. Reduce loan size, increase down payment, or pay off existing loans first.</span>`;
+    callout.classList.remove('hidden');
+  } else if (dti > 30) {
+    callout.className = 'callout warn';
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Borderline:</strong> ${dti.toFixed(0)}% total debt ratio${existingNote}. Manageable but tight.</span>`;
+    callout.classList.remove('hidden');
+  } else {
+    callout.classList.add('hidden');
+  }
+}
+
+// ─── FINANCIAL FUNCTIONS ──────────────────────────────────────────────────────
+function monthlyPayment(principal, annualRate, termYears) {
+  if (principal <= 0) return 0;
+  const r = annualRate / 100 / 12;
+  const n = termYears * 12;
+  if (r === 0) return principal / n;
+  return principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+function incomeTax(annualIncome) {
+  if (annualIncome <= 250000) return 0;
+  if (annualIncome <= 400000) return (annualIncome - 250000) * 0.15;
+  if (annualIncome <= 800000) return 22500 + (annualIncome - 400000) * 0.20;
+  if (annualIncome <= 2000000) return 102500 + (annualIncome - 800000) * 0.25;
+  if (annualIncome <= 8000000) return 402500 + (annualIncome - 2000000) * 0.30;
+  return 2202500 + (annualIncome - 8000000) * 0.35;
+}
+
+function mandatoryDeductions(monthlySalary) {
+  const msc = Math.min(Math.max(monthlySalary, 4000), 30000);
+  const sss = msc * 0.045;
+  const ph = Math.min(monthlySalary, 100000) * 0.025;
+  const pi = Math.min(monthlySalary * 0.02, 200);
+  return sss + ph + pi;
+}
+
+function netTakeHome(grossMonthly) {
+  if (grossMonthly <= 0) return 0;
+  const annualBasic = grossMonthly * 12;
+  const deductions = mandatoryDeductions(grossMonthly) * 12;
+  const taxable = Math.max(0, annualBasic - deductions);
+  const tax = incomeTax(taxable);
+  return grossMonthly - mandatoryDeductions(grossMonthly) - tax / 12;
+}
+
+// ─── MAIN CALCULATE ──────────────────────────────────────────────────────────
+function calculate() {
+  if (!validateStep2()) { goStep(2); return; }
+
+  const price = parseVal('prop-price');
+  const dpPct = getDPPct();
+  const dp = price * dpPct / 100;
+  const loan = price - dp;
+
+  const loanType = getSelectedPill('loan-type-group') || 'bank';
+  const propType = getSelectedPill('prop-type-group') || 'condo';
+  const term = parseInt(getSelectedPill('loan-term-group') || '20');
+  const scen = getSelectedScenario();
+  const fixedPeriod = loanType === 'bank'
+    ? parseInt(getSelectedPill('fixed-period-group') || '3')
+    : term;
+
+  const rates = (DEFAULT_RATES[loanType] || DEFAULT_RATES.bank)[scen];
+  const initRate = rates[0];
+  const repricedRate = rates[1];
+
+  const salary = parseVal('salary');
+  const spouse = parseVal('spouse-salary');
+  const other = parseVal('other-income');
+  const living = parseVal('living-exp');
+  const existingLoans = parseVal('existing-loans') || 0;
+  const rent = parseVal('current-rent') || price * 0.004;
+
+  const totalGross = salary + spouse + other;
+  const totalNet = netTakeHome(salary) + netTakeHome(spouse) + other;
+
+  // Accurate closing costs
+  const cc = computeClosingCosts(price, loan, loanType);
+  const closingCosts = cc.total;
+
+  const fixedAmort = monthlyPayment(loan, initRate, term);
+  const repricedAmort = monthlyPayment(loan, repricedRate, term);
+  // DTI includes existing loan obligations — this is what banks actually compute
+  const dti         = (fixedAmort + existingLoans) / totalGross * 100;
+  const dtiRepriced = (repricedAmort + existingLoans) / totalGross * 100;
+
+  // Accurate monthly ongoing costs (year-1 snapshot)
+  const monthlyRPT  = price * RPT_RATE / 12;
+  const monthlyFire = price * FIRE_RATE / 12;
+  const monthlyMRI  = loan  * MRI_RATE  / 12;
+  const monthlyHOA  = loanType === 'pagibig' ? 1000 :
+                      propType === 'condo' ? 4000 : 1000;
+
+  // Buffer deducts existing loans — they compete for the same take-home
+  const monthlyBuffer = totalNet - fixedAmort - existingLoans - living - monthlyHOA - monthlyRPT - monthlyFire - monthlyMRI;
+
+  // Year-by-year schedule
+  const SALARY_GROWTH = 0.05;
+  const APPRECIATION = 0.05;
+  const INFLATION = 0.04;
+  const horizon = Math.max(term + 5, 25);
+
+  const rows = [];
+  let balance = loan;
+  let propValue = price;
+  // salary/spouse/other are monthly inputs — store as monthly throughout
+  const monthlySalaryBase = salary;
+  const monthlySpouseBase = spouse;
+  const monthlyOtherBase = other;
+  let totalInterest = 0;
+  let cumBuyCost = closingCosts + dp;
+  let cumRent = 0;
+  let rentMonthly = rent;
+
+  const AGE_BASE = parseInt(document.getElementById('age').value) || 30;
+
+  for (let yr = 1; yr <= horizon; yr++) {
+    const age = AGE_BASE + yr - 1;
+    const loanActive = balance > 1;
+    const isRepriced = loanType === 'bank' && yr > fixedPeriod && loanActive;
+
+    // All salary figures stay monthly; grow by salary growth rate each year
+    const gMonthlySalary = monthlySalaryBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
+    const gMonthlySpouse = monthlySpouseBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
+    const gMonthlyOther = monthlyOtherBase * Math.pow(1 + SALARY_GROWTH * 0.5, yr - 1);
+    const netMonthly = netTakeHome(gMonthlySalary) + netTakeHome(gMonthlySpouse) + gMonthlyOther;
+    // Annual equivalents for the schedule display
+    const gSalary = gMonthlySalary * 12;
+    const gSpouse = gMonthlySpouse * 12;
+
+    let currRate = initRate;
+    let moAmort = fixedAmort;
+
+    if (isRepriced) {
+      currRate = repricedRate;
+      const remMonths = (term - (yr - 1)) * 12;
+      if (remMonths > 0 && balance > 0) {
+        moAmort = monthlyPayment(balance, repricedRate, term - (yr - 1));
+      }
+    }
+    if (!loanActive) moAmort = 0;
+
+    let annInterest = 0, annPrincipal = 0;
+    let runBal = balance;
+    for (let m = 0; m < 12 && runBal > 0.01; m++) {
+      const mi = runBal * currRate / 100 / 12;
+      const mp = Math.max(0, Math.min(moAmort - mi, runBal));
+      annInterest += mi;
+      annPrincipal += mp;
+      runBal = Math.max(0, runBal - mp);
+    }
+    balance = runBal;
+    totalInterest += annInterest;
+
+    propValue *= (1 + APPRECIATION);
+    const equity = propValue - balance;
+
+    const annAmort  = moAmort * 12;
+    const inflFactor = Math.pow(1 + INFLATION, yr - 1);
+    const annLiving  = living * 12 * inflFactor;
+    const annHOA     = monthlyHOA * 12 * inflFactor;
+    const annRPT     = propValue * RPT_RATE;
+    const annFire    = propValue * FIRE_RATE;
+    const annMRI     = loanActive ? balance * MRI_RATE : 0;
+    // Existing loans assumed to reduce over time — linear paydown over 5yr assumption
+    const annExisting = existingLoans > 0 ? Math.max(0, existingLoans * 12 * (1 - (yr - 1) / 5)) : 0;
+    const netCF = netMonthly * 12 - annAmort - annExisting - annLiving - annHOA - annRPT - annFire - annMRI;
+
+    cumBuyCost += annAmort + annHOA + annRPT + annFire + annMRI;
+    cumRent += rentMonthly * 12;
+    rentMonthly *= 1.03;
+
+    let note = '';
+    if (yr === 1) note = 'Start';
+    else if (!loanActive) note = 'Paid off';
+    else if (isRepriced && yr === fixedPeriod + 1) note = 'Repriced';
+
+    rows.push({
+      yr, age, note,
+      grossSalary: Math.round(gSalary),       // annual
+      netAnnual: Math.round(netMonthly * 12), // annual take-home
+      moAmort: Math.round(moAmort),
+      annAmort: Math.round(annAmort),
+      annPrincipal: Math.round(annPrincipal),
+      annInterest: Math.round(annInterest),
+      balance: Math.round(balance),
+      propValue: Math.round(propValue),
+      equity: Math.round(equity),
+      netCF: Math.round(netCF),
+      isRepriced,
+      loanActive,
+      cumBuyCost: Math.round(cumBuyCost),
+      cumRent: Math.round(cumRent),
+    });
+  }
+
+  // ─── ① BANK APPROVAL GATE ─────────────────────────────────────────────────
+  // PH banks use TOTAL net DSR: (all loan payments) / net take-home ≤ 35%
+  // Existing loans are included — banks pull credit history and see all obligations
+  const netDSR         = (fixedAmort + existingLoans) / totalNet * 100;
+  const netDSRRepriced = (repricedAmort + existingLoans) / totalNet * 100;
+  const existingDSR    = existingLoans / totalNet * 100;
+  const MIN_NET_INCOME_PAGIBIG = 10000;
+  const savings = parseVal('savings') || 0;
+  const existingLoanNote = existingLoans > 0
+    ? ` (home loan ₱${fmtM(fixedAmort)} + existing ₱${fmtM(existingLoans)})`
+    : '';
+
+  const approvalReasons = [];
+  let approvalStatus = 'approved'; // 'approved' | 'marginal' | 'declined'
+
+  // Check 0: Existing loans pre-consume DSR headroom
+  if (existingLoans > 0) {
+    const headroom = Math.max(0, totalNet * 0.35 - existingLoans);
+    if (existingDSR >= 35) {
+      approvalReasons.push({ text: `Existing loans already use ${existingDSR.toFixed(0)}% of your take-home — no headroom left for a new home loan.`, type: 'fail' });
+      approvalStatus = 'declined';
+    } else {
+      approvalReasons.push({ text: `Existing loans use ${existingDSR.toFixed(0)}% of take-home (₱${fmt(existingLoans)}/mo). Max affordable home loan payment: ₱${fmt(Math.round(headroom))}/mo.`, type: existingDSR > 20 ? 'warn-item' : 'pass' });
+      if (existingDSR > 20 && approvalStatus === 'approved') approvalStatus = 'marginal';
+    }
+  }
+
+  // Check 1: Total Net DSR — includes existing loans (PH banks pull full credit history)
+  if (netDSR > 50) {
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — exceeds the 40% bank cap.`, type: 'fail' });
+    approvalStatus = 'declined';
+  } else if (netDSR > 35) {
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — borderline. Some banks accept up to 40%.`, type: 'warn-item' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+  } else {
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — within the 35% guideline.`, type: 'pass' });
+  }
+
+  // Check 2: Repriced DSR stress test
+  if (netDSRRepriced > 50) {
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — banks doing stress tests may decline on this.`, type: 'fail' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+  } else if (netDSRRepriced > 40) {
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — tight but most banks will still process.`, type: 'warn-item' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+  } else {
+    approvalReasons.push({ text: `Even after repricing to ${repricedRate}%, total DSR stays at ${netDSRRepriced.toFixed(0)}% — passes stress test.`, type: 'pass' });
+  }
+
+  // Check 3: Loan amount vs income — most banks require loan ≤ 80× monthly gross
+  const loanToIncome = loan / totalGross;
+  if (loanToIncome > 100) {
+    approvalReasons.push({ text: `Loan is ${loanToIncome.toFixed(0)}× your monthly income. Banks typically cap at 80–100×.`, type: 'fail' });
+    approvalStatus = 'declined';
+  } else if (loanToIncome > 80) {
+    approvalReasons.push({ text: `Loan is ${loanToIncome.toFixed(0)}× your monthly income — at the upper limit banks allow.`, type: 'warn-item' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+  } else {
+    approvalReasons.push({ text: `Loan-to-income ratio is ${loanToIncome.toFixed(0)}× — well within bank guidelines.`, type: 'pass' });
+  }
+
+  // Check 4: Pag-IBIG minimum income
+  if (loanType === 'pagibig' && totalNet < MIN_NET_INCOME_PAGIBIG) {
+    approvalReasons.push({ text: `Pag-IBIG requires minimum net monthly income of ₱10,000. Your take-home is ₱${fmt(Math.round(totalNet))}.`, type: 'fail' });
+    approvalStatus = 'declined';
+  }
+
+  // Check 5: Down payment adequacy
+  if (dpPct < 10) {
+    approvalReasons.push({ text: `Down payment below 10% — most banks require at least 10–20%.`, type: 'fail' });
+    approvalStatus = 'declined';
+  } else if (dpPct < 20) {
+    approvalReasons.push({ text: `Down payment of ${dpPct}% is accepted but expect a slightly higher rate and mandatory MRI.`, type: 'warn-item' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+  } else {
+    approvalReasons.push({ text: `${dpPct}% down payment — meets standard bank requirements.`, type: 'pass' });
+  }
+
+  // ─── ② SAVINGS ADEQUACY ──────────────────────────────────────────────────
+  const savingsAfterClosing = Math.max(0, savings - closingCosts - dp);
+  const savingsMonthsCoverage = monthlyBuffer > 0
+    ? Math.floor(savingsAfterClosing / fixedAmort)  // months of mortgage covered
+    : 0;
+  const savingsRunwayMonths = fixedAmort + living + monthlyHOA + monthlyRPT + monthlyFire + monthlyMRI > 0
+    ? Math.floor(savingsAfterClosing / (fixedAmort + living + monthlyHOA + monthlyRPT + monthlyFire + monthlyMRI))
+    : 999;
+
+  let savingsClass = 'ok', savingsDisplay, savingsNote;
+  if (savings === 0) {
+    savingsDisplay = 'Not entered';
+    savingsNote = 'Enter your savings above for a survival analysis';
+    savingsClass = 'warn';
+  } else if (savingsAfterClosing <= 0) {
+    savingsDisplay = '0 months';
+    savingsNote = `Savings (₱${fmtM(savings)}) are fully consumed by closing costs + down payment. No buffer left.`;
+    savingsClass = 'danger';
+  } else if (savingsRunwayMonths < 3) {
+    savingsDisplay = `${savingsRunwayMonths} month${savingsRunwayMonths !== 1 ? 's' : ''}`;
+    savingsNote = `Critical — less than 3 months of full expenses if income stopped.`;
+    savingsClass = 'danger';
+  } else if (savingsRunwayMonths < 6) {
+    savingsDisplay = `${savingsRunwayMonths} months`;
+    savingsNote = `Below the recommended 6-month emergency fund. Risky if you lose income.`;
+    savingsClass = 'warn';
+  } else {
+    savingsDisplay = `${savingsRunwayMonths} months`;
+    savingsNote = `After down payment + closing costs, ₱${fmtM(savingsAfterClosing)} remains — ${savingsRunwayMonths} months of full expenses.`;
+    savingsClass = 'ok';
+  }
+
+  // ─── ③ FORCED SALE / FINANCIAL BREAKING POINT ──────────────────────────
+  // Walk cumulative surplus/deficit. Starting savings = savingsAfterClosing.
+  // Each year: savings += netCF (annual). If savings < 0, forced sale year.
+  let runSavings = savingsAfterClosing;
+  let tightYear = null;    // first year monthly buffer < 3 months of amortization
+  let forcedSaleYear = null;
+  let forcedSaleAge = null;
+
+  for (const row of rows) {
+    runSavings += row.netCF; // netCF = annual surplus/deficit
+    const moBuffer = row.netCF / 12;
+    // "tight" = monthly buffer < 3 months mortgage coverage in savings
+    if (tightYear === null && moBuffer < 0) {
+      tightYear = row.yr;
+    }
+    if (forcedSaleYear === null && runSavings < 0 && savings > 0) {
+      forcedSaleYear = row.yr;
+      forcedSaleAge = row.age;
+    }
+  }
+
+  // Build timeline segments
+  const horizonYrs = rows.length;
+  const segments = rows.map(row => {
+    const moBuffer = row.netCF / 12;
+    if (!row.loanActive) return 'gray';
+    if (forcedSaleYear && row.yr >= forcedSaleYear) return 'red';
+    if (moBuffer < 0) return 'yellow';
+    return 'green';
+  });
+
+  // ─── VERDICT (informed by approval + forced sale + buffer) ───────────────
+  let verdictClass, tag, title, body;
+
+  // Hard decline conditions (ordered by severity)
+  const hardDecline = approvalStatus === 'declined' || monthlyBuffer < -totalNet * 0.2;
+  const hardDanger  = forcedSaleYear !== null;
+
+  if (hardDecline) {
+    verdictClass = 'danger';
+    if (approvalStatus === 'declined') {
+      tag   = 'BANK WILL LIKELY DECLINE';
+      title = 'This loan does not meet Philippine bank requirements';
+      body  = `Your net DSR is ${netDSR.toFixed(0)}% — Philippine banks approve loans where the monthly payment is at most 35% of take-home pay (₱${fmt(Math.round(totalNet))}). ` +
+              `To qualify: reduce the loan amount, increase your down payment, or extend the loan term. See "What would it take?" below.`;
+    } else {
+      tag   = 'CASH FLOW INSOLVENT';
+      title = 'Your monthly expenses exceed your take-home pay from day one';
+      body  = `After your mortgage payment and all expenses, you are short ₱${fmt(Math.round(-monthlyBuffer))}/month. ` +
+              `This is not a savings problem — your income is insufficient for this property at current expenses.`;
+    }
+  } else if (hardDanger) {
+    verdictClass = 'danger';
+    tag   = 'FINANCIAL BREAKING POINT DETECTED';
+    title = `Savings exhausted by year ${forcedSaleYear} (age ${forcedSaleAge})`;
+    body  = `Even with ₱${fmtM(savings)} in savings, cumulative deficits exhaust your buffer by year ${forcedSaleYear}. ` +
+            `You may be forced to sell or default. Monthly buffer is ₱${fmt(Math.round(monthlyBuffer))} today ` +
+            `but deteriorates as expenses inflate. See the timeline below.`;
+  } else if (approvalStatus === 'marginal' || netDSRRepriced > 40 || monthlyBuffer < totalNet * 0.15) {
+    verdictClass = 'warn';
+    tag   = 'APPROVABLE — BUT TIGHT';
+    title = 'A bank will likely process this, but the margin is slim';
+    body  = `Net DSR is ${netDSR.toFixed(0)}% — within limits (max 35%). ` +
+            `After repricing to ${repricedRate}%, DSR rises to ${netDSRRepriced.toFixed(0)}%. ` +
+            `Monthly buffer: ₱${fmt(Math.round(monthlyBuffer))}. ` +
+            (netDSR > 30 ? `Consider a larger down payment or longer term to improve your approval odds.` : `A broker can help you find the bank with the best rate for your profile.`);
+  } else {
+    verdictClass = 'ok';
+    tag   = 'APPROVABLE AND AFFORDABLE';
+    title = 'This loan is within your means';
+    body  = `Net DSR is ${netDSR.toFixed(0)}% — well within the 35% bank guideline. Monthly buffer: ₱${fmt(Math.round(monthlyBuffer))}. ` +
+            `Even at repriced rate (${repricedRate}%), DSR stays at ${netDSRRepriced.toFixed(0)}%.` +
+            (savingsRunwayMonths >= 6 ? ` Your savings cover ${savingsRunwayMonths} months of full expenses.` : '');
+  }
+
+  // ─── POPULATE DOM ─────────────────────────────────────────────────────────
+
+  // ① Bank Approval Gate
+  const gateEl = document.getElementById('bank-gate');
+  gateEl.className = 'bank-gate ' + approvalStatus;
+  gateEl.classList.remove('hidden');
+  const gateIcons = { approved: 'Pass', marginal: '!', declined: 'Fail' };
+  const gateTitles = {
+    approved: 'Bank Approval: Likely Approved',
+    marginal:  'Bank Approval: Borderline — May Need Negotiation',
+    declined:  'Bank Approval: Likely Declined',
+  };
+  const gateSubs = {
+    approved: 'Your income and loan amount meet Philippine bank underwriting guidelines.',
+    marginal:  'This loan is at the edge of approval criteria. A co-borrower, larger down payment, or longer term would help.',
+    declined:  'Most Philippine banks would decline this loan as structured. See reasons below.',
+  };
+  document.getElementById('bg-icon').textContent = gateIcons[approvalStatus];
+  document.getElementById('bg-title').textContent = gateTitles[approvalStatus];
+  document.getElementById('bg-sub').textContent   = gateSubs[approvalStatus];
+  document.getElementById('bg-reasons').innerHTML = approvalReasons
+    .map(r => `<div class="bg-reason ${r.type}">${r.text}</div>`)
+    .join('');
+
+  // ② Decision Engine KPIs
+  const deEl = document.getElementById('decision-engine');
+  deEl.classList.remove('hidden');
+
+  // Approval KPI — set card status class + val color
+  const approvalLabels = { approved: 'Likely Approved', marginal: 'Borderline', declined: 'Likely Declined' };
+  const approvalCls    = { approved: 'ok', marginal: 'warn', declined: 'danger' };
+  const aKpiCls = approvalCls[approvalStatus];
+  document.getElementById('de-approval').className = 'de-kpi ' + aKpiCls;
+  document.getElementById('de-approval-val').textContent = approvalLabels[approvalStatus];
+  document.getElementById('de-approval-val').className   = 'de-val ' + aKpiCls;
+  document.getElementById('de-approval-note').textContent = `Net DSR: ${netDSR.toFixed(0)}% (max 35%)`;
+
+  // Breakpoint KPI
+  const bpEl = document.getElementById('de-breakpoint-val');
+  const bpCard = document.getElementById('de-breakpoint');
+  if (tightYear === null) {
+    bpCard.className   = 'de-kpi ok';
+    bpEl.textContent   = 'Positive throughout';
+    bpEl.className     = 'de-val ok';
+    document.getElementById('de-breakpoint-note').textContent = 'Income covers all expenses every year';
+  } else {
+    bpCard.className   = 'de-kpi warn';
+    bpEl.textContent   = `Tight from Year ${tightYear}`;
+    bpEl.className     = 'de-val warn';
+    document.getElementById('de-breakpoint-note').textContent = `Age ${AGE_BASE + tightYear - 1} — expenses begin exceeding income`;
+  }
+
+  // Savings Runway KPI
+  document.getElementById('de-runway').className = 'de-kpi ' + savingsClass;
+  document.getElementById('de-runway-val').textContent = savingsDisplay;
+  document.getElementById('de-runway-val').className   = 'de-val ' + savingsClass;
+  document.getElementById('de-runway-note').textContent = savingsNote;
+
+  // ③ Forced Sale Box — suppress if loan is already declined (moot)
+  const fsEl = document.getElementById('forced-sale-box');
+  if (forcedSaleYear !== null && savings > 0 && approvalStatus !== 'declined') {
+    fsEl.classList.remove('hidden');
+    document.getElementById('fsb-title').textContent =
+      `Savings exhausted in Year ${forcedSaleYear} — you may be forced to sell`;
+    document.getElementById('fsb-body').textContent =
+      `Starting with ₱${fmtM(savingsAfterClosing)} after purchase costs, cumulative annual deficits deplete your savings by year ${forcedSaleYear} (age ${forcedSaleAge}). ` +
+      `Unless income grows faster than modeled or expenses are reduced, you would need to sell the property or take on additional debt.`;
+
+    // Timeline bar
+    const greenYrs  = segments.filter(s => s === 'green').length;
+    const yellowYrs = segments.filter(s => s === 'yellow').length;
+    const redYrs    = segments.filter(s => s === 'red').length;
+    const grayYrs   = segments.filter(s => s === 'gray').length;
+    const total = segments.length;
+    const pct = n => (n / total * 100).toFixed(1) + '%';
+    document.getElementById('fsb-timeline').innerHTML = `
+      <div class="timeline-track">
+        ${greenYrs  > 0 ? `<div class="tl-seg green"  style="width:${pct(greenYrs)}">${greenYrs > 2 ? greenYrs + ' yrs' : ''}</div>` : ''}
+        ${yellowYrs > 0 ? `<div class="tl-seg yellow" style="width:${pct(yellowYrs)}">${yellowYrs > 2 ? yellowYrs + ' yrs' : ''}</div>` : ''}
+        ${redYrs    > 0 ? `<div class="tl-seg red"    style="width:${pct(redYrs)}">${redYrs > 2 ? redYrs + ' yrs' : ''}</div>` : ''}
+        ${grayYrs   > 0 ? `<div class="tl-seg gray"   style="width:${pct(grayYrs)}">${grayYrs > 2 ? grayYrs + ' yrs' : ''}</div>` : ''}
+      </div>
+      <div class="timeline-legend">
+        <span><span class="tl-dot" style="background:var(--green)"></span>Cash flow positive</span>
+        <span><span class="tl-dot" style="background:#f59e0b"></span>Monthly deficit (savings absorbing)</span>
+        <span><span class="tl-dot" style="background:var(--red)"></span>Savings exhausted — forced sale risk</span>
+        <span><span class="tl-dot" style="background:var(--gray-300)"></span>Post-loan</span>
+      </div>`;
+  } else if (tightYear !== null && approvalStatus !== 'declined') {
+    // Show timeline even without forced sale if there are tight years
+    fsEl.classList.remove('hidden');
+    fsEl.style.borderColor = '#fdba74';
+    fsEl.style.background  = 'var(--orange-pale)';
+    document.getElementById('fsb-title').style.color = 'var(--orange)';
+    document.getElementById('fsb-title').textContent = `Cash flow turns negative from Year ${tightYear}`;
+    document.getElementById('fsb-body').textContent =
+      savings > 0
+        ? `Your savings (₱${fmtM(savingsAfterClosing)} after purchase) can absorb the shortfall. But if expenses grow faster or income drops, the buffer thins quickly.`
+        : `Enter your savings above to see how long you can absorb this shortfall before a forced sale becomes a risk.`;
+    const greenYrs = tightYear - 1;
+    const badYrs   = horizonYrs - greenYrs;
+    const total = horizonYrs;
+    const pct = n => (n / total * 100).toFixed(1) + '%';
+    document.getElementById('fsb-timeline').innerHTML = `
+      <div class="timeline-track">
+        ${greenYrs > 0 ? `<div class="tl-seg green"  style="width:${pct(greenYrs)}">${greenYrs > 2 ? greenYrs + ' yrs' : ''}</div>` : ''}
+        <div class="tl-seg yellow" style="width:${pct(badYrs)}">${badYrs > 2 ? badYrs + ' yrs' : ''}</div>
+      </div>
+      <div class="timeline-legend">
+        <span><span class="tl-dot" style="background:var(--green)"></span>Cash flow positive</span>
+        <span><span class="tl-dot" style="background:#f59e0b"></span>Monthly deficit — savings needed</span>
+      </div>`;
+  } else {
+    fsEl.classList.add('hidden');
+  }
+
+  // Verdict (summary banner below the KPIs)
+  const icons = { ok: '✓', warn: '!', danger: '✕' };
+  document.getElementById('verdict-banner').className = 'verdict-banner ' + verdictClass;
+  document.getElementById('vb-icon').textContent = icons[verdictClass];
+  document.getElementById('vb-tag').textContent = tag;
+  document.getElementById('vb-title').textContent = title;
+  document.getElementById('vb-body').textContent = body;
+
+  // ④ Broker CTA
+  const ctaEl = document.getElementById('broker-cta');
+  ctaEl.classList.remove('hidden', 'warn-cta', 'redirect-cta');
+  if (approvalStatus === 'declined' || verdictClass === 'danger') {
+    ctaEl.classList.add('redirect-cta');
+    document.getElementById('bc-title').textContent = 'Not quite yet — but you\'re closer than you think';
+    document.getElementById('bc-sub').textContent   = 'A broker can show you properties within your actual budget and help you plan the path to your dream home.';
+    document.getElementById('bc-btn').textContent   = 'Show me what I can afford';
+  } else if (approvalStatus === 'marginal' || verdictClass === 'warn') {
+    ctaEl.classList.add('warn-cta');
+    document.getElementById('bc-title').textContent = 'You\'re close — a broker can help you cross the line';
+    document.getElementById('bc-sub').textContent   = 'The right bank and loan structure can make the difference. Get a free consultation with a verified PH real estate broker.';
+    document.getElementById('bc-btn').textContent   = 'Talk to a Broker';
+  } else {
+    document.getElementById('bc-title').textContent = 'Your numbers qualify — take the next step';
+    document.getElementById('bc-sub').textContent   = 'Connect with a verified broker to get pre-approved and start viewing properties. Most banks respond within 5 business days.';
+    document.getElementById('bc-btn').textContent   = 'Get Pre-Approved';
+  }
+
+  // ⑤ What Would It Take?
+  const witEl = document.getElementById('what-it-takes');
+  if (approvalStatus !== 'approved' || verdictClass === 'danger') {
+    witEl.classList.remove('hidden');
+    // Max affordable property at current income: amort = 30% net take-home
+    const maxAmort    = totalNet * 0.30;
+    const maxLoanAt30 = maxAmort > 0 ? maxAmort * (Math.pow(1 + initRate/100/12, term*12) - 1) / (initRate/100/12 * Math.pow(1 + initRate/100/12, term*12)) : 0;
+    const maxProperty = maxLoanAt30 / (1 - dpPct/100);
+    // Min income to qualify this loan: amort = 30% net, solve for gross
+    // Approximate: gross needed ≈ fixedAmort / 0.30 / 0.78 (tax factor for mid-range)
+    const minGross    = fixedAmort / 0.30 / 0.78;
+    // Months to save the DP gap
+    const dpGap       = Math.max(0, (dp + closingCosts) - savings);
+    const currentSurplus = Math.max(0, monthlyBuffer); // current monthly surplus
+    const monthsToSave = currentSurplus > 0 ? Math.ceil(dpGap / currentSurplus) : null;
+
+    document.getElementById('wit-grid').innerHTML = `
+      <div class="wit-card">
+        <div class="wc-label">Max property at your income</div>
+        <div class="wc-val">₱${fmtM(Math.round(maxProperty/100000)*100000)}</div>
+        <div class="wc-note">At ${dpPct}% down, ${term}-yr term, 30% net DSR</div>
+      </div>
+      <div class="wit-card">
+        <div class="wc-label">Min monthly income to qualify</div>
+        <div class="wc-val">₱${fmtM(Math.round(minGross/5000)*5000)}</div>
+        <div class="wc-note">For this exact property + loan structure</div>
+      </div>
+      <div class="wit-card">
+        <div class="wc-label">${dpGap > 0 ? 'Savings gap to close' : 'Savings sufficient'}</div>
+        <div class="wc-val">${dpGap > 0 ? '₱' + fmtM(dpGap) : 'Covered'}</div>
+        <div class="wc-note">${
+          dpGap <= 0 ? 'You have enough to cover down payment + closing costs' :
+          monthsToSave !== null ? `~${monthsToSave} months at your current monthly surplus` :
+          monthlyBuffer < 0 ? `Your expenses currently exceed take-home — clear existing debts or increase income before saving for this purchase` :
+          'Start saving your monthly surplus toward this gap'
+        }</div>
+      </div>`;
+
+    document.getElementById('wit-note').textContent =
+      `These are approximations. A broker or bank officer can give you an exact pre-qualification figure based on your complete financial documents.`;
+  } else {
+    witEl.classList.add('hidden');
+  }
+
+  // ⑥ Purchase Gap Alert
+  const pgEl = document.getElementById('purchase-gap');
+  const totalNeededToClose = dp + closingCosts;
+  if (savings > 0 && savings < totalNeededToClose) {
+    pgEl.classList.remove('hidden');
+    const gap = totalNeededToClose - savings;
+    document.getElementById('pg-title').textContent = `You need ₱${fmt(Math.round(gap))} more to close this purchase`;
+    document.getElementById('pg-body').textContent  =
+      `Completing this transaction requires ₱${fmt(Math.round(totalNeededToClose))} upfront — ` +
+      `₱${fmt(Math.round(dp))} down payment + ₱${fmt(Math.round(closingCosts))} in closing costs (DST, transfer tax, registration, notarial, bank fees). ` +
+      `Your savings of ₱${fmt(Math.round(savings))} cover ${((savings/totalNeededToClose)*100).toFixed(0)}% of this. ` +
+      `You need to save ₱${fmt(Math.round(gap))} more before you can sign the deed of sale.`;
+  } else if (savings === 0) {
+    pgEl.classList.add('hidden');
+  } else {
+    pgEl.classList.add('hidden');
+  }
+
+  // ─── Age-at-maturity warning ──────────────────────────────────────────────
+  // Add to approval reasons if loan matures above bank max age (typically 65)
+  const ageAtMaturity = AGE_BASE + term;
+  if (ageAtMaturity > 65) {
+    // This check runs after approvalReasons is already rendered — update gate
+    const extraReason = document.createElement('div');
+    extraReason.className = 'bg-reason warn-item';
+    extraReason.textContent = `At age ${AGE_BASE} with a ${term}-year term, you would be ${ageAtMaturity} at loan maturity. Some banks cap borrower age at loan end to 65. Consider a shorter term.`;
+    document.getElementById('bg-reasons').appendChild(extraReason);
+  }
+
+  // Summary chips
+  document.getElementById('summary-chips').innerHTML = [
+    `<span class="summary-chip">₱${fmtM(price)} property</span>`,
+    `<span class="summary-chip">${dpPct}% down (₱${fmtM(dp)})</span>`,
+    `<span class="summary-chip">₱${fmtM(loan)} loan</span>`,
+    `<span class="summary-chip">${term}-yr term</span>`,
+    `<span class="summary-chip">${initRate}% → ${repricedRate}% (${scen})</span>`,
+    `<span class="summary-chip">₱${fmtM(totalGross)}/mo income</span>`,
+    existingLoans > 0 ? `<span class="summary-chip" style="border-color:var(--amber);color:var(--amber)">₱${fmtM(existingLoans)}/mo existing loans</span>` : '',
+  ].filter(Boolean).join('');
+
+  // Helper to set metric bar class
+  function setMetricBar(id, cls) {
+    const el = document.getElementById(id);
+    if (el) el.className = 'metric-bar ' + cls;
+  }
+
+  // Metrics with plain-English explanations
+  const fixedClass = dti > 40 ? 'danger' : dti > 30 ? 'warn' : 'ok';
+  setMetricBar('mb-fixed', fixedClass);
+  const amortEl = document.getElementById('r-amort-fixed');
+  amortEl.textContent = '₱' + fmt(Math.round(fixedAmort));
+  amortEl.className = 'm-val ' + fixedClass;
+  document.getElementById('r-amort-fixed-sub').textContent = `${initRate}% rate, ${term} yrs`;
+  document.getElementById('r-amort-fixed-explain').textContent =
+    dti > 40 ? `That's more than 40% of your income — banks will likely decline this loan.` :
+    dti > 30 ? `That's ${dti.toFixed(0)}% of your gross income. Manageable, but leaves little room if anything changes.` :
+    `That's ${dti.toFixed(0)}% of your gross income — a comfortable amount most banks will approve.`;
+
+  const repricedClass = dtiRepriced > 40 ? 'danger' : dtiRepriced > 30 ? 'warn' : 'ok';
+  setMetricBar('mb-repriced', repricedClass);
+  document.getElementById('r-amort-repriced').textContent = '₱' + fmt(Math.round(repricedAmort));
+  document.getElementById('r-amort-repriced').className = 'm-val ' + repricedClass;
+  document.getElementById('r-amort-repriced-sub').textContent =
+    loanType === 'bank' ? `After year ${fixedPeriod} at ${repricedRate}%` : `Fixed at ${initRate}% full term`;
+  const repricedDiff = Math.round(repricedAmort - fixedAmort);
+  document.getElementById('r-amort-repriced-explain').textContent =
+    loanType !== 'bank' ? `Your rate is fixed for the full loan — no surprise increases.` :
+    repricedDiff > 0
+      ? `Your payment goes up by ₱${fmt(repricedDiff)}/mo after year ${fixedPeriod}. Plan for this.`
+      : `Your payment actually decreases after repricing — a good scenario.`;
+
+  const dtiClass = dti > 40 ? 'danger' : dti > 30 ? 'warn' : 'ok';
+  setMetricBar('mb-dti', dtiClass);
+  document.getElementById('r-dti').textContent = dti.toFixed(1) + '%';
+  document.getElementById('r-dti').className = 'm-val ' + dtiClass;
+  const dtiBar = document.getElementById('r-dti-bar');
+  dtiBar.style.width = Math.min(dti, 100) + '%';
+  dtiBar.style.background = dti > 40 ? 'var(--red)' : dti > 30 ? 'var(--orange)' : 'var(--green)';
+  document.getElementById('r-dti-explain').textContent =
+    `For every ₱100 you earn, ₱${dti.toFixed(0)} goes to your loan payment. ` +
+    (dti <= 30 ? `Banks want this below 35% — you're in good shape.` :
+     dti <= 40 ? `This is borderline. A larger down payment or longer term would help.` :
+     `This is too high. Most banks require below 40%.`);
+
+  const bufClass = monthlyBuffer < 0 ? 'danger' : monthlyBuffer < totalGross * 0.1 ? 'warn' : 'ok';
+  setMetricBar('mb-buffer', bufClass);
+  document.getElementById('r-buffer').textContent = (monthlyBuffer < 0 ? '-' : '') + '₱' + fmt(Math.abs(Math.round(monthlyBuffer)));
+  document.getElementById('r-buffer').className = 'm-val ' + bufClass;
+  // Check if future years turn negative (due to inflation outpacing salary growth)
+  const futureNegRow = rows.find(r => r.netCF < 0);
+  let bufExplain;
+  if (monthlyBuffer < 0) {
+    bufExplain = `You'd be spending more than you earn from day one. This loan is not sustainable at current expenses.`;
+  } else if (futureNegRow && futureNegRow.yr <= term) {
+    bufExplain = `Positive now, but the chart below shows this turns negative around year ${futureNegRow.yr} as living costs (inflating 4%/yr) grow faster than your salary. Plan ahead.`;
+  } else if (monthlyBuffer < totalGross * 0.1) {
+    bufExplain = `Very tight. Any unexpected expense — hospital, car repair — could put you at risk.`;
+  } else {
+    bufExplain = `This is money left over each month for savings, emergencies, or spending.`;
+  }
+  document.getElementById('r-buffer-explain').textContent = bufExplain;
+
+  const interestPct = (totalInterest / loan * 100).toFixed(0);
+
+  // Interest cost row
+  document.getElementById('r-interest').textContent = '₱' + fmt(Math.round(totalInterest));
+  document.getElementById('r-interest-sub').textContent = `${interestPct}% of your loan amount — the cost of borrowing over ${term} years`;
+  document.getElementById('r-interest-explain').textContent =
+    `For every ₱100 you borrow, you pay back ₱${(100 + totalInterest/loan*100).toFixed(0)} total. Paying even ₱1,000 extra per month against principal could save you years of interest.`;
+  // Interest bar shows interest as % of total repayment
+  const intBarPct = Math.min(100, totalInterest / (loan + totalInterest) * 100);
+  document.getElementById('eq-int-bar').style.width = intBarPct.toFixed(0) + '%';
+
+  // Equity hero
+  if (rows.length >= 10) {
+    const eq10 = rows[9].equity;
+    const propVal10 = rows[9].propValue;
+    const bal10 = rows[9].balance;
+    const equityPct = Math.round(eq10 / propVal10 * 100);
+    document.getElementById('r-equity10').textContent = '₱' + fmt(eq10);
+    document.getElementById('r-equity10-sub').textContent =
+      `${equityPct}% of property owned — value ₱${fmtM(propVal10)}, balance ₱${fmtM(bal10)}`;
+    document.getElementById('r-equity10-explain').textContent =
+      `In 10 years, you own ${equityPct}% of a property worth ₱${fmtM(propVal10)}. If you sold at that point, you would walk away with approximately ₱${fmtM(eq10)} after clearing the remaining loan.`;
+    // Update SVG equity fill proportional to ownership %
+    const fillEl = document.getElementById('eq-fill-rect');
+    if (fillEl) fillEl.setAttribute('opacity', (0.10 + equityPct / 200).toFixed(2));
+    const pctLabel = document.getElementById('eq-pct-label');
+    if (pctLabel) pctLabel.textContent = equityPct + '% yours';
+  }
+
+  // Years paid metric (Chapter 4)
+  const currentYear = new Date().getFullYear();
+  document.getElementById('r-years-paid').textContent = term + ' years';
+  document.getElementById('r-years-paid-sub').textContent =
+    `Loan fully paid in ${currentYear + term} — when you're ${AGE_BASE + term} years old`;
+
+  // Buy vs Rent — table + narrative
+  // ─── TOTAL COST BREAKDOWN ────────────────────────────────────────────────
+  const totalMRI   = rows.reduce((s, r) => s + (r.loanActive ? r.balance * MRI_RATE : 0), 0);
+  const totalFire  = rows.slice(0, term).reduce((s, r) => s + r.propValue * FIRE_RATE, 0);
+  const totalRPT   = rows.slice(0, term).reduce((s, r) => s + r.propValue * RPT_RATE, 0);
+  const totalHOA   = monthlyHOA * 12 * term;  // simplified; actual inflated in rows
+  const grandTotal = loan + totalInterest + closingCosts + totalMRI + totalFire + totalRPT + totalHOA;
+  const interestRatio = (totalInterest / loan * 100).toFixed(0);
+
+  document.getElementById('tcb-headline').innerHTML =
+    `For a ₱${fmtM(loan)} loan, here is what you will <em>actually</em> pay over ${term} years:` +
+    `<span class="tcb-total">₱${fmt(Math.round(grandTotal))}</span>`;
+
+  document.getElementById('tcb-breakdown').innerHTML = [
+    { label: 'Loan Principal (what you borrow)',         amt: loan,           cls: '' },
+    { label: `Interest (${interestRatio}% of principal)`, amt: totalInterest,  cls: 'highlight' },
+    { label: 'Closing Costs (DST, transfer, fees)',      amt: closingCosts,   cls: '' },
+    { label: `MRI — Mortgage Insurance (${term} yrs)`,  amt: totalMRI,       cls: '' },
+    { label: `Fire Insurance (${term} yrs)`,            amt: totalFire,      cls: '' },
+    { label: `Real Property Tax (${term} yrs)`,         amt: totalRPT,       cls: '' },
+    { label: `HOA / Condo Dues (${term} yrs)`,          amt: totalHOA,       cls: '' },
+  ].map(r => `<div class="tcb-row ${r.cls}">
+    <span class="tcb-item">${r.label}</span>
+    <span class="tcb-amt">₱${fmt(Math.round(r.amt))}</span>
+  </div>`).join('');
+
+  document.getElementById('tcb-note').textContent =
+    `Most people are surprised that interest alone is ₱${fmtM(Math.round(totalInterest))} — ` +
+    `${interestRatio}% on top of what you borrowed. ` +
+    `This is why paying extra principal early has a huge effect: every ₱1,000 extra today saves ₱${(initRate/100 * term / 2).toFixed(1)}× in future interest.` +
+    ` Down payment and closing costs of ₱${fmtM(Math.round(dp + closingCosts))} are needed upfront before you get the keys.`;
+
+  const bvrYears = [5, 10, 15, 20, term];
+  const bvrIds = ['5', '10', '15', '20', 'end'];
+  let firstBuyWinYear = null;
+  bvrYears.forEach((y, i) => {
+    const row = rows[Math.min(y - 1, rows.length - 1)];
+    if (!row) return;
+    const buyV = row.cumBuyCost - (row.propValue - price);
+    const rentV = row.cumRent;
+    const id = bvrIds[i];
+    document.getElementById('bvr-buy-' + id).textContent = '₱' + fmtM(buyV);
+    document.getElementById('bvr-rent-' + id).textContent = '₱' + fmtM(rentV);
+    const winner = document.getElementById('bvr-w-' + id);
+    const buyWins = buyV < rentV;
+    winner.textContent = buyWins ? 'Buy' : 'Rent';
+    winner.className = buyWins ? 'good' : 'bad';
+    if (buyWins && firstBuyWinYear === null) firstBuyWinYear = y;
+  });
+
+  // BVR narrative
+  const currentRentDisplay = fmt(Math.round(parseVal('current-rent') || price * 0.004));
+  let bvrNarrative;
+  if (firstBuyWinYear === null) {
+    bvrNarrative = `Based on your numbers, <strong>renting is cheaper</strong> throughout the entire loan period. This doesn't mean you shouldn't buy — owning provides stability and you build equity — but purely on cost, renting wins here.`;
+  } else if (firstBuyWinYear <= 5) {
+    bvrNarrative = `<strong>Buying becomes cheaper after just ${firstBuyWinYear} years</strong>. After that, you're building equity while your renting neighbors keep paying ₱${currentRentDisplay}/mo with nothing to show for it at the end.`;
+  } else {
+    bvrNarrative = `Renting is cheaper for the first ${firstBuyWinYear - 1} years. <strong>Buying becomes the better financial choice from year ${firstBuyWinYear} onwards</strong> — the break-even point when your property appreciation and equity start to outweigh the cost of borrowing.`;
+  }
+  document.getElementById('bvr-narrative').innerHTML = bvrNarrative;
+
+  // Chart narratives
+  const breakEvenRow = rows.find(r => r.propValue > r.balance + r.balance * 0.1);
+  document.getElementById('chart-balance-narrative').textContent =
+    breakEvenRow
+      ? `The blue line (loan) falls as you pay it down. The green line (property) grows with 5%/yr appreciation. You own more than you owe from the start — this gap is your growing equity.`
+      : `The blue line (loan) and green line (property value) show how your wealth picture changes each year.`;
+
+  const cfNegYears = rows.filter(r => r.netCF < 0).length;
+  const cfFirstNeg = rows.find(r => r.netCF < 0);
+  const cfAllPos = cfNegYears === 0;
+  const cfAllNeg = rows.every(r => r.netCF < 0);
+  let cfNarrative;
+  if (cfAllPos) {
+    cfNarrative = `Every year shows positive cash flow — your income (growing at 5%/yr) comfortably covers all expenses throughout the loan. Green is good.`;
+  } else if (cfAllNeg) {
+    cfNarrative = `Your expenses (loan + living costs inflating at 4%/yr) exceed your projected income every year. This is a serious warning — consider a lower loan amount or reducing living costs.`;
+  } else if (cfFirstNeg && cfFirstNeg.yr > 1) {
+    cfNarrative = `Cash flow turns negative from year ${cfFirstNeg.yr} onward. This happens when living expense inflation (4%/yr) outpaces salary growth. Plan to save aggressively in the early years.`;
+  } else {
+    const firstPos = rows.find(r => r.netCF >= 0);
+    cfNarrative = `Cash flow is negative early on but improves as your salary grows. It turns positive from year ${firstPos ? firstPos.yr : '?'} onward.`;
+  }
+  document.getElementById('chart-cashflow-narrative').textContent = cfNarrative;
+
+  // Charts
+  renderCharts(rows, term, fixedPeriod);
+
+  // Amort table — slim columns only (detail cols hidden by default)
+  const tbody = document.getElementById('amort-tbody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    if (row.isRepriced && row.note === 'Repriced') tr.classList.add('repriced');
+    if (!row.loanActive) tr.classList.add('loan-end');
+    const moBuffer = Math.round(row.netCF / 12);
+    tr.innerHTML = `
+      <td>${row.yr}</td>
+      <td>${row.age}</td>
+      <td class="col-detail note-col" style="font-size:10px;color:var(--gray-500)">${row.note}</td>
+      <td class="col-detail">₱${fmt(row.grossSalary)}</td>
+      <td class="col-detail">₱${fmt(row.netAnnual)}</td>
+      <td>₱${fmt(row.moAmort)}</td>
+      <td class="col-detail">₱${fmt(row.annAmort)}</td>
+      <td class="col-detail">₱${fmt(row.annPrincipal)}</td>
+      <td class="interest-col">₱${fmt(row.annInterest)}</td>
+      <td>₱${fmt(row.balance)}</td>
+      <td class="col-detail">₱${fmt(row.propValue)}</td>
+      <td class="equity-col">₱${fmt(row.equity)}</td>
+      <td class="${moBuffer < 0 ? 'neg' : ''}">${moBuffer < 0 ? '-' : ''}₱${fmt(Math.abs(moBuffer))}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // ─── SYNTHESIS BOX ───────────────────────────────────────────────────────
+  const synSignals = [];
+
+  // Signal 1: Bank approval
+  synSignals.push({
+    cls:   approvalStatus === 'approved' ? 'ok' : approvalStatus === 'marginal' ? 'warn' : 'danger',
+    icon:  approvalStatus === 'approved' ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#16a34a"/></svg>' : approvalStatus === 'marginal' ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#d97706"/></svg>' : '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#dc2626"/></svg>',
+    label: 'Bank Approval',
+    text:  approvalStatus === 'approved'
+      ? `Your net DSR of ${netDSR.toFixed(0)}% is within the 35% limit. Most Philippine banks will process this application.`
+      : approvalStatus === 'marginal'
+      ? `Net DSR is ${netDSR.toFixed(0)}% — borderline. You qualify but may need a larger down payment or co-borrower to secure the best rate.`
+      : `Net DSR is ${netDSR.toFixed(0)}% — above the 40% bank threshold. The loan as structured will likely be declined.`,
+  });
+
+  // Signal 2: Affordability
+  const bufClass2 = monthlyBuffer < 0 ? 'danger' : monthlyBuffer < totalNet * 0.1 ? 'warn' : 'ok';
+  synSignals.push({
+    cls:   bufClass2,
+    icon:  bufClass2 === 'ok' ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#16a34a"/></svg>' : bufClass2 === 'warn' ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#d97706"/></svg>' : '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#dc2626"/></svg>',
+    label: 'Monthly Cash Flow',
+    text:  monthlyBuffer < 0
+      ? `After mortgage and expenses you are short ₱${fmt(Math.round(-monthlyBuffer))}/month. Your income needs to increase before this is sustainable.`
+      : monthlyBuffer < totalNet * 0.1
+      ? `You have ₱${fmt(Math.round(monthlyBuffer))}/month left after all expenses — tight. Any unexpected cost could create stress.`
+      : `You keep ₱${fmt(Math.round(monthlyBuffer))}/month after all expenses. That is a healthy cushion for emergencies and savings.`,
+  });
+
+  // Signal 3: Equity building
+  const eq10val = rows.length >= 10 ? rows[9].equity : 0;
+  synSignals.push({
+    cls:   'ok',
+    icon:  '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#16a34a"/></svg>',
+    label: 'Wealth Building',
+    text:  eq10val > 0
+      ? `In 10 years you will own ₱${fmtM(eq10val)} of real equity — money that is yours if you sell, refinance, or pass it on. Renting builds none of this.`
+      : `Property appreciation works for you every year. Even before the loan is paid, you are building an asset.`,
+  });
+
+  // Signal 4: Buy vs rent verdict
+  synSignals.push({
+    cls:   firstBuyWinYear === null ? 'warn' : firstBuyWinYear <= 10 ? 'ok' : 'warn',
+    icon:  firstBuyWinYear === null ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#d97706"/></svg>' : '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#16a34a"/></svg>',
+    label: 'Buy vs. Rent',
+    text:  firstBuyWinYear === null
+      ? `Renting is cheaper throughout the loan period at your current rent level. Buying still builds equity — but purely on cost, renting wins right now.`
+      : firstBuyWinYear <= 10
+      ? `Buying becomes the cheaper option in year ${firstBuyWinYear}. After that, every month you own instead of rent is money in your favour.`
+      : `Renting is cheaper for the first ${firstBuyWinYear - 1} years. Buying wins from year ${firstBuyWinYear} — plan to stay that long.`,
+  });
+
+  // ── Verdict mark ──────────────────────────────────────────────────────────
+  const svmMark  = document.getElementById('syn-verdict-mark');
+  const svmSvg   = document.getElementById('svm-svg');
+  const svmLabel = document.getElementById('svm-label');
+  const svmVerdict = document.getElementById('svm-verdict');
+
+  svmMark.className = 'syn-verdict-mark ' + verdictClass;
+
+  const svmData = {
+    ok: {
+      label:   'Yes — you can do this',
+      verdict: 'This is a sound financial decision based on your numbers.',
+      color:   '#16a34a',
+      // Large checkmark in circle
+      svg: `<circle cx="40" cy="40" r="36" stroke="#16a34a" stroke-width="3" fill="#f0fdf4"/>
+            <path d="M24 40 L34 52 L56 28" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+    },
+    warn: {
+      label:   'Almost — a few things to watch',
+      verdict: 'Approvable, but the margin is slim. Get professional advice first.',
+      color:   '#d97706',
+      // Exclamation in circle
+      svg: `<circle cx="40" cy="40" r="36" stroke="#d97706" stroke-width="3" fill="#fffbeb"/>
+            <rect x="37" y="20" width="6" height="26" rx="3" fill="#d97706"/>
+            <circle cx="40" cy="56" r="4" fill="#d97706"/>`,
+    },
+    danger: {
+      label:   'Not yet — but not impossible',
+      verdict: 'The numbers need to change before this becomes viable.',
+      color:   '#dc2626',
+      // X in circle
+      svg: `<circle cx="40" cy="40" r="36" stroke="#dc2626" stroke-width="3" fill="#fef2f2"/>
+            <path d="M26 26 L54 54 M54 26 L26 54" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>`,
+    },
+  };
+
+  const svm = svmData[verdictClass] || svmData.warn;
+  svmSvg.innerHTML    = svm.svg;
+  svmLabel.textContent   = svm.label;
+  svmVerdict.textContent = svm.verdict;
+
+  document.getElementById('syn-signals').innerHTML = synSignals.map(s => `
+    <div class="syn-signal ${s.cls}">
+      <div class="syn-sig-icon">${s.icon}</div>
+      <div class="syn-sig-body">
+        <div class="syn-sig-label">${s.label}</div>
+        <div class="syn-sig-text">${s.text}</div>
+      </div>
+    </div>`).join('');
+
+  // Conclusion paragraph
+  const synConclusionMap = {
+    ok:     `<strong>Overall: a well-structured decision.</strong> Your income supports this loan, the equity builds over time, and your cash flow stays positive. The main thing to manage is the rate repricing in year ${fixedPeriod} — make sure you have a plan for when the payment changes.`,
+    warn:   `<strong>Overall: possible, but needs attention.</strong> The loan is approvable but the margins are tight. Before you commit, increase your down payment if you can, or explore a longer term to lower the monthly payment. Talk to a broker about structuring this for the best rate.`,
+    danger: `<strong>Overall: not ready yet — but not far off.</strong> The biggest blockers are ${approvalStatus === 'declined' ? 'income vs. loan size' : 'cash flow after expenses'}. The "What would it take?" section above shows exactly what needs to change. This is a when, not a never.`,
+  };
+  document.getElementById('syn-conclusion').innerHTML = synConclusionMap[verdictClass] || synConclusionMap.warn;
+
+  // Synthesis CTA
+  const synBtn = document.getElementById('syn-cta');
+  const synNote = document.getElementById('syn-cta-note');
+  if (verdictClass === 'ok') {
+    synBtn.textContent = 'Get Pre-Approved';
+    synBtn.className   = 'syn-cta';
+    synNote.textContent = 'Connect with a verified broker — free, no obligation';
+  } else if (verdictClass === 'warn') {
+    synBtn.textContent = 'Talk to a Broker';
+    synBtn.className   = 'syn-cta warn';
+    synNote.textContent = 'A broker can help you restructure this loan to qualify';
+  } else {
+    synBtn.textContent = 'Show me what I can afford';
+    synBtn.className   = 'syn-cta neutral';
+    synNote.textContent = 'Re-run with your maximum affordable property';
+  }
+
+  // Show results
+  // Reset amort table to slim mode on each new calculation
+  const amortTableEl = document.getElementById('amort-table');
+  if (amortTableEl) {
+    amortTableEl.classList.remove('show-detail');
+    const toggleBtn = document.querySelector('.toggle-detail-btn');
+    if (toggleBtn) toggleBtn.textContent = 'Show all columns';
+  }
+
+  document.getElementById('results').style.display = 'block';
+  [1, 2, 3].forEach(i => document.getElementById('step-' + i).classList.add('hidden'));
+  ['sn-1','sn-2','sn-3'].forEach((id, i) => {
+    document.getElementById(id).className = 'step-num done';
+    document.getElementById(id).textContent = '';
+    document.getElementById('sl-' + (i+1)).className = 'step-label done';
+  });
+  ['line-1','line-2'].forEach(id => {
+    document.getElementById(id).className = 'step-line done';
+  });
+
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // ─── POPULATE STICKY SIDEBAR ─────────────────────────────────────────────
+  // Verdict card
+  const rsbVerdictCard = document.getElementById('rsb-verdict-card');
+  rsbVerdictCard.className = 'rsb-card rsb-verdict ' + verdictClass;
+  document.getElementById('rsb-verdict-tag').textContent = tag;
+  document.getElementById('rsb-verdict-title').textContent = title;
+
+  // Monthly payment
+  document.getElementById('rsb-payment-val').textContent = '₱' + fmt(Math.round(fixedAmort));
+  document.getElementById('rsb-payment-sub').textContent =
+    `${initRate}% fixed · ${term} yrs` +
+    (loanType === 'bank' ? ` · ₱${fmt(Math.round(repricedAmort))} after yr ${fixedPeriod}` : '');
+
+  // KPIs
+  const rsbApproval = document.getElementById('rsb-approval');
+  rsbApproval.textContent = approvalStatus === 'approved' ? 'Likely Approved' : approvalStatus === 'marginal' ? 'Borderline' : 'Likely Declined';
+  rsbApproval.className = 'rsb-kpi-val ' + (approvalStatus === 'approved' ? 'ok' : approvalStatus === 'marginal' ? 'warn' : 'danger');
+
+  const rsbCF = document.getElementById('rsb-cashflow');
+  if (tightYear === null) {
+    rsbCF.textContent = 'Positive throughout';
+    rsbCF.className = 'rsb-kpi-val ok';
+  } else {
+    rsbCF.textContent = `Tight from Yr ${tightYear}`;
+    rsbCF.className = 'rsb-kpi-val warn';
+  }
+
+  const rsbRunway = document.getElementById('rsb-runway');
+  rsbRunway.textContent = savingsDisplay;
+  rsbRunway.className = 'rsb-kpi-val ' + savingsClass;
+
+  if (rows.length >= 10) {
+    document.getElementById('rsb-equity').textContent = '₱' + fmtM(rows[9].equity);
+  }
+  document.getElementById('rsb-interest').textContent = '₱' + fmtM(Math.round(totalInterest));
+
+  // CTA
+  const rsbBtn = document.getElementById('rsb-cta-btn');
+  const rsbSub = document.getElementById('rsb-cta-sub');
+  if (approvalStatus === 'declined' || verdictClass === 'danger') {
+    rsbBtn.textContent = 'Show me what I can afford';
+    rsbBtn.className = 'rsb-cta';
+    rsbSub.textContent = 'Re-run the calculator with your max affordable property';
+  } else if (approvalStatus === 'marginal' || verdictClass === 'warn') {
+    rsbBtn.textContent = 'Talk to a Broker';
+    rsbBtn.className = 'rsb-cta warn-cta';
+    rsbSub.textContent = 'A broker can help you structure this loan to qualify';
+  } else {
+    rsbBtn.textContent = 'Get Pre-Approved';
+    rsbBtn.className = 'rsb-cta';
+    rsbSub.textContent = 'Most banks respond within 5 business days';
+  }
+
+  // ─── STICKY MOBILE ACTION BAR ─────────────────────────────────────────────
+  const mabDot    = document.getElementById('mab-dot');
+  const mabStatus = document.getElementById('mab-status-text');
+  const mabPay    = document.getElementById('mab-payment');
+  const mabSub    = document.getElementById('mab-payment-sub');
+  const mabCta    = document.getElementById('mab-cta');
+  const mabBar    = document.getElementById('mobile-action-bar');
+
+  // Status dot + label
+  const statusMap = { ok: 'Likely Approved', warn: 'Borderline', danger: verdictClass === 'danger' && approvalStatus === 'declined' ? 'Likely Declined' : 'Financial Risk' };
+  mabDot.className    = 'mab-dot ' + verdictClass;
+  mabStatus.textContent = statusMap[verdictClass] || 'See results';
+
+  // Payment
+  mabPay.textContent = '₱' + fmt(Math.round(fixedAmort));
+  mabSub.textContent = `${initRate}% · ${term} yrs`;
+
+  // CTA
+  if (verdictClass === 'danger' || approvalStatus === 'declined') {
+    mabCta.textContent  = 'What can I afford?';
+    mabCta.className    = 'mab-cta';
+  } else if (verdictClass === 'warn' || approvalStatus === 'marginal') {
+    mabCta.textContent  = 'Talk to a Broker';
+    mabCta.className    = 'mab-cta warn';
+  } else {
+    mabCta.textContent  = 'Get Pre-Approved';
+    mabCta.className    = 'mab-cta';
+  }
+
+  // Show bar + add bottom padding to results so content isn't hidden
+  mabBar.classList.remove('hidden-bar');
+  document.getElementById('results').classList.add('has-bar');
+}
+
+// ─── CHARTS ──────────────────────────────────────────────────────────────────
+function renderCharts(rows, term, fixedPeriod) {
+  const labels = rows.map(r => 'Yr ' + r.yr);
+  const chartDefaults = {
+    plugins: {
+      legend: { labels: { font: { size: 11 }, boxWidth: 12, padding: 12 } },
+      tooltip: {
+        callbacks: {
+          label: ctx => ' ₱' + (ctx.raw / 1000000 >= 1
+            ? (ctx.raw / 1000000).toFixed(2) + 'M'
+            : (ctx.raw / 1000).toFixed(0) + 'K')
+        }
+      }
+    }
+  };
+
+  if (chartBalance) chartBalance.destroy();
+  const ctx1 = document.getElementById('chart-balance').getContext('2d');
+  chartBalance = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Loan Balance',
+          data: rows.map(r => r.balance),
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37,99,235,0.08)',
+          fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 4,
+        },
+        {
+          label: 'Property Value',
+          data: rows.map(r => r.propValue),
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22,163,74,0.05)',
+          fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4,
+          borderDash: [5,3],
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: chartDefaults.plugins,
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, maxTicksLimit: 7 } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '₱' + (v/1000000).toFixed(1) + 'M' } }
+      }
+    }
+  });
+
+  if (chartCashflow) chartCashflow.destroy();
+  const ctx2 = document.getElementById('chart-cashflow').getContext('2d');
+  const cfs = rows.map(r => r.netCF / 12);
+  chartCashflow = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Monthly Net Cash Flow',
+        data: cfs,
+        backgroundColor: cfs.map(v => v >= 0 ? 'rgba(22,163,74,0.6)' : 'rgba(185,28,28,0.6)'),
+        borderColor: cfs.map(v => v >= 0 ? '#16a34a' : '#b91c1c'),
+        borderWidth: 0,
+        borderRadius: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' ₱' + Math.round(ctx.raw).toLocaleString('en-PH') + '/mo' } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, maxTicksLimit: 7 } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, callback: v => '₱' + (v/1000).toFixed(0) + 'K' } }
+      }
+    }
+  });
+}
+
+// ─── AMORT DETAIL TOGGLE ─────────────────────────────────────────────────────
+function toggleAmortDetail(btn) {
+  const table = document.getElementById('amort-table');
+  const showing = table.classList.toggle('show-detail');
+  btn.textContent = showing ? 'Show fewer columns' : 'Show all columns';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  step1Update();
+  onLoanTypeChange();
+  // Ensure bar is hidden on load regardless of browser back/forward cache
+  document.getElementById('mobile-action-bar').classList.add('hidden-bar');
+});
+</script>
+</body>
+</html>
