@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Home Loan Simulator Philippines — Can You Afford It?</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HPH7ELYNKG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HPH7ELYNKG');
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -362,11 +370,133 @@ select {
 /* ── RESULTS TWO-COLUMN LAYOUT ── */
 .results-layout {
   display: grid;
-  grid-template-columns: 1fr 264px;
+  grid-template-columns: 176px 1fr 264px;
   gap: 24px;
   align-items: start;
 }
-.results-main { min-width: 0; } /* prevents grid blowout */
+.results-main { min-width: 0; }
+
+/* ── SCROLL SPY NAV (left column, desktop) ── */
+.scroll-spy {
+  position: sticky;
+  top: 20px;
+  padding-top: 4px;
+}
+.ss-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+/* vertical connecting line behind all items */
+.ss-track::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: var(--line);
+  z-index: 0;
+}
+.ss-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.ss-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ink-4);
+}
+.ss-label {
+  font-size: 11px;
+  color: var(--ink-4);
+  line-height: 1.3;
+  padding-top: 3px;
+  transition: color 0.2s;
+  white-space: normal;
+}
+/* Active state */
+.ss-item.active .ss-dot {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+.ss-item.active .ss-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+/* Completed state */
+.ss-item.done .ss-dot {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+.ss-item.done .ss-label { color: var(--ink-3); }
+
+/* Special: synthesis stop */
+.ss-item.synthesis .ss-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px; /* square = final */
+}
+.ss-item.synthesis.active .ss-dot { background: var(--ink); border-color: var(--ink); }
+.ss-item.synthesis.done .ss-dot   { background: var(--green); border-color: var(--green); }
+
+/* ── MOBILE: horizontal progress bar + chapter label ── */
+.scroll-progress-bar {
+  display: none; /* shown via media query */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 16px 7px;
+  box-shadow: 0 1px 4px rgba(30,58,95,0.08);
+  transform: translateY(-100%);
+  transition: transform 0.25s ease;
+}
+.scroll-progress-bar.visible { transform: translateY(0); }
+.spb-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+.spb-step {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background 0.3s;
+}
+.spb-step.done   { background: var(--green); }
+.spb-step.active { background: var(--ink); }
+.spb-label {
+  font-size: 11px;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.spb-label strong { color: var(--ink); font-weight: 600; font-size: 12px; }
+.spb-label .spb-count { color: var(--ink-4); margin-left: auto; }
 
 /* ── STICKY SIDEBAR ── */
 .results-sidebar {
@@ -886,12 +1016,21 @@ select {
 /* Prevent content from being hidden behind the bar */
 .results.has-bar { padding-bottom: 80px; }
 
+@media (max-width: 1100px) {
+  /* Hide scroll spy on smaller desktop — keep 2-col */
+  .results-layout { grid-template-columns: 1fr 264px; }
+  .scroll-spy { display: none; }
+}
+
 @media (max-width: 900px) {
   /* Collapse to single column on tablet and below */
   .results-layout { grid-template-columns: 1fr; }
   .results-sidebar { display: none; }
+  .scroll-spy { display: none; }
   .wizard-wrap { max-width: 100%; }
   .mobile-action-bar { display: block; }
+  /* Show horizontal progress bar on mobile */
+  .scroll-progress-bar { display: block; }
 }
 
 @media (max-width: 640px) {
@@ -1342,7 +1481,23 @@ select {
   <!-- ═══ RESULTS ═══ -->
   <div id="results" class="results">
 
+    <!-- Mobile scroll progress bar -->
+    <div class="scroll-progress-bar" id="scroll-progress-bar">
+      <div class="spb-steps" id="spb-steps"></div>
+      <div class="spb-label">
+        <span id="spb-chapter-label">Chapter 1</span>
+        <strong id="spb-chapter-title">Can you get this loan?</strong>
+        <span class="spb-count" id="spb-count">1 / 7</span>
+      </div>
+    </div>
+
     <div class="results-layout">
+
+    <!-- Desktop scroll spy (left column) -->
+    <div class="scroll-spy" id="scroll-spy">
+      <div class="ss-track" id="ss-track"></div>
+    </div>
+
     <div class="results-main">
 
     <div class="results-topbar">
@@ -1354,7 +1509,7 @@ select {
     </div>
 
     <!-- ═══ CHAPTER 1: CAN YOU GET THIS LOAN? ═══ -->
-    <div class="story-chapter">
+    <div class="story-chapter" id="ch-01">
       <div class="story-chapter-header">
         <div class="story-chapter-left">
           <div class="story-chapter-num">01</div>
@@ -1456,7 +1611,7 @@ select {
     </div>
 
     <!-- ═══ CHAPTER 2: WHAT WILL THIS ACTUALLY COST? ═══ -->
-    <div class="story-chapter">
+    <div class="story-chapter" id="ch-02">
       <div class="story-chapter-header">
         <div class="story-chapter-left">
           <div class="story-chapter-num">02</div>
@@ -1532,7 +1687,7 @@ select {
     </div>
 
     <!-- ═══ CHAPTER 3: WHAT WEALTH ARE YOU BUILDING? ═══ -->
-    <div class="story-chapter">
+    <div class="story-chapter" id="ch-03">
       <div class="story-chapter-header">
         <div class="story-chapter-left">
           <div class="story-chapter-num">03</div>
@@ -1607,7 +1762,7 @@ select {
     </div>
 
     <!-- ═══ CHAPTER 4: MONTH TO MONTH, WHAT IS YOUR LIFE LIKE? ═══ -->
-    <div class="story-chapter">
+    <div class="story-chapter" id="ch-04">
       <div class="story-chapter-header">
         <div class="story-chapter-left">
           <div class="story-chapter-num">04</div>
@@ -1660,7 +1815,7 @@ select {
     </div>
 
     <!-- ═══ CHAPTER 5: IS BUYING SMARTER THAN RENTING? ═══ -->
-    <div class="story-chapter">
+    <div class="story-chapter" id="ch-05">
       <div class="story-chapter-header">
         <div class="story-chapter-left">
           <div class="story-chapter-num">05</div>
@@ -1733,7 +1888,7 @@ select {
     </div><!-- /chapter 5 -->
 
     <!-- ═══ CHAPTER 6: YOUR COMPLETE PAYMENT PLAN ═══ -->
-    <div class="story-chapter">
+    <div class="story-chapter" id="ch-06">
       <div class="story-chapter-header">
         <div class="story-chapter-left">
           <div class="story-chapter-num">06</div>
@@ -2050,8 +2205,10 @@ function goStep(n) {
 
   document.getElementById('results').style.display = 'none';
   document.getElementById('results').classList.remove('has-bar');
-  // Always hide the mobile bar when navigating to any wizard step
   document.getElementById('mobile-action-bar').classList.add('hidden-bar');
+  const spb = document.getElementById('scroll-progress-bar');
+  if (spb) spb.classList.remove('visible');
+  if (spyObserver) { spyObserver.disconnect(); spyObserver = null; }
   currentStep = n;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2245,6 +2402,18 @@ function brokerCTAClick() {
   if (banner) {
     if (banner.classList.contains('danger')) path = 'declined';
     else if (banner.classList.contains('warn')) path = 'marginal';
+  }
+
+  // GA4 — track CTA click with context
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'cta_click', {
+      event_category: 'waitlist',
+      event_label:    path,
+      approval_path:  path,
+      property_price: Math.round(price) || 0,
+      monthly_income: Math.round(income) || 0,
+      net_dsr:        parseFloat(dsr) || 0,
+    });
   }
 
   const payload = {
@@ -3291,6 +3460,8 @@ function calculate() {
 
   document.getElementById('results').style.display = 'block';
   [1, 2, 3].forEach(i => document.getElementById('step-' + i).classList.add('hidden'));
+  // Init scroll spy after DOM is rendered
+  requestAnimationFrame(() => initScrollSpy());
   ['sn-1','sn-2','sn-3'].forEach((id, i) => {
     document.getElementById(id).className = 'step-num done';
     document.getElementById(id).textContent = '';
@@ -3301,6 +3472,19 @@ function calculate() {
   });
 
   document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // GA4 — track simulation completed
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'simulation_complete', {
+      event_category: 'simulator',
+      approval_path:  verdictClass,
+      loan_type:      loanType,
+      property_price: Math.round(price),
+      monthly_income: Math.round(totalGross),
+      net_dsr:        parseFloat(netDSR.toFixed(1)),
+      loan_term:      term,
+    });
+  }
 
   // ─── POPULATE STICKY SIDEBAR ─────────────────────────────────────────────
   // Verdict card
@@ -3476,6 +3660,84 @@ function toggleAmortDetail(btn) {
   const showing = table.classList.toggle('show-detail');
   btn.textContent = showing ? 'Show fewer columns' : 'Show all columns';
 }
+
+// ─── SCROLL SPY ───────────────────────────────────────────────────────────────
+const SPY_CHAPTERS = [
+  { id: 'ch-01', label: 'Chapter 1', title: 'Can you get this loan?' },
+  { id: 'ch-02', label: 'Chapter 2', title: 'What will this cost?' },
+  { id: 'ch-03', label: 'Chapter 3', title: 'Wealth you are building' },
+  { id: 'ch-04', label: 'Chapter 4', title: 'Month to month' },
+  { id: 'ch-05', label: 'Chapter 5', title: 'Buy or keep renting?' },
+  { id: 'ch-06', label: 'Chapter 6', title: 'Your payment plan' },
+  { id: 'synthesis-box', label: 'Conclusion', title: 'Should you buy?', isSynthesis: true },
+];
+
+let spyObserver = null;
+
+function initScrollSpy() {
+  const track = document.getElementById('ss-track');
+  const spbSteps = document.getElementById('spb-steps');
+  if (!track || !spbSteps) return;
+
+  // Build desktop nav
+  track.innerHTML = SPY_CHAPTERS.map((c, i) => `
+    <div class="ss-item ${c.isSynthesis ? 'synthesis' : ''}" id="ss-item-${i}" onclick="scrollToChapter('${c.id}')">
+      <div class="ss-dot">${c.isSynthesis ? '&#9733;' : i + 1}</div>
+      <div class="ss-label">${c.title}</div>
+    </div>`).join('');
+
+  // Build mobile steps
+  spbSteps.innerHTML = SPY_CHAPTERS.map((_, i) =>
+    `<div class="spb-step" id="spb-step-${i}"></div>`).join('');
+
+  // Disconnect any previous observer
+  if (spyObserver) spyObserver.disconnect();
+
+  const options = { rootMargin: '-15% 0px -70% 0px', threshold: 0 };
+  spyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const idx = SPY_CHAPTERS.findIndex(c => c.id === entry.target.id);
+      if (idx !== -1) updateSpy(idx);
+    });
+  }, options);
+
+  SPY_CHAPTERS.forEach(c => {
+    const el = document.getElementById(c.id);
+    if (el) spyObserver.observe(el);
+  });
+
+  updateSpy(0);
+}
+
+function updateSpy(activeIdx) {
+  SPY_CHAPTERS.forEach((_, i) => {
+    const item = document.getElementById('ss-item-' + i);
+    const step = document.getElementById('spb-step-' + i);
+    if (item) { item.classList.remove('active','done'); if (i === activeIdx) item.classList.add('active'); else if (i < activeIdx) item.classList.add('done'); }
+    if (step) { step.className = 'spb-step'; if (i === activeIdx) step.classList.add('active'); else if (i < activeIdx) step.classList.add('done'); }
+  });
+  const ch = SPY_CHAPTERS[activeIdx];
+  const lb = document.getElementById('spb-chapter-label');
+  const tt = document.getElementById('spb-chapter-title');
+  const ct = document.getElementById('spb-count');
+  if (lb) lb.textContent = ch.label;
+  if (tt) tt.textContent = ch.title;
+  if (ct) ct.textContent = (activeIdx + 1) + ' / ' + SPY_CHAPTERS.length;
+}
+
+function scrollToChapter(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+window.addEventListener('scroll', () => {
+  const bar = document.getElementById('scroll-progress-bar');
+  if (!bar) return;
+  const results = document.getElementById('results');
+  const onResults = results && results.style.display !== 'none';
+  bar.classList.toggle('visible', onResults && window.scrollY > 180);
+}, { passive: true });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

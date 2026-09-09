@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Join the Waitlist — Home Loan Simulator Philippines</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HPH7ELYNKG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HPH7ELYNKG');
+</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -552,6 +560,17 @@ function showSuccess(name) {
   successEl.classList.add('visible');
   document.getElementById('success-desc').textContent = c.success;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // GA4 — track waitlist signup
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'waitlist_signup', {
+      event_category: 'waitlist',
+      approval_path:  path,
+      property_price: parseInt(propertyPrice) || 0,
+      monthly_income: parseInt(monthlyIncome) || 0,
+      net_dsr:        parseFloat(netDSR) || 0,
+    });
+  }
 }
 
 function goBack() {
