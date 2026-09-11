@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>How We Calculate — KayaKo Home Loan Simulator Philippines</title>
+<meta name="description" content="Every formula, rate, and regulatory source behind the KayaKo home loan simulator. TRAIN Law tax brackets, SSS/PhilHealth/Pag-IBIG rates, closing costs, DSR thresholds — all cited.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://jcig789.github.io/kayako/ph-methodology.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jcig789.github.io/kayako/ph-methodology.html">
+<meta property="og:title" content="Methodology & Sources — KayaKo">
+<meta property="og:description" content="How we calculate your home loan results. TRAIN Law, SSS Circular 2024-006, Pag-IBIG rates, DSR thresholds — every number sourced and explained.">
+<meta property="og:site_name" content="KayaKo">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:      #1e3a5f;
+  --ink-2:    #334e6e;
+  --ink-3:    #64748b;
+  --ink-4:    #94a3b8;
+  --line:     #dde3ea;
+  --surface:  #ffffff;
+  --bg:       #f0f4f8;
+  --bg-2:     #f8fafc;
+  --green:    #16a34a;
+  --green-pale:#f0fdf4;
+  --amber:    #d97706;
+  --amber-pale:#fffbeb;
+  --red:      #dc2626;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(30,58,95,0.06);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.header {
+  background: var(--ink);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-brand { color: #fff; font-weight: 600; font-size: 14px; }
+.header-kayako { color: rgba(255,255,255,0.22); font-size: 11px; letter-spacing: 0.5px; }
+.header-back {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  transition: color 0.12s;
+}
+.header-back:hover { color: #fff; }
+
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 16px 56px;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 28px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.hero-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-3); margin-bottom: 8px; }
+.hero-title { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.25; }
+.hero-desc  { font-size: 14px; color: var(--ink-3); line-height: 1.7; margin-bottom: 20px; }
+.hero-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-pale);
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 500;
+}
+.hero-updated .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+/* ── TOC ── */
+.toc {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+.toc-title { font-weight: 600; color: var(--ink-2); margin-bottom: 10px; }
+.toc-list  { display: flex; flex-direction: column; gap: 6px; padding-left: 4px; }
+.toc-list a { color: var(--ink-3); text-decoration: none; transition: color 0.1s; }
+.toc-list a:hover { color: var(--ink); }
+.toc-list a::before { content: '→ '; color: var(--ink-4); }
+
+/* ── SECTION ── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.section-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.section-header:hover { background: var(--bg-2); }
+.section-header-left { display: flex; align-items: flex-start; gap: 14px; }
+.section-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.section-title  { font-size: 14px; font-weight: 600; color: var(--ink); }
+.section-sub    { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.section-toggle { font-size: 18px; color: var(--ink-4); transition: transform 0.2s; }
+.section.open .section-toggle { transform: rotate(180deg); }
+.section-body   { display: none; padding: 20px; }
+.section.open .section-body { display: block; }
+
+/* ── CONTENT INSIDE SECTIONS ── */
+.source-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+.source-table th {
+  background: var(--bg-2);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-2);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--line);
+}
+.source-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.source-table tr:last-child td { border-bottom: none; }
+.source-table tr:hover td { background: var(--bg-2); }
+.source-table td:first-child { font-weight: 500; color: var(--ink); white-space: nowrap; }
+.source-table a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); }
+.source-table a:hover { text-decoration-color: var(--ink); }
+
+.note-box {
+  background: var(--amber-pale);
+  border: 1px solid #fde68a;
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin-top: 12px;
+}
+.note-box strong { color: var(--ink); font-weight: 600; }
+
+.formula-box {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin: 10px 0;
+  line-height: 1.8;
+}
+
+.assumption-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.assumption-card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.ac-label { font-size: 11px; color: var(--ink-3); margin-bottom: 4px; }
+.ac-val   { font-size: 18px; font-weight: 700; color: var(--ink); }
+.ac-note  { font-size: 11px; color: var(--ink-3); margin-top: 3px; line-height: 1.4; }
+
+p { color: var(--ink-2); line-height: 1.7; margin-bottom: 10px; font-size: 13px; }
+p:last-child { margin-bottom: 0; }
+ul { padding-left: 16px; margin-bottom: 10px; }
+li { color: var(--ink-2); line-height: 1.7; font-size: 13px; margin-bottom: 3px; }
+h4 { font-size: 13px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+h4:first-child { margin-top: 0; }
+
+/* ── FOOTER ── */
+.footer-note {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+.footer-note strong { color: var(--ink-2); font-weight: 600; }
+.footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 9px 18px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+.footer-cta:hover { background: #163050; }
+
+@media (max-width: 600px) {
+  .assumption-grid { grid-template-columns: 1fr; }
+  .hero { padding: 20px; }
+  .section-body { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">Home Loan Simulator</div>
+  <a class="header-back" href="index.html">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to simulator
+  </a>
+  <div class="header-kayako">KayaKo.ph</div>
+</div>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-label">Methodology & Sources</div>
+    <div class="hero-title">How we calculate your home loan results</div>
+    <div class="hero-desc">Every number this simulator produces is based on publicly available Philippine regulations, official government rates, and standard financial formulas. This page explains exactly what we use, where we got it, and what assumptions we make.</div>
+    <div class="hero-updated">
+      <span class="dot"></span>
+      Last reviewed: September 2026 — bank rates updated to reflect BSP 5.00% policy rate (Aug 27, 2026)
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">On this page</div>
+    <div class="toc-list">
+      <a href="#s1" onclick="openSection('s1')">Interest rates — Bank, Pag-IBIG, In-House</a>
+      <a href="#s2" onclick="openSection('s2')">Income tax & mandatory deductions (TRAIN Law)</a>
+      <a href="#s3" onclick="openSection('s3')">Closing costs — DST, transfer tax, registration</a>
+      <a href="#s4" onclick="openSection('s4')">Ongoing costs — MRI, fire insurance, RPT</a>
+      <a href="#s5" onclick="openSection('s5')">Monthly amortization formula</a>
+      <a href="#s6" onclick="openSection('s6')">Projection assumptions — appreciation, inflation, salary growth</a>
+      <a href="#s7" onclick="openSection('s7')">Bank approval criteria — DSR thresholds</a>
+      <a href="#s8" onclick="openSection('s8')">What we do not model</a>
+      <a href="#s9" onclick="openSection('s9')">Pag-IBIG documentation requirements (confirmed Sep 2026)</a>
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-header-left">
+        <div class="section-num">1</div>
+        <div>
+          <div class="section-title">Interest Rates</div>
+          <div class="section-sub">Bank loans, Pag-IBIG (HDMF), and In-House financing</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <h4>Bank Loans</h4>
+      <p>Bank home loan rates in the Philippines are set individually by each bank and move with BSP (Bangko Sentral ng Pilipinas) policy rate adjustments. The BSP raised its overnight rate to <strong>5.00%</strong> on August 27, 2026 (third consecutive hike in 2026). We use indicative rates reflecting a typical bank spread of 3.0–4.0% over the BSP rate.</p>
+      <table class="source-table">
+        <thead><tr><th>Scenario</th><th>Initial Rate</th><th>Repriced Rate</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Optimistic</td><td>8.0%</td><td>7.5%</td><td>BSP cuts, rates ease from current level</td></tr>
+          <tr><td>Base Case</td><td>8.5%</td><td>9.0%</td><td>Rates stable near Sep 2026 market</td></tr>
+          <tr><td>Stress Test</td><td>8.5%</td><td>11.0%</td><td>Further BSP hikes, extended tight cycle</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Source:</strong> BSP policy rate from Trading Economics / BSP press release, August 27, 2026. Individual bank fixed-period rates are indicative — Metrobank confirmed rates "updated as of June 16, 2026" but specific figures require contacting the bank directly.</p>
+      <p>After the fixed period ends, rates are repriced annually. We model the repriced rate as fixed for the remainder of the term to simplify projections — in reality, repricing happens every 1–5 years depending on the bank.</p>
+      <h4>Pag-IBIG (HDMF) Loans</h4>
+      <p>Pag-IBIG rates confirmed directly from <a href="https://www.pagibigfund.gov.ph" target="_blank" rel="noopener">pagibigfund.gov.ph</a> as displayed on the housing loan page. These rates are valid until <strong>December 31, 2026</strong>. The site also shows promo rates (4.5% and 5.75%) for specific loan brackets — these are promotional and not used in our base calculations.</p>
+      <table class="source-table">
+        <thead><tr><th>Repricing Period</th><th>Annual Rate</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>5 years</td><td>6.500%</td><td>Confirmed — live screenshot Sep 2026</td></tr>
+          <tr><td>10 years</td><td>7.125%</td><td>Confirmed</td></tr>
+          <tr><td>15 years</td><td>7.750%</td><td>Confirmed</td></tr>
+          <tr><td>20 years</td><td>8.500%</td><td>Confirmed</td></tr>
+          <tr><td>25 years</td><td>9.125%</td><td>Confirmed</td></tr>
+          <tr><td>30 years</td><td>9.750%</td><td>Confirmed</td></tr>
+          <tr><td>1 year / 3 years</td><td>5.75% / 6.375%</td><td>Not shown on current page — kept from Circular No. 460 (2024)</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Maximum loan: ₱10,000,000</strong> — confirmed from the official Pag-IBIG Fund housing loan page (Sep 2026 banner: "UP TO P10M NA!"). Loan must mature before the borrower turns 70. Source: pagibigfund.gov.ph, verified September 2026.</p>
+      <p><strong>Promo rates (valid until Dec 31, 2026):</strong> 4.5% for loans up to ₱4.9M (socialized/affordable housing, first 3 years), 5.75% for loans ₱4.9M–₱10M (first 3 years). After the promo period the standard repricing rates above apply.</p>
+
+      <h4>In-House / Developer Financing</h4>
+      <p>In-house financing rates are not regulated and vary by developer. We model these at 14–18% per annum, which reflects typical developer financing terms in the Philippine market. No repricing occurs — the rate is fixed for the full term.</p>
+      <div class="note-box"><strong>Note:</strong> All rates are indicative. Before applying, verify current rates directly with your bank, Pag-IBIG branch, or developer. Rates change frequently in response to BSP policy decisions.</div>
+    </div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-header-left">
+        <div class="section-num">2</div>
+        <div>
+          <div class="section-title">Income Tax & Mandatory Deductions</div>
+          <div class="section-sub">TRAIN Law, SSS, PhilHealth, Pag-IBIG</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <h4>Income Tax — TRAIN Law (RA 10963, as amended)</h4>
+      <p>We apply the revised tax table effective January 2023 onwards under the Tax Reform for Acceleration and Inclusion (TRAIN) Law:</p>
+      <table class="source-table">
+        <thead><tr><th>Annual Taxable Income</th><th>Tax</th></tr></thead>
+        <tbody>
+          <tr><td>Up to ₱250,000</td><td>0%</td></tr>
+          <tr><td>₱250,001 – ₱400,000</td><td>15% of excess over ₱250,000</td></tr>
+          <tr><td>₱400,001 – ₱800,000</td><td>₱22,500 + 20% of excess over ₱400,000</td></tr>
+          <tr><td>₱800,001 – ₱2,000,000</td><td>₱102,500 + 25% of excess over ₱800,000</td></tr>
+          <tr><td>₱2,000,001 – ₱8,000,000</td><td>₱402,500 + 30% of excess over ₱2,000,000</td></tr>
+          <tr><td>Over ₱8,000,000</td><td>₱2,202,500 + 35% of excess over ₱8,000,000</td></tr>
+        </tbody>
+      </table>
+      <p>Source: <a href="https://www.bir.gov.ph" target="_blank" rel="noopener">Bureau of Internal Revenue (BIR)</a> — Revenue Regulations No. 8-2018 as amended by TRAIN.</p>
+
+      <h4>SSS (Employee Share)</h4>
+      <p>We apply <strong>5.0% of monthly salary credit (MSC)</strong>, minimum MSC ₱5,000, maximum MSC ₱35,000. Maximum employee contribution: ₱1,750/month. Per <strong>SSS Circular No. 2024-006</strong> (signed December 19, 2024, effective January 2025), which increased the contribution rate to 15% total and raised the MSC ceiling. Previous rate was 4.5% capped at ₱30,000.</p>
+
+      <h4>PhilHealth (Employee Share)</h4>
+      <p><strong>2.5% of monthly basic salary</strong> (5% total, split 50/50 with employer), with a floor of ₱10,000 (minimum ₱250 employee share) and ceiling of ₱100,000 (maximum ₱2,500 employee share) per month. This is the final scheduled rate under <strong>RA 11223 (Universal Health Care Law)</strong>, confirmed effective 2026.</p>
+
+      <h4>Pag-IBIG (Member Contribution)</h4>
+      <p><strong>2% of monthly salary, capped at ₱200</strong> per month employee contribution (on salaries above ₱10,000). Per <strong>Republic Act No. 9679</strong> (Home Development Mutual Fund Law of 2009).</p>
+
+      <div class="note-box"><strong>Important limitation:</strong> This simulator applies PAYE (Pay As You Earn) deductions to salary inputs only. Self-employed and OFW income entered in the "Other Income" field is treated as net of tax since documentation requirements and tax treatment vary significantly. For self-employed borrowers, banks use 2-year ITR averages — your actual qualifying income may differ from what is entered here.</div>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-header-left">
+        <div class="section-num">3</div>
+        <div>
+          <div class="section-title">Closing Costs</div>
+          <div class="section-sub">Documentary Stamp Tax, Transfer Tax, Registration, Notarial</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <table class="source-table">
+        <thead><tr><th>Cost Item</th><th>Rate / Amount</th><th>Base</th><th>Who Pays</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Documentary Stamp Tax (DST)</td><td>0.5% (bank) / 1.0% (Pag-IBIG)</td><td>Loan amount</td><td>Buyer</td><td>BIR — Section 195, NIRC; HDMF schedule</td></tr>
+          <tr><td>Transfer Tax</td><td>0.5% (average)</td><td>Selling price</td><td>Buyer</td><td>LGU — varies 0.5–0.75% by city/municipality</td></tr>
+          <tr><td>Registration Fee (RD)</td><td>₱8K–₱25K (tiered)</td><td>Property value</td><td>Buyer</td><td>Land Registration Authority tiered schedule</td></tr>
+          <tr><td>Notarial / DOAS Fee</td><td>1% of price, max ₱50,000</td><td>Selling price</td><td>Split (negotiable)</td><td>Market standard; IBP Schedule of Fees</td></tr>
+          <tr><td>Bank / Processing Fee</td><td>₱20,000 (bank) / ₱5,000 (Pag-IBIG)</td><td>Flat</td><td>Buyer</td><td>Indicative — varies by lender</td></tr>
+          <tr><td>Capital Gains Tax (CGT)</td><td>6% of higher of price or zonal value</td><td>Property value</td><td><strong>Seller</strong></td><td>BIR — Section 24(D), NIRC</td></tr>
+        </tbody>
+      </table>
+      <p><strong>CGT is a seller cost and is excluded from our calculations.</strong> The simulator only models buyer closing costs.</p>
+      <p>LRA Registration Fee tiers used: &lt;₱1.75M = ₱8,000 | ₱1.75M–₱3.5M = ₱12,000 | ₱3.5M–₱7M = ₱20,000 | &gt;₱7M = ₱25,000. These are approximations — actual fees depend on the property's assessed value.</p>
+      <div class="note-box"><strong>Note:</strong> Transfer tax rates vary by LGU. Metro Manila cities typically charge 0.5–0.75%. We use 0.5% as a conservative estimate. Verify with your target LGU.</div>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-header-left">
+        <div class="section-num">4</div>
+        <div>
+          <div class="section-title">Ongoing Property Costs</div>
+          <div class="section-sub">MRI, fire insurance, real property tax</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <table class="source-table">
+        <thead><tr><th>Cost</th><th>Rate Used</th><th>Applied To</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>MRI (Mortgage Redemption Insurance)</td><td>0.07% per year</td><td>Outstanding loan balance (declining)</td><td>HDMF/bank standard; age-banded in practice — we use mid-range approximation</td></tr>
+          <tr><td>Fire Insurance</td><td>0.10% per year</td><td>Property market value (growing)</td><td>Industry standard for residential properties; required by all Philippine lenders</td></tr>
+          <tr><td>Real Property Tax (RPT)</td><td>0.40% per year (effective)</td><td>Property market value (growing)</td><td>Assessment level 20% × basic RPT 1% + SEF 1% = 0.4% effective. Per LGC Section 218.</td></tr>
+          <tr><td>HOA / Condo Dues</td><td>₱500–₱4,000/mo</td><td>Flat (inflated annually at 4%)</td><td>Indicative: Pag-IBIG/affordable ₱500, house & lot ₱1,000, condo ₱4,000</td></tr>
+        </tbody>
+      </table>
+      <p>RPT basis: Metro Manila LGUs assess residential property at 20% of fair market value and apply a 2% rate (1% basic + 1% Special Education Fund). This produces an effective rate of 0.40% of market value. Rates vary outside Metro Manila.</p>
+      <div class="note-box"><strong>MRI rate note:</strong> MRI is technically age-banded (older borrowers pay more). We apply a flat 0.07% approximation which is representative for borrowers aged 25–45. Your actual MRI premium will be specified by your lender.</div>
+    </div>
+  </div>
+
+  <!-- Section 5 -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-header-left">
+        <div class="section-num">5</div>
+        <div>
+          <div class="section-title">Monthly Amortization Formula</div>
+          <div class="section-sub">How the monthly payment is calculated</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <p>We use the standard mortgage amortization formula (constant payment, reducing balance):</p>
+      <div class="formula-box">
+M = P × [r(1+r)^n] / [(1+r)^n – 1]
+
+Where:
+  M = monthly amortization (principal + interest only)
+  P = loan principal
+  r = monthly interest rate (annual rate ÷ 12)
+  n = total number of monthly payments (term in years × 12)
+      </div>
+      <p>MRI and fire insurance are computed separately and added on top of M to arrive at the total monthly payment. At each repricing date, a new M is computed on the remaining balance for the remaining term.</p>
+      <p>This is the same formula used by all Philippine banks and Pag-IBIG. The total interest paid over the life of the loan equals (M × n) − P.</p>
+
+      <h4>Example — ₱4M loan, 7%, 20 years:</h4>
+      <div class="formula-box">r = 7% ÷ 12 = 0.5833%/month
+n = 20 × 12 = 240 payments
+M = 4,000,000 × [0.005833 × (1.005833)^240] ÷ [(1.005833)^240 – 1]
+M = ₱31,012/month
+
+Total paid = 31,012 × 240 = ₱7,442,880
+Total interest = ₱7,442,880 − ₱4,000,000 = ₱3,442,880 (86% of principal)</div>
+    </div>
+  </div>
+
+  <!-- Section 6 -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-header-left">
+        <div class="section-num">6</div>
+        <div>
+          <div class="section-title">Projection Assumptions</div>
+          <div class="section-sub">Salary growth, property appreciation, inflation</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <p>The year-by-year projections (cash flow, equity, buy vs. rent) use the following assumptions. These are applied uniformly — they do not vary by location or property type.</p>
+      <div class="assumption-grid">
+        <div class="assumption-card">
+          <div class="ac-label">Annual salary growth</div>
+          <div class="ac-val">5.0%</div>
+          <div class="ac-note">Approximate median wage growth for employed Filipinos, consistent with DOLE/PSA wage order history</div>
+        </div>
+        <div class="assumption-card">
+          <div class="ac-label">Property appreciation</div>
+          <div class="ac-val">5.0%</div>
+          <div class="ac-note">Conservative estimate for Metro Manila residential. BGC/Makati historically higher (7–10%). Provincial may be lower (2–4%).</div>
+        </div>
+        <div class="assumption-card">
+          <div class="ac-label">Expense inflation</div>
+          <div class="ac-val">4.0%</div>
+          <div class="ac-note">Above-target BSP inflation assumption; reflects PH average CPI 2020–2024</div>
+        </div>
+        <div class="assumption-card">
+          <div class="ac-label">Rent increase (buy vs. rent)</div>
+          <div class="ac-val">3.0%</div>
+          <div class="ac-note">Conservative annual rent increase; typical for Metro Manila apartments</div>
+        </div>
+        <div class="assumption-card">
+          <div class="ac-label">Existing loan paydown</div>
+          <div class="ac-val">5 years</div>
+          <div class="ac-note">Existing loans (car, personal) assumed to be fully paid in 5 years via linear paydown</div>
+        </div>
+        <div class="assumption-card">
+          <div class="ac-label">OFW salary growth</div>
+          <div class="ac-val">2.5%</div>
+          <div class="ac-note">Other income grows at 50% of salary growth rate — more conservative for non-employment income</div>
+        </div>
+      </div>
+      <div class="note-box"><strong>Why these matter:</strong> The buy vs. rent breakeven point and the cash flow trajectory are highly sensitive to the appreciation assumption. If your target property is in a high-growth area (BGC, Makati CBD), the actual breakeven may be earlier than shown. For provincial properties, it may be later. The simulator footnotes these assumptions on the results page.</div>
+    </div>
+  </div>
+
+  <!-- Section 7 -->
+  <div class="section" id="s7">
+    <div class="section-header" onclick="toggleSection('s7')">
+      <div class="section-header-left">
+        <div class="section-num">7</div>
+        <div>
+          <div class="section-title">Bank Approval Criteria</div>
+          <div class="section-sub">How we determine likely approval, marginal, or declined</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Philippine banks assess home loan applications primarily on <strong>Debt Service Ratio (DSR)</strong> — the percentage of net take-home pay consumed by all loan obligations. Our thresholds are based on published BSP guidelines and industry practice:</p>
+      <table class="source-table">
+        <thead><tr><th>Check</th><th>Threshold</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Total Net DSR</td><td>&lt;35%</td><td>Approved — within guideline</td></tr>
+          <tr><td>Total Net DSR</td><td>35–40%</td><td>Marginal — borderline, some banks may process</td></tr>
+          <tr><td>Total Net DSR</td><td>&gt;40%</td><td>Declined — exceeds most banks' absolute cap</td></tr>
+          <tr><td>Loan-to-income ratio</td><td>&gt;100× monthly gross</td><td>Declined — loan too large relative to income</td></tr>
+          <tr><td>Down payment</td><td>&lt;10%</td><td>Declined — below minimum LTV requirement</td></tr>
+          <tr><td>Pag-IBIG loan amount</td><td>&gt;₱10,000,000</td><td>Declined — exceeds HDMF maximum (confirmed Sep 2026)</td></tr>
+          <tr><td>Age at maturity (bank)</td><td>&gt;65 years</td><td>Marginal — some banks cap at 65</td></tr>
+          <tr><td>Age at maturity (Pag-IBIG)</td><td>&gt;70 years</td><td>Declined — HDMF hard cap</td></tr>
+        </tbody>
+      </table>
+      <p>Net DSR uses <strong>net take-home pay</strong> (after income tax, SSS, PhilHealth, Pag-IBIG) as the denominator — this is what banks actually use, not gross income. All existing loan obligations are added to the new amortization in the numerator.</p>
+      <p>Sources: <a href="https://www.bsp.gov.ph" target="_blank" rel="noopener">BSP Circular No. 855</a> (bank risk management guidelines), <a href="https://www.pagibigfund.gov.ph" target="_blank" rel="noopener">HDMF Housing Loan Guidelines</a>.</p>
+      <div class="note-box"><strong>Disclaimer:</strong> Our approval assessment is indicative only. Individual bank policies differ. A borrower shown as "declined" here may still qualify at a bank with more flexible underwriting. A borrower shown as "approved" may still be declined for reasons this tool cannot assess (credit history, employment stability, property appraisal, etc.).</div>
+    </div>
+  </div>
+
+  <!-- Section 8 -->
+  <div class="section" id="s8">
+    <div class="section-header" onclick="toggleSection('s8')">
+      <div class="section-header-left">
+        <div class="section-num">8</div>
+        <div>
+          <div class="section-title">What We Do Not Model</div>
+          <div class="section-sub">Known limitations of this simulator</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <p>The following factors affect real home loan outcomes but are not captured by this simulator:</p>
+      <ul>
+        <li><strong>Credit score / credit history</strong> — banks pull credit bureau records. A poor payment history can decline a financially qualified application.</li>
+        <li><strong>Employment stability</strong> — banks require 2 years of continuous employment. Probationary employees, recent job changers, and those with irregular income may face stricter scrutiny.</li>
+        <li><strong>Property appraisal</strong> — banks lend against the <em>lower</em> of selling price or appraised value. If the bank appraises the property below the purchase price, the loan amount is reduced.</li>
+        <li><strong>OFW income haircut</strong> — banks typically apply a 20–30% reduction to foreign-sourced income. Our tool advises entering 70–80% of actual remittance but does not automatically apply this haircut.</li>
+        <li><strong>Self-employed ITR gap</strong> — banks use declared taxable income from 2-year ITR averages, which may differ significantly from actual cash earnings.</li>
+        <li><strong>Developer in-house financing underwriting</strong> — in-house financing criteria vary widely and are not regulated. Some developers approve regardless of income documentation.</li>
+        <li><strong>Interest rate path after repricing</strong> — we model a single repriced rate for the remaining term. In practice, rates are reviewed periodically and may change multiple times.</li>
+        <li><strong>Prepayment</strong> — making extra principal payments reduces total interest significantly but is not modeled here.</li>
+        <li><strong>Opportunity cost of down payment</strong> — capital deployed as a down payment could otherwise be invested. The buy vs. rent comparison does not account for investment returns on the down payment amount.</li>
+        <li><strong>Zonal values for CGT</strong> — capital gains tax for sellers uses the higher of selling price or BIR zonal value, which changes periodically.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Section 9: Pag-IBIG Documentation Requirements -->
+  <div class="section" id="s9">
+    <div class="section-header" onclick="toggleSection('s9')">
+      <div class="section-header-left">
+        <div class="section-num">9</div>
+        <div>
+          <div class="section-title">Pag-IBIG Housing Loan — What Documents Do You Need?</div>
+          <div class="section-sub">Confirmed from pagibigfund.gov.ph, September 2026</div>
+        </div>
+      </div>
+      <div class="section-toggle">▾</div>
+    </div>
+    <div class="section-body">
+      <p>The following are the income documentation requirements for Pag-IBIG housing loan applications. You also need 2 copies of the completed Housing Loan Application Form and 1 valid ID with photo (1×1).</p>
+
+      <h4>For Locally Employed Individuals — any one of:</h4>
+      <ul>
+        <li>Certificate of Employment and Compensation (CEC) — gross monthly income and allowances, signed by authorized employer signatory (1 original)</li>
+        <li>Latest Income Tax Return (ITR) with BIR Form 2316, acknowledged by BIR (1 photocopy)</li>
+        <li>One-month Payslip within the last 3 months, signed by authorized employer signatory (1 certified true copy)</li>
+      </ul>
+
+      <h4>For Self-Employed Individuals — any one of:</h4>
+      <ul>
+        <li>ITR (BIR Form 1701) certified by BIR + Audited Financial Statements + Official Receipt of tax payment + DTI Registration + Mayor's/Business Permit + sketch of business location</li>
+        <li>Commission Voucher or Certification of commission received (last 12 months, 1 original)</li>
+        <li>Bank Statements or passbook for last 12 months (1 original or photocopy) with authorization for bank verification</li>
+        <li>Notarized Lease Contract + proof of ownership (if income from rental)</li>
+        <li>Certificate of Engagement from client/business owner (1 original)</li>
+      </ul>
+
+      <h4>For OFW Borrowers — any one of:</h4>
+      <ul>
+        <li>Employment Contract certified by POEA or Philippine Consular Office (within past 12 months) — either POEA Standard Contract or employer contract (1 photocopy each)</li>
+        <li>Certificate of Employment and Compensation (CEC) on employer letterhead, within past 12 months (1 original)</li>
+        <li>Supporting documents: Payslip, OWWA Membership Certificate, Overseas Employment Certificate, Passport with Working Visa, Bank remittance record (1 original)</li>
+      </ul>
+
+      <h4>Valid IDs accepted (22 types including):</h4>
+      <p>National ID, Passport, Driver's License, PRC ID, NBI Clearance, Police Clearance, Voter's ID, TIN ID, SSS Card, GSIS e-Card, OWWA e-Card, PhilHealth Card, Senior Citizen Card, and others. Note: Barangay Certification and Company IDs from private entities are <strong>not acceptable</strong> for housing transactions.</p>
+
+      <div class="note-box"><strong>For the simulator:</strong> This confirms our OFW advisory is correct — POEA contract and remittance slips are required. Self-employed borrowers need ITR BIR Form 1701, not just bank statements. The simulator flags both of these in the employment type advisory notes on Step 2.</div>
+    </div>
+  </div>
+
+  <!-- Footer note -->
+  <div class="footer-note">
+    <strong>This tool is for educational purposes only.</strong> It does not constitute financial, legal, or tax advice. Calculations are based on public information and standard models. Actual loan terms, rates, tax treatment, and property values depend on your specific circumstances and will be determined by your lender.
+    <br><br>
+    We review this methodology page when significant regulatory changes occur (new BSP circulars, TRAIN Law amendments, Pag-IBIG circular updates). If you believe a rate or rule has changed, please flag it to us.
+    <br><br>
+    <a class="footer-cta" href="index.html">Run the simulator</a>
+  </div>
+
+</div>
+
+<script>
+function toggleSection(id) {
+  const s = document.getElementById(id);
+  s.classList.toggle('open');
+}
+
+function openSection(id) {
+  const s = document.getElementById(id);
+  if (s) {
+    s.classList.add('open');
+    setTimeout(() => s.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+}
+
+// Open first section by default
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('s1').classList.add('open');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a5f"/>
+      <stop offset="100%" style="stop-color:#152d4a"/>
+    </linearGradient>
+    <linearGradient id="card-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.06"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.02"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid texture -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Left accent bar -->
+  <rect x="0" y="0" width="6" height="630" fill="#3b82f6" opacity="0.6"/>
+
+  <!-- Top-right decorative house — fully contained within right column -->
+  <g transform="translate(680, 50)" opacity="0.13">
+    <path d="M100 200 L250 70 L400 200" stroke="white" stroke-width="8" fill="none" stroke-linejoin="round"/>
+    <rect x="114" y="200" width="272" height="190" rx="4" fill="white"/>
+    <!-- door -->
+    <rect x="214" y="298" width="72" height="92" rx="4" fill="#1e3a5f"/>
+    <!-- windows -->
+    <rect x="132" y="228" width="68" height="52" rx="3" fill="#1e3a5f"/>
+    <rect x="300" y="228" width="68" height="52" rx="3" fill="#1e3a5f"/>
+  </g>
+
+  <!-- Equity fill bar — below house, well clear of it -->
+  <rect x="720" y="490" width="260" height="8" rx="4" fill="rgba(255,255,255,0.08)"/>
+  <rect x="720" y="490" width="164" height="8" rx="4" fill="#16a34a" opacity="0.5"/>
+  <text x="720" y="518" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" fill="rgba(255,255,255,0.35)" font-weight="500">63% equity at year 10</text>
+
+  <!-- Main content — left aligned -->
+  <!-- KayaKo label -->
+  <text x="80" y="110" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" fill="rgba(255,255,255,0.45)" font-weight="600" letter-spacing="3">KAYAKO</text>
+
+  <!-- Main headline -->
+  <text x="80" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="82" fill="#ffffff" font-weight="800" letter-spacing="-2">Kaya mo ba?</text>
+
+  <!-- Sub headline -->
+  <text x="80" y="285" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" fill="rgba(255,255,255,0.65)" font-weight="400">Find out if you can afford that home loan.</text>
+
+  <!-- Divider -->
+  <rect x="80" y="324" width="64" height="3" rx="2" fill="#16a34a"/>
+
+  <!-- Feature pills -->
+  <!-- Pill 1 -->
+  <rect x="80" y="352" width="148" height="40" rx="20" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <text x="154" y="377" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="rgba(255,255,255,0.8)" text-anchor="middle">Bank Loan</text>
+
+  <!-- Pill 2 -->
+  <rect x="244" y="352" width="148" height="40" rx="20" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <text x="318" y="377" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="rgba(255,255,255,0.8)" text-anchor="middle">Pag-IBIG</text>
+
+  <!-- Pill 3 -->
+  <rect x="408" y="352" width="148" height="40" rx="20" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <text x="482" y="377" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" fill="rgba(255,255,255,0.8)" text-anchor="middle">In-House</text>
+
+  <!-- Stats row — each stat in its own column with generous spacing -->
+  <!-- Stat 1 -->
+  <text x="80" y="478" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="40" fill="#ffffff" font-weight="700">3 steps</text>
+  <text x="80" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="rgba(255,255,255,0.45)">to full affordability report</text>
+
+  <rect x="270" y="455" width="1" height="65" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Stat 2 -->
+  <text x="294" y="478" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="40" fill="#ffffff" font-weight="700">25 years</text>
+  <text x="294" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="rgba(255,255,255,0.45)">cash flow projection</text>
+
+  <rect x="530" y="455" width="1" height="65" fill="rgba(255,255,255,0.12)"/>
+
+  <!-- Stat 3 -->
+  <text x="554" y="478" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="40" fill="#16a34a" font-weight="700">Free</text>
+  <text x="554" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" fill="rgba(255,255,255,0.45)">no signup required</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="580" width="1200" height="50" fill="rgba(0,0,0,0.2)"/>
+  <text x="80" y="613" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" fill="rgba(255,255,255,0.4)">https://jcig789.github.io/kayako</text>
+  <text x="1120" y="613" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" fill="rgba(255,255,255,0.4)" text-anchor="end">Philippines 🇵🇭</text>
+</svg>

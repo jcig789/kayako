@@ -3,7 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Home Loan Simulator Philippines — Can You Afford It?</title>
+<title>Home Loan Simulator Philippines — Can You Afford It? | KayaKo</title>
+
+<!-- SEO -->
+<meta name="description" content="Free Philippine home loan calculator. Check if you can afford a property — Bank, Pag-IBIG, or In-House. Computes TRAIN Law taxes, DSR, closing costs, and 25-year cash flow in 3 steps.">
+<meta name="keywords" content="home loan calculator Philippines, Pag-IBIG loan simulator, can I afford a house Philippines, DSR calculator, Philippine mortgage calculator, housing loan affordability">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://jcig789.github.io/kayako/">
+
+<!-- Open Graph (Facebook, Messenger, Viber link previews) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jcig789.github.io/kayako/">
+<meta property="og:title" content="Can you afford this home loan? — KayaKo">
+<meta property="og:description" content="Free PH home loan simulator. Enter property price, income, and loan type — get a full affordability report in 3 steps. Bank, Pag-IBIG, In-House.">
+<meta property="og:image" content="https://jcig789.github.io/kayako/og-image.png">
+<meta property="og:locale" content="en_PH">
+<meta property="og:site_name" content="KayaKo">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Can you afford this home loan? — KayaKo">
+<meta name="twitter:description" content="Free PH home loan simulator. Bank, Pag-IBIG, In-House. TRAIN Law taxes, DSR, closing costs — full 25-year projection.">
+<meta name="twitter:image" content="https://jcig789.github.io/kayako/og-image.png">
+
+<!-- Structured Data — WebApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "KayaKo Home Loan Simulator",
+  "url": "https://jcig789.github.io/kayako/",
+  "description": "Free Philippine home loan affordability simulator. Computes bank approval likelihood, DSR, closing costs, and 25-year cash flow for Bank, Pag-IBIG, and In-House financing.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PHP" },
+  "inLanguage": "en-PH",
+  "keywords": "home loan, Philippines, Pag-IBIG, mortgage calculator, affordability"
+}
+</script>
+
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HPH7ELYNKG"></script>
 <script>
@@ -630,9 +668,10 @@ select {
 .de-divider    { display: none; }
 .de-label  { font-size: 11px; font-weight: 400; color: var(--ink-3); margin-bottom: 6px; }
 .de-val    { font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1.2; margin-bottom: 4px; }
-.de-val.ok    { color: var(--green); }
-.de-val.warn  { color: var(--amber); }
-.de-val.danger{ color: var(--red); }
+/* KPI bar sits on dark navy — needs light semantic colors for contrast */
+.de-val.ok    { color: #4ade80; }
+.de-val.warn  { color: #fbbf24; }
+.de-val.danger{ color: #f87171; }
 .de-note   { font-size: 11px; color: var(--ink-3); line-height: 1.5; margin-top: 2px; }
 
 /* ── FORCED SALE BOX ── */
@@ -1022,6 +1061,179 @@ select {
   .scroll-spy { display: none; }
 }
 
+/* ── PRINT / PDF ── */
+@media print {
+  /* Reset */
+  *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Hide everything except results */
+  .header, #steps-bar, .wizard-wrap, .scroll-spy, .results-sidebar,
+  .mobile-action-bar, .scroll-progress-bar, .results-topbar,
+  .edit-btn, #share-btn, #pdf-btn { display: none !important; }
+
+  /* Force results visible regardless of inline style */
+  #results { display: block !important; }
+
+  /* Ensure wizard steps stay hidden even if wizard-wrap override fails */
+  #step-1, #step-2, #step-3 { display: none !important; }
+
+  body { background: #fff; font-size: 12px; }
+  .page { padding: 0; max-width: 100%; }
+
+  /* Single column layout */
+  .results-layout { display: block !important; }
+  .results-main { width: 100%; }
+
+  /* Chapter cards */
+  .story-chapter {
+    border: 1px solid #dde3ea;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+    box-shadow: none;
+  }
+
+  /* Keep story chapter header readable */
+  .story-chapter-header { margin-bottom: 12px; padding-bottom: 10px; }
+  .story-illo { display: none; }
+
+  /* Metrics grid — 3 col stays */
+  .metrics { grid-template-columns: 1fr 1fr 1fr; }
+  .decision-engine { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* Charts — hide canvas, not renderable in PDF */
+  .chart-card canvas { display: none; }
+  .chart-card::after {
+    content: '[Chart not available in PDF — view online for interactive charts]';
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    font-style: italic;
+    padding: 8px 0;
+  }
+
+  /* Synthesis box */
+  .synthesis-box { box-shadow: none; page-break-inside: avoid; }
+  .syn-verdict-mark { margin: -16px -16px 16px -16px; }
+
+  /* Amort table — selective columns for PDF readability */
+  /* Show: Yr, Age, Note, Mo.Payment, Interest Paid, Balance, Equity, Buffer */
+  /* Hide: Gross Salary, Take-Home, Annual Total, Principal, Prop.Value (too wide) */
+  .amort-table th:nth-child(4), .amort-table td:nth-child(4),  /* Gross Salary */
+  .amort-table th:nth-child(5), .amort-table td:nth-child(5),  /* Take-Home */
+  .amort-table th:nth-child(7), .amort-table td:nth-child(7),  /* Annual Total */
+  .amort-table th:nth-child(8), .amort-table td:nth-child(8),  /* Principal */
+  .amort-table th:nth-child(11), .amort-table td:nth-child(11) /* Prop. Value */
+  { display: none !important; }
+  .amort-table .col-detail { display: table-cell !important; }
+  .amort-table { font-size: 10px; width: 100%; }
+  .amort-table th, .amort-table td { padding: 5px 8px; }
+  .amort-scroll { overflow: visible; }
+  .amort-card { page-break-before: avoid; }
+  #ch-06 { page-break-before: always; }
+
+  /* BVR table */
+  .bvr-table th:nth-child(3), .bvr-table td:nth-child(3),
+  .bvr-table th:nth-child(4), .bvr-table td:nth-child(4),
+  .bvr-table th:nth-child(5), .bvr-table td:nth-child(5) { display: table-cell !important; }
+
+  /* PDF header — shown only in print */
+  .pdf-header { display: block !important; }
+
+  /* Hide toggle buttons */
+  .toggle-detail-btn, .amort-legend { display: none; }
+
+  /* Colors must print */
+  .m-val.ok, .rsb-kpi-val.ok, .de-val.ok { color: #16a34a !important; }
+  .m-val.warn, .de-val.warn { color: #d97706 !important; }
+  .m-val.danger, .de-val.danger { color: #dc2626 !important; }
+  .verdict-banner.ok { border-left: 3px solid #16a34a !important; }
+  .verdict-banner.warn { border-left: 3px solid #d97706 !important; }
+  .verdict-banner.danger { border-left: 3px solid #dc2626 !important; }
+  .metric-bar.ok { background: #16a34a !important; }
+  .metric-bar.warn { background: #d97706 !important; }
+  .metric-bar.danger { background: #dc2626 !important; }
+  .de-kpi.ok { border-top: 3px solid #16a34a !important; }
+  .de-kpi.warn { border-top: 3px solid #d97706 !important; }
+  .de-kpi.danger { border-top: 3px solid #dc2626 !important; }
+  .syn-verdict-mark.ok { background: #f0fdf4 !important; }
+  .syn-verdict-mark.warn { background: #fffbeb !important; }
+  .syn-verdict-mark.danger { background: #fef2f2 !important; }
+}
+
+/* ── JARGON TOOLTIPS ── */
+.jargon {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  position: relative;
+  cursor: help;
+}
+.jargon-word {
+  border-bottom: 1px dashed var(--ink-4);
+  font-style: normal;
+}
+.jargon-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+  font-style: normal;
+  vertical-align: middle;
+  transition: background 0.12s;
+  cursor: pointer;
+}
+.jargon:hover .jargon-icon,
+.jargon.active .jargon-icon { background: var(--ink); }
+
+/* Tooltip rendered via JS into body — position: fixed, always in viewport */
+.jargon-tooltip-popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  width: 240px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  box-shadow: 0 4px 20px rgba(30,58,95,0.22);
+  pointer-events: none;
+}
+.jargon-tooltip-popup::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: var(--arrow-left, 14px);
+  width: 10px;
+  height: 10px;
+  background: var(--ink);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+/* Arrow at bottom when tooltip flips above the icon */
+.jargon-tooltip-popup.above::before {
+  top: auto;
+  bottom: -5px;
+}
+.jargon-tooltip-popup .tt-term {
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+.jargon-tooltip-popup .tt-body { color: rgba(255,255,255,0.78); }
+
 @media (max-width: 900px) {
   /* Collapse to single column on tablet and below */
   .results-layout { grid-template-columns: 1fr; }
@@ -1123,7 +1335,7 @@ select {
     <div class="header-brand">Home Loan Simulator</div>
     <div class="header-sub">Philippines — Bank, Pag-IBIG, In-House</div>
   </div>
-  <div class="header-kayako">KayaKo.ph</div>
+  <div class="header-kayako">KayaKo</div>
 </div>
 
 <div class="page">
@@ -1219,12 +1431,12 @@ select {
           <div class="cc-row"><span>Transfer Tax (LGU)</span><span class="cc-val" id="cc-tx">—</span></div>
           <div class="cc-row"><span>Registration Fee (RD)</span><span class="cc-val" id="cc-reg">—</span></div>
           <div class="cc-row"><span>Notarial / Deed of Sale</span><span class="cc-val" id="cc-not">—</span></div>
-          <div class="cc-row"><span>Bank / Appraisal Fees</span><span class="cc-val" id="cc-bank">—</span></div>
+          <div class="cc-row"><span id="cc-bank-label">Bank / Appraisal Fees</span><span class="cc-val" id="cc-bank">—</span></div>
           <div class="cc-row"><span>Total Closing Costs</span><span class="cc-val" id="cc-total">—</span></div>
         </div>
         <div id="callout-pagibig" class="callout info hidden">
           <span class="co-icon">i</span>
-          <span>Pag-IBIG max loan is <strong>₱6.5M</strong>. Your loan amount exceeds this — you'll need a bank loan for the difference.</span>
+          <span>Pag-IBIG max loan is <strong>₱10M</strong> (confirmed Sep 2026). Your loan amount exceeds this — you'll need a bank loan for the difference.</span>
         </div>
         <div id="callout-dp-low" class="callout warn hidden">
           <span class="co-icon">!</span>
@@ -1327,7 +1539,7 @@ select {
           </div>
           <div class="input-wrap has-prefix">
             <span class="prefix">₱</span>
-            <input type="text" id="current-rent" inputmode="numeric" placeholder="e.g. 20,000" oninput="fmtInput(this)">
+            <input type="text" id="current-rent" inputmode="numeric" placeholder="e.g. 20,000" oninput="fmtInput(this); step2Update()">
           </div>
           <div class="field-note">Leave blank to auto-estimate</div>
         </div>
@@ -1340,10 +1552,10 @@ select {
             <span class="field-hint">For the schedule table</span>
           </div>
           <div class="input-wrap has-suffix">
-            <input type="number" id="age" inputmode="numeric" min="18" max="60" placeholder="e.g. 30" oninput="step2Update()">
+            <input type="number" id="age" inputmode="numeric" min="18" max="65" placeholder="e.g. 30" oninput="step2Update()">
             <span class="suffix">yrs</span>
           </div>
-          <div class="field-error" id="err-age">Enter your age (18–60)</div>
+          <div class="field-error" id="err-age">Enter your age (18–65)</div>
         </div>
         <div class="field">
           <div class="field-label">
@@ -1415,7 +1627,7 @@ select {
       <div class="field" id="fixed-period-field">
         <div class="field-label">
           <label>Fixed Rate Period</label>
-          <span class="field-hint">Rate is locked before repricing</span>
+          <span class="field-hint" id="repricing-hint">Rate is locked before repricing</span>
         </div>
         <div class="pill-group" id="fixed-period-group">
           <div class="pill" data-val="1" onclick="selectPill(this,'fixed-period-group'); step3Update()">1 yr</div>
@@ -1432,14 +1644,14 @@ select {
           <span class="field-hint">Pick one — rates are pre-filled</span>
         </div>
         <div class="rate-options" id="rate-scenario-group">
-          <div class="rate-option selected" data-scenario="optimistic" onclick="selectRateScenario(this)">
+          <div class="rate-option" data-scenario="optimistic" onclick="selectRateScenario(this)">
             <div class="ro-name">Optimistic</div>
-            <div class="ro-rate" id="ropt-rate">6.5%</div>
+            <div class="ro-rate" id="ropt-rate">8.0%</div>
             <div class="ro-desc">Rates drop after fixed period</div>
           </div>
-          <div class="rate-option" data-scenario="base" onclick="selectRateScenario(this)">
+          <div class="rate-option selected" data-scenario="base" onclick="selectRateScenario(this)">
             <div class="ro-name">Base Case</div>
-            <div class="ro-rate" id="rbase-rate">7.5%</div>
+            <div class="ro-rate" id="rbase-rate">8.5%</div>
             <div class="ro-desc">Stable — stays near current</div>
           </div>
           <div class="rate-option" data-scenario="stress" onclick="selectRateScenario(this)">
@@ -1464,7 +1676,7 @@ select {
           </div>
           <div class="info-chip">
             <div class="ic-val" id="d-dti-preview">—</div>
-            <div class="ic-label">DTI Ratio</div>
+            <div class="ic-label" id="step3-dti-label">DTI Ratio</div>
           </div>
         </div>
         <div id="step3-callout" class="hidden"></div>
@@ -1480,6 +1692,21 @@ select {
 
   <!-- ═══ RESULTS ═══ -->
   <div id="results" class="results">
+
+    <!-- PDF-only header — hidden on screen, shown in print -->
+    <div class="pdf-header" style="display:none; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #1e3a5f;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:#64748b; margin-bottom:4px;">KayaKo — Home Loan Simulator</div>
+          <div style="font-size:20px; font-weight:700; color:#1e3a5f;" id="pdf-title">Home Loan Affordability Report</div>
+        </div>
+        <div style="text-align:right; font-size:11px; color:#94a3b8;">
+          <div id="pdf-date"></div>
+          <div>https://jcig789.github.io/kayako</div>
+        </div>
+      </div>
+      <div style="margin-top:10px; font-size:11px; color:#64748b; line-height:1.7;" id="pdf-inputs"></div>
+    </div>
 
     <!-- Mobile scroll progress bar -->
     <div class="scroll-progress-bar" id="scroll-progress-bar">
@@ -1504,6 +1731,11 @@ select {
       <button class="edit-btn" onclick="goStep(1)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Edit Inputs
+      </button>
+
+      <button class="edit-btn" id="pdf-btn" onclick="downloadPDF()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Download PDF
       </button>
       <div class="summary-chips" id="summary-chips"></div>
     </div>
@@ -1667,7 +1899,7 @@ select {
         <div class="metric">
           <div class="metric-bar" id="mb-repriced"></div>
           <div class="metric-inner">
-            <div class="m-label">After Repricing</div>
+            <div class="m-label" id="label-repriced">After Repricing</div>
             <div class="m-val" id="r-amort-repriced">—</div>
             <div class="m-sub" id="r-amort-repriced-sub"></div>
             <div class="m-explain" id="r-amort-repriced-explain"></div>
@@ -1676,10 +1908,10 @@ select {
         <div class="metric">
           <div class="metric-bar" id="mb-dti"></div>
           <div class="metric-inner">
-            <div class="m-label">Debt-to-Income Ratio</div>
+            <div class="m-label" id="label-dti">Debt-to-Income Ratio</div>
             <div class="m-val" id="r-dti">—</div>
             <div class="dti-bar-wrap"><div class="dti-bar" id="r-dti-bar"></div></div>
-            <div class="m-sub">Recommended max: 30–35%</div>
+            <div class="m-sub" id="dti-sub">Recommended max: 30–35%</div>
             <div class="m-explain" id="r-dti-explain"></div>
           </div>
         </div>
@@ -1992,6 +2224,7 @@ select {
 
     <div class="disclaimer">
       <strong>Disclaimer:</strong> This tool is for educational purposes only and does not constitute financial advice. Actual loan terms, interest rates, taxes, and property values may differ. Interest rate scenarios are illustrative. Consult a licensed financial advisor and your bank or Pag-IBIG before making any property purchase decision.
+      <a href="ph-methodology.html" style="color:var(--ink-4);text-decoration:underline;margin-left:8px;font-size:11px;">How we calculate these numbers →</a>
     </div>
 
     </div><!-- /results-main -->
@@ -2017,7 +2250,7 @@ select {
         <div class="rsb-section-label">At a Glance</div>
         <div class="rsb-kpi-row">
           <div class="rsb-kpi">
-            <span class="rsb-kpi-label">Bank Approval</span>
+            <span class="rsb-kpi-label" id="rsb-approval-label">Bank Approval</span>
             <span class="rsb-kpi-val" id="rsb-approval">—</span>
           </div>
           <div class="rsb-kpi">
@@ -2068,10 +2301,41 @@ select {
 
 <script>
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
-const PAGIBIG_MAX = 6500000;
+// Confirmed from pagibigfund.gov.ph Sep 2026: max loan raised to ₱10,000,000
+// Banner: "UP TO P10M NA!" — Housing and Retirees, NonWorking Spouses
+const PAGIBIG_MAX = 10000000;
+
+// Pag-IBIG rates — confirmed from pagibigfund.gov.ph screenshot, valid until Dec 31, 2026
+// 1yr and 3yr repricing not shown on current page — using closest available (5yr)
+const PAGIBIG_RATES_BY_PERIOD = {
+  1:  5.750, // promo rate bracket (≤₱4.9M socialized/affordable) — use 5.75 as proxy
+  2:  6.000, // interpolated
+  3:  6.375, // not confirmed on current page — kept from Circular 460
+  5:  6.500, // confirmed from live screenshot Dec 2026
+  10: 7.125, // confirmed
+  15: 7.750, // confirmed
+  20: 8.500, // confirmed
+  25: 9.125, // confirmed
+  30: 9.750, // confirmed
+};
+
+// Helper: get Pag-IBIG rate for a given repricing period
+function getPagibigRate(repricingYears) {
+  const periods = Object.keys(PAGIBIG_RATES_BY_PERIOD).map(Number).sort((a,b) => a-b);
+  // Find closest period
+  const closest = periods.reduce((prev, curr) =>
+    Math.abs(curr - repricingYears) < Math.abs(prev - repricingYears) ? curr : prev
+  );
+  return PAGIBIG_RATES_BY_PERIOD[closest];
+}
+
+// Bank rates updated September 2026 — BSP policy rate at 5.00% (Aug 27, 2026)
+// Typical bank spread: 3.0–4.0% over BSP rate. Fixed period rates Aug 2026 indicative.
 const DEFAULT_RATES = {
-  bank:    { optimistic: [6.5, 5.5], base: [7.0, 7.5], stress: [7.0, 9.5] },
-  pagibig: { optimistic: [6.0, 6.0], base: [6.375, 6.375], stress: [6.5, 6.5] },
+  bank:    { optimistic: [8.0, 7.5], base: [8.5, 9.0], stress: [8.5, 11.0] },
+  // Pag-IBIG: rates are derived from repricing period, not scenario — see getPagibigRate()
+  // These scenario values are fallbacks only; actual rate is set dynamically
+  pagibig: { optimistic: [6.5, 6.5], base: [6.5, 6.5], stress: [6.5, 7.0] }, // 5yr repricing as default base
   inhouse: { optimistic: [14.0, 14.0], base: [16.0, 16.0], stress: [18.0, 18.0] },
 };
 
@@ -2274,7 +2538,7 @@ function validateStep2() {
     setInputState('living-exp', 'ok');
   }
 
-  if (age < 18 || age > 60) {
+  if (age < 18 || age > 65) {
     showErr('err-age', true);
     setInputState('age', 'error');
     ok = false;
@@ -2314,6 +2578,8 @@ function step1Update() {
   document.getElementById('cc-reg').textContent  = '₱' + fmt(Math.round(cc.regFee));
   document.getElementById('cc-not').textContent  = '₱' + fmt(Math.round(cc.notarial));
   document.getElementById('cc-bank').textContent = '₱' + fmt(Math.round(cc.bankFees));
+  const ccBankLabel = document.getElementById('cc-bank-label');
+  if (ccBankLabel) ccBankLabel.textContent = loanType === 'pagibig' ? 'Pag-IBIG Processing Fee' : 'Bank / Appraisal Fees';
   document.getElementById('cc-total').textContent = '₱' + fmt(Math.round(cc.total));
 
   const pagibigVisible = loan > PAGIBIG_MAX;
@@ -2432,31 +2698,59 @@ function onLoanTypeChange() {
   const type = getSelectedPill('loan-type-group');
   const fixedField = document.getElementById('fixed-period-field');
   const notes = {
-    bank: 'Bank loans reprice after the fixed period. Typical current rates: 6.5–7.5% fixed.',
-    pagibig: 'Pag-IBIG rates are fixed for the full term: 6.0% (1yr) to 6.5% (30yr). Max loan: ₱6.5M.',
+    bank: 'Bank loans reprice after the fixed period. Indicative rates as of Sep 2026 (BSP rate 5.00%): 8.0–9.0% fixed. Verify with your bank before applying.',
+    pagibig: 'Pag-IBIG rates (valid until Dec 31, 2026): 6.5% (5yr) to 9.75% (30yr). Promo rates: 4.5% and 5.75% for select brackets. Max loan: ₱10M. Must mature before age 70.',
     inhouse: 'In-house financing is easier to qualify for but significantly more expensive — typically 14–18% p.a.',
   };
   document.getElementById('loan-type-note').textContent = notes[type] || '';
   fixedField.classList.toggle('hidden', type !== 'bank');
   updateRateDisplays();
   step3Update();
+  // Update closing cost breakdown in Step 1 — DST rate differs for Pag-IBIG
+  step1Update();
+}
+
+// Helper to resolve actual init/repriced rates based on loan type + period + scenario
+function resolveRates(type, scen, term, fixedPeriod) {
+  if (type === 'pagibig') {
+    // Pag-IBIG: rate is determined by the repricing period selected, not the scenario
+    // At repricing, the prevailing rate at that time applies — we model stress as +0.5%
+    const baseRate = getPagibigRate(fixedPeriod || term);
+    const repricedRate = scen === 'stress' ? baseRate + 0.5 :
+                         scen === 'optimistic' ? Math.max(5.75, baseRate - 0.5) : baseRate;
+    return [baseRate, repricedRate];
+  }
+  const rates = (DEFAULT_RATES[type] || DEFAULT_RATES.bank)[scen];
+  return [rates[0], rates[1]];
 }
 
 function updateRateDisplays() {
   const type = getSelectedPill('loan-type-group') || 'bank';
-  const rates = DEFAULT_RATES[type] || DEFAULT_RATES.bank;
-  document.getElementById('ropt-rate').textContent = rates.optimistic[0] + '%';
-  document.getElementById('rbase-rate').textContent = rates.base[1] + '%';
-  document.getElementById('rstress-rate').textContent = rates.stress[1] + '%';
-
+  const term = parseInt(getSelectedPill('loan-term-group') || '20');
+  const fixedPeriod = parseInt(getSelectedPill('fixed-period-group') || '3');
   const scen = getSelectedScenario();
-  const scen_rates = rates[scen] || rates.base;
-  const notes = {
-    optimistic: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates improve)`,
-    base: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates stable)`,
-    stress: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (BSP rate spike)`,
-  };
-  document.getElementById('rate-scenario-note').textContent = notes[scen] || '';
+
+  if (type === 'pagibig') {
+    // Show period-based rates for Pag-IBIG
+    const optRate = getPagibigRate(fixedPeriod);
+    document.getElementById('ropt-rate').textContent = optRate + '%';
+    document.getElementById('rbase-rate').textContent = optRate + '%';
+    document.getElementById('rstress-rate').textContent = (optRate + 0.5).toFixed(3) + '%';
+    document.getElementById('rate-scenario-note').textContent =
+      `Pag-IBIG rate for ${fixedPeriod}-year repricing period: ${optRate}% (per Circular No. 460, 2024)`;
+  } else {
+    const rates = DEFAULT_RATES[type] || DEFAULT_RATES.bank;
+    document.getElementById('ropt-rate').textContent = rates.optimistic[0] + '%';
+    document.getElementById('rbase-rate').textContent = rates.base[1] + '%';
+    document.getElementById('rstress-rate').textContent = rates.stress[1] + '%';
+    const scen_rates = rates[scen] || rates.base;
+    const notes = {
+      optimistic: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates improve)`,
+      base:       `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates stable)`,
+      stress:     `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (BSP rate spike)`,
+    };
+    document.getElementById('rate-scenario-note').textContent = notes[scen] || '';
+  }
 }
 
 function step3Update() {
@@ -2478,9 +2772,10 @@ function step3Update() {
   const type = getSelectedPill('loan-type-group') || 'bank';
   const scen = getSelectedScenario();
   const term = parseInt(getSelectedPill('loan-term-group') || '20');
-  const rates = (DEFAULT_RATES[type] || DEFAULT_RATES.bank)[scen];
-  const initRate = rates[0];
-  const repricedRate = rates[1];
+  const fixedPeriod = type === 'bank'
+    ? parseInt(getSelectedPill('fixed-period-group') || '3')
+    : type === 'pagibig' ? 3 : term;
+  const [initRate, repricedRate] = resolveRates(type, scen, term, fixedPeriod);
 
   const existingLoans = parseVal('existing-loans') || 0;
   const fixedAmort = monthlyPayment(loan, initRate, term);
@@ -2532,8 +2827,10 @@ function incomeTax(annualIncome) {
 }
 
 function mandatoryDeductions(monthlySalary) {
-  const msc = Math.min(Math.max(monthlySalary, 4000), 30000);
-  const sss = msc * 0.045;
+  // SSS per Circular No. 2024-006 effective January 2025:
+  // Employee rate: 5% of MSC | Min MSC: ₱5,000 | Max MSC: ₱35,000
+  const msc = Math.min(Math.max(monthlySalary, 5000), 35000);
+  const sss = msc * 0.05;
   const ph = Math.min(monthlySalary, 100000) * 0.025;
   const pi = Math.min(monthlySalary * 0.02, 200);
   return sss + ph + pi;
@@ -2561,13 +2858,19 @@ function calculate() {
   const propType = getSelectedPill('prop-type-group') || 'condo';
   const term = parseInt(getSelectedPill('loan-term-group') || '20');
   const scen = getSelectedScenario();
+  // Bank: use selected fixed period. Pag-IBIG: default 3yr (standard repricing). In-house: full term (no repricing).
   const fixedPeriod = loanType === 'bank'
     ? parseInt(getSelectedPill('fixed-period-group') || '3')
+    : loanType === 'pagibig'
+    ? 3
     : term;
 
-  const rates = (DEFAULT_RATES[loanType] || DEFAULT_RATES.bank)[scen];
-  const initRate = rates[0];
-  const repricedRate = rates[1];
+  // Lender name — used throughout calculate() for user-facing text
+  const lenderName = loanType === 'pagibig' ? 'Pag-IBIG' : loanType === 'inhouse' ? 'Developer' : 'Bank';
+  const lenderFull = loanType === 'pagibig' ? 'Pag-IBIG Fund (HDMF)' : loanType === 'inhouse' ? 'developer / in-house financing' : 'Philippine banks';
+
+  // Use resolveRates() which handles Pag-IBIG period-based rates correctly
+  const [initRate, repricedRate] = resolveRates(loanType, scen, term, fixedPeriod);
 
   const salary = parseVal('salary');
   const spouse = parseVal('spouse-salary');
@@ -2593,7 +2896,7 @@ function calculate() {
   const monthlyRPT  = price * RPT_RATE / 12;
   const monthlyFire = price * FIRE_RATE / 12;
   const monthlyMRI  = loan  * MRI_RATE  / 12;
-  const monthlyHOA  = loanType === 'pagibig' ? 1000 :
+  const monthlyHOA  = loanType === 'pagibig' ? 500 :   // socialized/affordable housing
                       propType === 'condo' ? 4000 : 1000;
 
   // Buffer deducts existing loans — they compete for the same take-home
@@ -2705,7 +3008,7 @@ function calculate() {
   const netDSR         = (fixedAmort + existingLoans) / totalNet * 100;
   const netDSRRepriced = (repricedAmort + existingLoans) / totalNet * 100;
   const existingDSR    = existingLoans / totalNet * 100;
-  const MIN_NET_INCOME_PAGIBIG = 10000;
+  // Pag-IBIG has no stated minimum income — affordability governed by DSR (35% of gross)
   const savings = parseVal('savings') || 0;
   const existingLoanNote = existingLoans > 0
     ? ` (home loan ₱${fmtM(fixedAmort)} + existing ₱${fmtM(existingLoans)})`
@@ -2726,23 +3029,29 @@ function calculate() {
     }
   }
 
-  // Check 1: Total Net DSR — includes existing loans (PH banks pull full credit history)
-  if (netDSR > 50) {
-    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — exceeds the 40% bank cap.`, type: 'fail' });
+  // Check 1: Total Net DSR (PH bank cap: 35% guideline, 40% absolute max)
+  if (netDSR > 45) {
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — well above the 40% cap. ${lenderFull} will likely decline.`, type: 'fail' });
     approvalStatus = 'declined';
+  } else if (netDSR > 40) {
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — at the absolute limit. A few banks may process this but most will decline.`, type: 'fail' });
+    if (approvalStatus !== 'declined') approvalStatus = 'declined';
   } else if (netDSR > 35) {
-    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — borderline. Some banks accept up to 40%.`, type: 'warn-item' });
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — above the 35% guideline. Some banks accept up to 40% with strong credit history.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else {
     approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — within the 35% guideline.`, type: 'pass' });
   }
 
   // Check 2: Repriced DSR stress test
-  if (netDSRRepriced > 50) {
-    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — banks doing stress tests may decline on this.`, type: 'fail' });
+  if (netDSRRepriced > 45) {
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — banks doing stress tests will likely decline on this.`, type: 'fail' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else if (netDSRRepriced > 40) {
-    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — tight but most banks will still process.`, type: 'warn-item' });
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — above the 40% cap after repricing. Consider a shorter fixed period.`, type: 'warn-item' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+  } else if (netDSRRepriced > 35) {
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), DSR rises to ${netDSRRepriced.toFixed(0)}% — still within most banks' tolerance.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else {
     approvalReasons.push({ text: `Even after repricing to ${repricedRate}%, total DSR stays at ${netDSRRepriced.toFixed(0)}% — passes stress test.`, type: 'pass' });
@@ -2760,10 +3069,15 @@ function calculate() {
     approvalReasons.push({ text: `Loan-to-income ratio is ${loanToIncome.toFixed(0)}× — well within bank guidelines.`, type: 'pass' });
   }
 
-  // Check 4: Pag-IBIG minimum income
-  if (loanType === 'pagibig' && totalNet < MIN_NET_INCOME_PAGIBIG) {
-    approvalReasons.push({ text: `Pag-IBIG requires minimum net monthly income of ₱10,000. Your take-home is ₱${fmt(Math.round(totalNet))}.`, type: 'fail' });
-    approvalStatus = 'declined';
+  // Check 4b: Pag-IBIG eligibility
+  if (loanType === 'pagibig') {
+    approvalReasons.push({ text: `Pag-IBIG requires at least 24 monthly contributions before applying. Confirm your contribution history at pagibigfund.gov.ph.`, type: 'warn-item' });
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
+    // Pag-IBIG max loan ₱10M (confirmed Sep 2026 from pagibigfund.gov.ph)
+    if (loan > PAGIBIG_MAX) {
+      approvalReasons.push({ text: `Loan amount ₱${fmtM(loan)} exceeds the Pag-IBIG maximum of ₱10M. You will need supplemental bank financing for the difference.`, type: 'fail' });
+      approvalStatus = 'declined';
+    }
   }
 
   // Check 5: Down payment adequacy
@@ -2824,7 +3138,9 @@ function calculate() {
     if (tightYear === null && moBuffer < 0) {
       tightYear = row.yr;
     }
-    if (forcedSaleYear === null && runSavings < 0 && savings > 0) {
+    // Only flag forced sale if user had savings after closing — if savings < purchase cost,
+    // that's a purchase gap problem (already shown separately), not a forced sale scenario
+    if (forcedSaleYear === null && runSavings < 0 && savingsAfterClosing > 0) {
       forcedSaleYear = row.yr;
       forcedSaleAge = row.age;
     }
@@ -2844,15 +3160,18 @@ function calculate() {
   let verdictClass, tag, title, body;
 
   // Hard decline conditions (ordered by severity)
-  const hardDecline = approvalStatus === 'declined' || monthlyBuffer < -totalNet * 0.2;
-  const hardDanger  = forcedSaleYear !== null;
+  // hardDecline only when bank declines OR buffer is severely negative (>40% shortfall)
+  // Mildly negative buffer = warn, not danger — salary growth covers it over time
+  const hardDecline = approvalStatus === 'declined' || monthlyBuffer < -totalNet * 0.4;
+  // hardDanger only when bank would approve but savings run out — not when already declined
+  const hardDanger  = forcedSaleYear !== null && !hardDecline;
 
   if (hardDecline) {
     verdictClass = 'danger';
     if (approvalStatus === 'declined') {
       tag   = 'BANK WILL LIKELY DECLINE';
       title = 'This loan does not meet Philippine bank requirements';
-      body  = `Your net DSR is ${netDSR.toFixed(0)}% — Philippine banks approve loans where the monthly payment is at most 35% of take-home pay (₱${fmt(Math.round(totalNet))}). ` +
+      body  = `Your net DSR is ${netDSR.toFixed(0)}% — ${lenderFull} approve loans where the monthly payment is at most 35% of take-home pay (₱${fmt(Math.round(totalNet))}). ` +
               `To qualify: reduce the loan amount, increase your down payment, or extend the loan term. See "What would it take?" below.`;
     } else {
       tag   = 'CASH FLOW INSOLVENT';
@@ -2885,21 +3204,22 @@ function calculate() {
   }
 
   // ─── POPULATE DOM ─────────────────────────────────────────────────────────
+  // lenderName and lenderFull declared at top of calculate() — available throughout
 
-  // ① Bank Approval Gate
+  // ① Approval Gate
   const gateEl = document.getElementById('bank-gate');
   gateEl.className = 'bank-gate ' + approvalStatus;
   gateEl.classList.remove('hidden');
   const gateIcons = { approved: 'Pass', marginal: '!', declined: 'Fail' };
   const gateTitles = {
-    approved: 'Bank Approval: Likely Approved',
-    marginal:  'Bank Approval: Borderline — May Need Negotiation',
-    declined:  'Bank Approval: Likely Declined',
+    approved: `${lenderName} Approval: Likely Approved`,
+    marginal:  `${lenderName} Approval: Borderline — May Need Negotiation`,
+    declined:  `${lenderName} Approval: Likely Declined`,
   };
   const gateSubs = {
-    approved: 'Your income and loan amount meet Philippine bank underwriting guidelines.',
-    marginal:  'This loan is at the edge of approval criteria. A co-borrower, larger down payment, or longer term would help.',
-    declined:  'Most Philippine banks would decline this loan as structured. See reasons below.',
+    approved: `Your income and loan amount meet ${lenderFull} underwriting guidelines.`,
+    marginal:  `This loan is at the edge of approval criteria. A co-borrower, larger down payment, or longer term would help.`,
+    declined:  `${lenderFull} would likely decline this loan as structured. See reasons below.`,
   };
   document.getElementById('bg-icon').textContent = gateIcons[approvalStatus];
   document.getElementById('bg-title').textContent = gateTitles[approvalStatus];
@@ -2912,7 +3232,10 @@ function calculate() {
   const deEl = document.getElementById('decision-engine');
   deEl.classList.remove('hidden');
 
-  // Approval KPI — set card status class + val color
+  // Approval KPI — update label to reflect lender type
+  const deApprovalLabel = document.getElementById('de-approval')?.querySelector('.de-label');
+  if (deApprovalLabel) deApprovalLabel.textContent = `${lenderName} Approval`;
+
   const approvalLabels = { approved: 'Likely Approved', marginal: 'Borderline', declined: 'Likely Declined' };
   const approvalCls    = { approved: 'ok', marginal: 'warn', declined: 'danger' };
   const aKpiCls = approvalCls[approvalStatus];
@@ -3023,7 +3346,11 @@ function calculate() {
     document.getElementById('bc-btn').textContent   = 'Talk to a Broker';
   } else {
     document.getElementById('bc-title').textContent = 'Your numbers qualify — take the next step';
-    document.getElementById('bc-sub').textContent   = 'Connect with a verified broker to get pre-approved and start viewing properties. Most banks respond within 5 business days.';
+    document.getElementById('bc-sub').textContent   = loanType === 'pagibig'
+      ? 'Connect with a Pag-IBIG accredited broker to submit your application. Pag-IBIG typically processes within 2–3 weeks.'
+      : loanType === 'inhouse'
+      ? 'Connect with the developer\'s in-house sales team to start the application process.'
+      : 'Connect with a verified broker to get pre-approved and start viewing properties. Most banks respond within 5 business days.';
     document.getElementById('bc-btn').textContent   = 'Get Pre-Approved';
   }
 
@@ -3090,14 +3417,19 @@ function calculate() {
   }
 
   // ─── Age-at-maturity warning ──────────────────────────────────────────────
-  // Add to approval reasons if loan matures above bank max age (typically 65)
+  // Age-at-maturity check — Pag-IBIG: max age 70; banks: typically 65–70
   const ageAtMaturity = AGE_BASE + term;
-  if (ageAtMaturity > 65) {
-    // This check runs after approvalReasons is already rendered — update gate
+  const maxAgeAtMaturity = loanType === 'pagibig' ? 70 : 65;
+  if (ageAtMaturity > maxAgeAtMaturity) {
     const extraReason = document.createElement('div');
-    extraReason.className = 'bg-reason warn-item';
-    extraReason.textContent = `At age ${AGE_BASE} with a ${term}-year term, you would be ${ageAtMaturity} at loan maturity. Some banks cap borrower age at loan end to 65. Consider a shorter term.`;
+    extraReason.className = 'bg-reason fail';
+    extraReason.textContent = `At age ${AGE_BASE} with a ${term}-year term, you would be ${ageAtMaturity} at loan maturity. ` +
+      (loanType === 'pagibig'
+        ? `Pag-IBIG requires the loan to mature before age 70.`
+        : `Most banks cap borrower age at loan end to 65.`) +
+      ` Consider a shorter term.`;
     document.getElementById('bg-reasons').appendChild(extraReason);
+    if (approvalStatus === 'approved') approvalStatus = 'marginal';
   }
 
   // Summary chips
@@ -3131,10 +3463,20 @@ function calculate() {
 
   const repricedClass = dtiRepriced > 40 ? 'danger' : dtiRepriced > 30 ? 'warn' : 'ok';
   setMetricBar('mb-repriced', repricedClass);
-  document.getElementById('r-amort-repriced').textContent = '₱' + fmt(Math.round(repricedAmort));
-  document.getElementById('r-amort-repriced').className = 'm-val ' + repricedClass;
+  // Update card label based on loan type
+  const repricedLabel = document.getElementById('label-repriced');
+  if (repricedLabel) {
+    repricedLabel.textContent = loanType === 'bank' ? 'After Repricing' :
+                                loanType === 'pagibig' ? 'After Pag-IBIG Repricing' :
+                                'Fixed Rate (No Repricing)';
+  }
+  document.getElementById('r-amort-repriced').textContent = loanType === 'inhouse'
+    ? '—' : '₱' + fmt(Math.round(repricedAmort));
+  document.getElementById('r-amort-repriced').className = 'm-val ' + (loanType === 'inhouse' ? '' : repricedClass);
   document.getElementById('r-amort-repriced-sub').textContent =
-    loanType === 'bank' ? `After year ${fixedPeriod} at ${repricedRate}%` : `Fixed at ${initRate}% full term`;
+    loanType === 'bank'    ? `After year ${fixedPeriod} at ${repricedRate}%` :
+    loanType === 'pagibig' ? `At repricing (${repricedRate}%)` :
+    `Rate is fixed for the full ${term}-year term`;
   const repricedDiff = Math.round(repricedAmort - fixedAmort);
   document.getElementById('r-amort-repriced-explain').textContent =
     loanType !== 'bank' ? `Your rate is fixed for the full loan — no surprise increases.` :
@@ -3224,7 +3566,7 @@ function calculate() {
   document.getElementById('tcb-breakdown').innerHTML = [
     { label: 'Loan Principal (what you borrow)',         amt: loan,           cls: '' },
     { label: `Interest (${interestRatio}% of principal)`, amt: totalInterest,  cls: 'highlight' },
-    { label: 'Closing Costs (DST, transfer, fees)',      amt: closingCosts,   cls: '' },
+    { label: loanType === 'pagibig' ? 'Closing Costs (DST, transfer, Pag-IBIG fees)' : 'Closing Costs (DST, transfer, bank fees)', amt: closingCosts, cls: '' },
     { label: `MRI — Mortgage Insurance (${term} yrs)`,  amt: totalMRI,       cls: '' },
     { label: `Fire Insurance (${term} yrs)`,            amt: totalFire,      cls: '' },
     { label: `Real Property Tax (${term} yrs)`,         amt: totalRPT,       cls: '' },
@@ -3330,12 +3672,12 @@ function calculate() {
   synSignals.push({
     cls:   approvalStatus === 'approved' ? 'ok' : approvalStatus === 'marginal' ? 'warn' : 'danger',
     icon:  approvalStatus === 'approved' ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#16a34a"/></svg>' : approvalStatus === 'marginal' ? '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#d97706"/></svg>' : '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#dc2626"/></svg>',
-    label: 'Bank Approval',
+    label: `${lenderName} Approval`,
     text:  approvalStatus === 'approved'
-      ? `Your net DSR of ${netDSR.toFixed(0)}% is within the 35% limit. Most Philippine banks will process this application.`
+      ? `Your net DSR of ${netDSR.toFixed(0)}% is within the 35% limit. ${lenderFull} will process this application.`
       : approvalStatus === 'marginal'
-      ? `Net DSR is ${netDSR.toFixed(0)}% — borderline. You qualify but may need a larger down payment or co-borrower to secure the best rate.`
-      : `Net DSR is ${netDSR.toFixed(0)}% — above the 40% bank threshold. The loan as structured will likely be declined.`,
+      ? `Net DSR is ${netDSR.toFixed(0)}% — borderline. You may qualify but a larger down payment or co-borrower would help secure approval.`
+      : `Net DSR is ${netDSR.toFixed(0)}% — above the threshold. This loan as structured will likely be declined by ${lenderFull}.`,
   });
 
   // Signal 2: Affordability
@@ -3411,9 +3753,24 @@ function calculate() {
   };
 
   const svm = svmData[verdictClass] || svmData.warn;
-  svmSvg.innerHTML    = svm.svg;
-  svmLabel.textContent   = svm.label;
-  svmVerdict.textContent = svm.verdict;
+  svmSvg.innerHTML = svm.svg;
+
+  // Contextual label/verdict for danger — distinguish decline vs forced sale
+  if (verdictClass === 'danger') {
+    if (approvalStatus === 'declined') {
+      svmLabel.textContent   = 'Not yet — the income gap needs to close';
+      svmVerdict.textContent = 'This loan will likely be declined. See what would it take to qualify.';
+    } else if (hardDanger) {
+      svmLabel.textContent   = 'Risky — savings run out mid-loan';
+      svmVerdict.textContent = `Savings exhausted by year ${forcedSaleYear}. You may be forced to sell before the loan ends.`;
+    } else {
+      svmLabel.textContent   = svm.label;
+      svmVerdict.textContent = svm.verdict;
+    }
+  } else {
+    svmLabel.textContent   = svm.label;
+    svmVerdict.textContent = svm.verdict;
+  }
 
   document.getElementById('syn-signals').innerHTML = synSignals.map(s => `
     <div class="syn-signal ${s.cls}">
@@ -3428,7 +3785,13 @@ function calculate() {
   const synConclusionMap = {
     ok:     `<strong>Overall: a well-structured decision.</strong> Your income supports this loan, the equity builds over time, and your cash flow stays positive. The main thing to manage is the rate repricing in year ${fixedPeriod} — make sure you have a plan for when the payment changes.`,
     warn:   `<strong>Overall: possible, but needs attention.</strong> The loan is approvable but the margins are tight. Before you commit, increase your down payment if you can, or explore a longer term to lower the monthly payment. Talk to a broker about structuring this for the best rate.`,
-    danger: `<strong>Overall: not ready yet — but not far off.</strong> The biggest blockers are ${approvalStatus === 'declined' ? 'income vs. loan size' : 'cash flow after expenses'}. The "What would it take?" section above shows exactly what needs to change. This is a when, not a never.`,
+    danger: `<strong>Overall: not ready yet — but not far off.</strong> The biggest blocker is ${
+      approvalStatus === 'declined' && loanType === 'pagibig' && loan > PAGIBIG_MAX
+        ? `the Pag-IBIG loan cap (₱10M max). Your income supports the payment — you just need supplemental bank financing or a larger down payment to bring the loan below ₱10M.`
+        : approvalStatus === 'declined'
+        ? `income vs. loan size. The "What would it take?" section above shows exactly what needs to change.`
+        : `cash flow after expenses. The "What would it take?" section above shows exactly what needs to change.`
+    } This is a when, not a never.`,
   };
   document.getElementById('syn-conclusion').innerHTML = synConclusionMap[verdictClass] || synConclusionMap.warn;
 
@@ -3461,7 +3824,7 @@ function calculate() {
   document.getElementById('results').style.display = 'block';
   [1, 2, 3].forEach(i => document.getElementById('step-' + i).classList.add('hidden'));
   // Init scroll spy after DOM is rendered
-  requestAnimationFrame(() => initScrollSpy());
+  requestAnimationFrame(() => { initScrollSpy(); injectDynamicJargon(); });
   ['sn-1','sn-2','sn-3'].forEach((id, i) => {
     document.getElementById(id).className = 'step-num done';
     document.getElementById(id).textContent = '';
@@ -3499,7 +3862,10 @@ function calculate() {
     `${initRate}% fixed · ${term} yrs` +
     (loanType === 'bank' ? ` · ₱${fmt(Math.round(repricedAmort))} after yr ${fixedPeriod}` : '');
 
-  // KPIs
+  // KPIs — update lender label in sidebar too
+  const rsbApprovalLabel = document.getElementById('rsb-approval-label');
+  if (rsbApprovalLabel) rsbApprovalLabel.textContent = `${lenderName} Approval`;
+
   const rsbApproval = document.getElementById('rsb-approval');
   rsbApproval.textContent = approvalStatus === 'approved' ? 'Likely Approved' : approvalStatus === 'marginal' ? 'Borderline' : 'Likely Declined';
   rsbApproval.className = 'rsb-kpi-val ' + (approvalStatus === 'approved' ? 'ok' : approvalStatus === 'marginal' ? 'warn' : 'danger');
@@ -3661,6 +4027,122 @@ function toggleAmortDetail(btn) {
   btn.textContent = showing ? 'Show fewer columns' : 'Show all columns';
 }
 
+// ─── JARGON GLOSSARY ─────────────────────────────────────────────────────────
+const GLOSSARY = {
+  DSR: {
+    term: 'DSR — Debt Service Ratio',
+    body: 'The percentage of your monthly take-home pay that goes toward loan payments. Philippine banks require this to stay below 35%. Example: if you earn ₱100K/mo take-home and your loan payment is ₱30K, your DSR is 30%.',
+  },
+  DTI: {
+    term: 'DTI — Debt-to-Income Ratio',
+    body: 'Similar to DSR but uses gross income (before tax) as the denominator. Banks use this as a quick check. Recommended max is 30–35% of gross monthly income.',
+  },
+  MRI: {
+    term: 'MRI — Mortgage Redemption Insurance',
+    body: 'A life insurance policy required by all Philippine lenders. If the borrower dies or becomes permanently disabled before the loan is paid, MRI pays off the remaining balance. Costs roughly 0.05–0.07% of the outstanding balance per year.',
+  },
+  RPT: {
+    term: 'RPT — Real Property Tax',
+    body: 'An annual tax paid to your local government (LGU) based on the assessed value of your property. In Metro Manila, the effective rate is roughly 0.4% of market value per year. Paid quarterly or annually.',
+  },
+  repricing: {
+    term: 'Repricing',
+    body: 'When a bank home loan\'s interest rate is reviewed and updated. Most Philippine bank loans have a "fixed period" (e.g. 3 years at 7%) — after that, the rate is repriced to whatever the bank\'s current rate is. Pag-IBIG also reprices at set intervals.',
+  },
+  amortization: {
+    term: 'Amortization',
+    body: 'The process of paying off a loan in regular installments over time. Each monthly payment covers both interest and principal. Early payments are mostly interest — as the balance decreases, more of each payment goes to principal.',
+  },
+  LTV: {
+    term: 'LTV — Loan-to-Value Ratio',
+    body: 'The loan amount as a percentage of the property\'s appraised value. Example: ₱4M loan on a ₱5M property = 80% LTV. Banks typically lend up to 80–90% LTV. A higher LTV means less down payment but higher risk for the lender.',
+  },
+  HOA: {
+    term: 'HOA — Homeowners Association Dues',
+    body: 'Monthly fees paid to the subdivision or condominium association for shared maintenance, security, and amenities. Typically ₱1,000–₱5,000/mo for house & lot, ₱3,000–₱15,000/mo for condominiums.',
+  },
+};
+
+// Creates a jargon span — tooltip rendered into body on click, never clipped
+function jargonHTML(word, key) {
+  if (!GLOSSARY[key]) return word;
+  return `<span class="jargon" data-key="${key}" onclick="toggleJargon(event,this)">` +
+    `<span class="jargon-word">${word}</span>` +
+    `<i class="jargon-icon">i</i>` +
+  `</span>`;
+}
+
+// Single floating tooltip element — appended to body so it's never clipped
+let _tooltipEl = null;
+
+function getTooltipEl() {
+  if (!_tooltipEl) {
+    _tooltipEl = document.createElement('div');
+    _tooltipEl.className = 'jargon-tooltip-popup';
+    _tooltipEl.innerHTML = '<div class="tt-term" id="_tt-term"></div><div class="tt-body" id="_tt-body"></div>';
+    document.body.appendChild(_tooltipEl);
+  }
+  return _tooltipEl;
+}
+
+function toggleJargon(e, el) {
+  e.stopPropagation();
+  const key = el.dataset.key;
+  const g = GLOSSARY[key];
+  if (!g) return;
+
+  const popup = getTooltipEl();
+  const isVisible = popup.style.display === 'block' && popup._source === el;
+
+  // Hide first
+  popup.style.display = 'none';
+  popup._source = null;
+
+  if (isVisible) return; // toggle off
+
+  // Populate
+  popup.querySelector('#_tt-term').textContent = g.term;
+  popup.querySelector('#_tt-body').textContent = g.body;
+  popup.style.display = 'block';
+  popup._source = el;
+
+  // position:fixed uses viewport coords — do NOT add scrollY/scrollX
+  const icon = el.querySelector('.jargon-icon');
+  const iconRect = (icon || el).getBoundingClientRect();
+  const PAD = 8;
+
+  let top  = iconRect.bottom + PAD;
+  let left = iconRect.left;
+
+  // Clamp to viewport
+  const pw = popup.offsetWidth;
+  const maxLeft = window.innerWidth - pw - 12;
+  if (left > maxLeft) left = maxLeft;
+  if (left < 8) left = 8;
+
+  // Flip above if not enough room below
+  const ph = popup.offsetHeight || 160;
+  const flippedAbove = top + ph > window.innerHeight - 12;
+  if (flippedAbove) top = iconRect.top - ph - PAD;
+
+  popup.style.top  = top + 'px';
+  popup.style.left = left + 'px';
+
+  // Arrow: flip to bottom when tooltip is above
+  popup.classList.toggle('above', flippedAbove);
+
+  // Arrow horizontal position
+  const arrowLeft = Math.min(Math.max(iconRect.left - left + 5, 8), pw - 18);
+  popup.style.setProperty('--arrow-left', arrowLeft + 'px');
+}
+
+// Close when clicking outside
+document.addEventListener('click', () => {
+  const popup = getTooltipEl();
+  popup.style.display = 'none';
+  popup._source = null;
+});
+
 // ─── SCROLL SPY ───────────────────────────────────────────────────────────────
 const SPY_CHAPTERS = [
   { id: 'ch-01', label: 'Chapter 1', title: 'Can you get this loan?' },
@@ -3739,13 +4221,207 @@ window.addEventListener('scroll', () => {
   bar.classList.toggle('visible', onResults && window.scrollY > 180);
 }, { passive: true });
 
+// ─── SHARE URL ────────────────────────────────────────────────────────────────
+// ─── PDF DOWNLOAD ─────────────────────────────────────────────────────────────
+function downloadPDF() {
+  // Populate PDF header fields before printing
+  const price   = parseVal('prop-price');
+  const dpPct   = getDPPct();
+  const loan    = price * (1 - dpPct / 100);
+  const loanType = getSelectedPill('loan-type-group') || 'bank';
+  const term    = getSelectedPill('loan-term-group') || '20';
+  const scen    = getSelectedScenario();
+  const salary  = parseVal('salary');
+  const spouse  = parseVal('spouse-salary');
+  const totalGross = salary + spouse + parseVal('other-income');
+
+  const loanLabel = loanType === 'pagibig' ? 'Pag-IBIG' : loanType === 'inhouse' ? 'In-House' : 'Bank';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  document.getElementById('pdf-date').textContent = dateStr;
+  document.getElementById('pdf-inputs').innerHTML =
+    `Property: ₱${fmt(price)} &nbsp;|&nbsp; Down Payment: ${dpPct}% (₱${fmt(price * dpPct / 100)}) &nbsp;|&nbsp; Loan: ₱${fmt(loan)} &nbsp;|&nbsp; ` +
+    `Financing: ${loanLabel} &nbsp;|&nbsp; Term: ${term} years &nbsp;|&nbsp; Scenario: ${scen.charAt(0).toUpperCase() + scen.slice(1)} &nbsp;|&nbsp; ` +
+    `Monthly Gross Income: ₱${fmt(totalGross)}`;
+
+  // Show detail columns in amort table for PDF
+  const amortTable = document.getElementById('amort-table');
+  const wasShowingDetail = amortTable && amortTable.classList.contains('show-detail');
+  if (amortTable) amortTable.classList.add('show-detail');
+
+  window.print();
+
+  // Restore amort table state after print dialog closes
+  if (amortTable && !wasShowingDetail) amortTable.classList.remove('show-detail');
+}
+
+function buildShareURL() {
+  const p = {
+    pr: parseVal('prop-price'),
+    pt: getSelectedPill('prop-type-group'),
+    dp: getDPPct(),
+    lt: getSelectedPill('loan-type-group'),
+    tm: getSelectedPill('loan-term-group'),
+    fp: getSelectedPill('fixed-period-group'),
+    sc: getSelectedScenario(),
+    sl: parseVal('salary'),
+    sp: parseVal('spouse-salary'),
+    oi: parseVal('other-income'),
+    et: getSelectedPill('emp-type-group'),
+    el: parseVal('existing-loans'),
+    lv: parseVal('living-exp'),
+    cr: parseVal('current-rent'),
+    ag: parseInt(document.getElementById('age').value) || 0,
+    sv: parseVal('savings'),
+  };
+  const encoded = btoa(JSON.stringify(p));
+  const url = window.location.origin + window.location.pathname + '?s=' + encoded;
+  return url;
+}
+
+function shareResults() {
+  const url = buildShareURL();
+  const btn = document.getElementById('share-btn');
+  const label = document.getElementById('share-btn-label');
+
+  // Use native share sheet on mobile if available
+  if (navigator.share) {
+    navigator.share({
+      title: 'KayaKo — Home Loan Simulator',
+      text: 'Check out my home loan affordability scenario',
+      url,
+    }).catch(() => {});
+    return;
+  }
+
+  // Fallback: copy to clipboard
+  navigator.clipboard.writeText(url).then(() => {
+    label.textContent = 'Copied!';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => {
+      label.textContent = 'Share';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2000);
+  }).catch(() => {
+    // Last resort: prompt with the URL
+    prompt('Copy this link to share your scenario:', url);
+  });
+}
+
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const s = params.get('s');
+  if (!s) return;
+
+  let p;
+  try { p = JSON.parse(atob(s)); } catch { return; }
+
+  // Property
+  if (p.pr) { const el = document.getElementById('prop-price'); el.value = Math.round(p.pr).toLocaleString('en-PH'); }
+  if (p.pt) { const pill = document.querySelector(`#prop-type-group .pill[data-val="${p.pt}"]`); if (pill) selectPill(pill, 'prop-type-group'); }
+
+  // Down payment
+  const dpStd = [10, 20, 30, 40];
+  if (p.dp !== undefined) {
+    if (dpStd.includes(p.dp)) {
+      const pill = document.querySelector(`#dp-quick-group .pill[data-val="${p.dp}"]`);
+      if (pill) { selectPill(pill, 'dp-quick-group'); setDP(p.dp); }
+    } else {
+      const pill = document.querySelector('#dp-quick-group .pill[data-val="custom"]');
+      if (pill) { selectPill(pill, 'dp-quick-group'); focusDPInput(); }
+      document.getElementById('dp-pct-input').value = p.dp;
+    }
+  }
+
+  // Loan type — must trigger onLoanTypeChange to show/hide fields
+  if (p.lt) { const pill = document.querySelector(`#loan-type-group .pill[data-val="${p.lt}"]`); if (pill) { selectPill(pill, 'loan-type-group'); onLoanTypeChange(); } }
+  if (p.tm) { const pill = document.querySelector(`#loan-term-group .pill[data-val="${p.tm}"]`); if (pill) selectPill(pill, 'loan-term-group'); }
+  if (p.fp) { const pill = document.querySelector(`#fixed-period-group .pill[data-val="${p.fp}"]`); if (pill) selectPill(pill, 'fixed-period-group'); }
+
+  // Rate scenario
+  if (p.sc) { const opt = document.querySelector(`#rate-scenario-group .rate-option[data-scenario="${p.sc}"]`); if (opt) selectRateScenario(opt); }
+
+  // Income
+  const setFmt = (id, val) => { if (!val) return; const el = document.getElementById(id); el.value = Math.round(val).toLocaleString('en-PH'); };
+  setFmt('salary', p.sl); setFmt('spouse-salary', p.sp); setFmt('other-income', p.oi);
+  setFmt('existing-loans', p.el); setFmt('living-exp', p.lv); setFmt('current-rent', p.cr);
+  setFmt('savings', p.sv);
+  if (p.ag) document.getElementById('age').value = p.ag;
+  if (p.et) { const pill = document.querySelector(`#emp-type-group .pill[data-val="${p.et}"]`); if (pill) { selectPill(pill, 'emp-type-group'); onEmpTypeChange(); } }
+
+  // Trigger live updates
+  step1Update(); step2Update(); step3Update();
+
+  // Auto-calculate if all required fields are present
+  if (p.pr && p.sl && p.lv && p.ag) {
+    setTimeout(() => calculate(), 100);
+  }
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   step1Update();
   onLoanTypeChange();
-  // Ensure bar is hidden on load regardless of browser back/forward cache
+  step3Update();
   document.getElementById('mobile-action-bar').classList.add('hidden-bar');
+
+  // Inject jargon tooltips into static HTML labels
+  const staticJargon = [
+    { id: 'label-dti',       word: 'Debt-to-Income Ratio', key: 'DTI' },
+    { id: 'step3-dti-label', word: 'DTI Ratio',            key: 'DTI' },
+  ];
+  staticJargon.forEach(({ id, word, key }) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = jargonHTML(word, key);
+  });
+
+  // Repricing hint in Step 3
+  const repricingHint = document.getElementById('repricing-hint');
+  if (repricingHint) {
+    repricingHint.innerHTML = 'Rate is locked before ' + jargonHTML('repricing', 'repricing');
+  }
+
+  // Also inject into the bank approval gate section label when rendered
+  // (dynamic labels injected in calculate() — see injectDynamicJargon())
+
+  // Load shared scenario from URL if present
+  loadFromURL();
 });
+
+// Called after calculate() renders results — inject tooltips into dynamic content
+function injectDynamicJargon() {
+  // Bank gate sub-label
+  const bgSub = document.getElementById('bg-sub');
+  if (bgSub && bgSub.textContent.includes('DSR')) {
+    bgSub.innerHTML = bgSub.textContent
+      .replace('Net DSR', jargonHTML('Net DSR', 'DSR'))
+      .replace('net DSR', jargonHTML('net DSR', 'DSR'));
+  }
+  // Decision engine notes
+  const approvalNote = document.getElementById('de-approval-note');
+  if (approvalNote && approvalNote.textContent.includes('DSR')) {
+    approvalNote.innerHTML = approvalNote.textContent
+      .replace('Net DSR', jargonHTML('Net DSR', 'DSR'));
+  }
+  // Metric explain texts
+  ['r-dti-explain','r-amort-fixed-explain','r-amort-repriced-explain','r-buffer-explain',
+   'r-interest-explain','r-equity10-explain'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = el.textContent
+      .replace(/\bDSR\b/g, jargonHTML('DSR', 'DSR'))
+      .replace(/\bDTI\b/g, jargonHTML('DTI', 'DTI'))
+      .replace(/\bMRI\b/g, jargonHTML('MRI', 'MRI'))
+      .replace(/amortization/gi, jargonHTML('amortization', 'amortization'))
+      .replace(/repricing/gi, jargonHTML('repricing', 'repricing'));
+  });
+  // DTI sub label
+  const dtiSub = document.getElementById('dti-sub');
+  if (dtiSub) dtiSub.innerHTML = `Recommended max: 30–35% — see ${jargonHTML('DTI', 'DTI')}`;
+}
 </script>
 </body>
 </html>
