@@ -1482,38 +1482,15 @@ select {
 
       <div class="field">
         <div class="field-label">
-          <label for="salary">Your Monthly Gross Salary</label>
-          <span class="field-hint">Before tax &amp; deductions</span>
+          <label for="salary" id="salary-label">Your Monthly Gross Salary</label>
+          <span class="field-hint" id="salary-hint">Before tax &amp; deductions</span>
         </div>
         <div class="input-wrap has-prefix">
           <span class="prefix">₱</span>
           <input type="text" id="salary" inputmode="numeric" placeholder="e.g. 80,000" oninput="fmtInput(this); step2Update()">
         </div>
-        <div class="field-error" id="err-salary">Enter your monthly gross salary</div>
+        <div class="field-error" id="err-salary">Enter your household's monthly income (yours or your spouse's)</div>
         <div id="salary-takeHome" class="field-note hidden"></div>
-      </div>
-
-      <div class="field">
-        <div class="field-label">
-          <label for="spouse-salary">Spouse / Co-borrower Monthly Salary</label>
-          <span class="field-hint">Optional — leave 0 if none</span>
-        </div>
-        <div class="input-wrap has-prefix">
-          <span class="prefix">₱</span>
-          <input type="text" id="spouse-salary" inputmode="numeric" placeholder="0" oninput="fmtInput(this); step2Update()">
-        </div>
-      </div>
-
-      <div class="field">
-        <div class="field-label">
-          <label for="other-income">Other Monthly Income</label>
-          <span class="field-hint">Freelance, OFW, business, rental</span>
-        </div>
-        <div class="input-wrap has-prefix">
-          <span class="prefix">₱</span>
-          <input type="text" id="other-income" inputmode="numeric" placeholder="0" oninput="fmtInput(this); step2Update()">
-        </div>
-        <div class="field-note">OFW remittance, freelance, business income. <strong>Banks apply a 20–30% haircut on non-regular income</strong> and require 2 years of documentation.</div>
       </div>
 
       <div class="field">
@@ -1526,6 +1503,42 @@ select {
           <div class="pill" data-val="ofw" onclick="selectPill(this,'emp-type-group'); onEmpTypeChange()">OFW</div>
         </div>
         <div id="emp-type-note" class="callout info hidden" style="margin-top:8px"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="spouse-salary" id="spouse-salary-label">Spouse / Co-borrower Monthly Salary</label>
+          <span class="field-hint" id="spouse-salary-hint">Optional — leave 0 if none</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="spouse-salary" inputmode="numeric" placeholder="0" oninput="fmtInput(this); onSpouseSalaryInput()">
+        </div>
+        <div id="spouse-salary-takeHome" class="field-note hidden"></div>
+      </div>
+
+      <div class="field hidden" id="spouse-emp-type-field">
+        <div class="field-label">
+          <label>Spouse / Co-borrower Employment Type</label>
+        </div>
+        <div class="pill-group" id="spouse-emp-type-group">
+          <div class="pill selected" data-val="employed" onclick="selectPill(this,'spouse-emp-type-group'); onSpouseEmpTypeChange()">Employed</div>
+          <div class="pill" data-val="self-employed" onclick="selectPill(this,'spouse-emp-type-group'); onSpouseEmpTypeChange()">Self-Employed</div>
+          <div class="pill" data-val="ofw" onclick="selectPill(this,'spouse-emp-type-group'); onSpouseEmpTypeChange()">OFW</div>
+        </div>
+        <div id="spouse-emp-type-note" class="callout info hidden" style="margin-top:8px"></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="other-income">Other Monthly Income</label>
+          <span class="field-hint">Freelance, OFW, business, rental</span>
+        </div>
+        <div class="input-wrap has-prefix">
+          <span class="prefix">₱</span>
+          <input type="text" id="other-income" inputmode="numeric" placeholder="0" oninput="fmtInput(this); step2Update()">
+        </div>
+        <div class="field-note">OFW remittance, freelance, business income. <strong>Banks apply a 20–30% haircut on non-regular income</strong> and require 2 years of documentation.</div>
       </div>
 
       <hr class="divider">
@@ -2597,11 +2610,12 @@ function validateStep1() {
 
 function validateStep2() {
   const salary = parseVal('salary');
+  const spouse = parseVal('spouse-salary');
   const living = parseVal('living-exp');
   const age = parseInt(document.getElementById('age').value) || 0;
   let ok = true;
 
-  if (salary < 5000) {
+  if (salary + spouse < 5000) {
     showErr('err-salary', true);
     setInputState('salary', 'error');
     ok = false;
@@ -2684,14 +2698,16 @@ function step2Update() {
   const living = parseVal('living-exp');
   const existingLoans = parseVal('existing-loans') || 0;
   const empType = getSelectedPill('emp-type-group') || 'employed';
+  const spouseEmpType = getSelectedPill('spouse-emp-type-group') || 'employed';
 
-  if (salary < 5000) {
+  if (salary + spouse < 5000) {
     document.getElementById('income-summary').classList.add('hidden');
     document.getElementById('salary-takeHome').classList.add('hidden');
+    document.getElementById('spouse-salary-takeHome').classList.add('hidden');
     return;
   }
 
-  const net = netTakeHome(salary, empType) + netTakeHome(spouse) + other;
+  const net = netTakeHome(salary, empType) + netTakeHome(spouse, spouseEmpType) + other;
   const gross = salary + spouse + other;
   const disposable = net - living - existingLoans;
 
@@ -2701,13 +2717,25 @@ function step2Update() {
   document.getElementById('d-disposable').textContent = disposable >= 0 ? '₱' + fmt(Math.round(disposable)) : '-₱' + fmt(Math.round(-disposable));
   document.getElementById('d-disposable').style.color = disposable < 0 ? 'var(--red)' : '';
 
-  document.getElementById('salary-takeHome').classList.remove('hidden');
-  const takeHomeLabels = {
-    ofw:            `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, 'ofw')))} / month (OFWs are exempt from PH income tax on foreign income — SSS/PhilHealth/Pag-IBIG still apply)`,
-    'self-employed':`Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, 'self-employed')))} / month (assumes the 8% flat tax option on gross receipts — SSS/PhilHealth/Pag-IBIG still apply)`,
-    employed:       `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, 'employed')))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`,
-  };
-  document.getElementById('salary-takeHome').textContent = takeHomeLabels[empType] || takeHomeLabels.employed;
+  const takeHomeLabels = (amt, type) => ({
+    ofw:            `Estimated take-home: ₱${fmt(Math.round(netTakeHome(amt, 'ofw')))} / month (no PH income tax on OFW foreign income — this assumes the amount entered is already after their host country's tax; SSS/PhilHealth/Pag-IBIG still apply)`,
+    'self-employed':`Estimated take-home: ₱${fmt(Math.round(netTakeHome(amt, 'self-employed')))} / month (assumes the 8% flat tax option on gross receipts — SSS/PhilHealth/Pag-IBIG still apply)`,
+    employed:       `Estimated take-home: ₱${fmt(Math.round(netTakeHome(amt, 'employed')))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`,
+  }[type] || `Estimated take-home: ₱${fmt(Math.round(netTakeHome(amt, 'employed')))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`);
+
+  if (salary > 0) {
+    document.getElementById('salary-takeHome').classList.remove('hidden');
+    document.getElementById('salary-takeHome').textContent = takeHomeLabels(salary, empType);
+  } else {
+    document.getElementById('salary-takeHome').classList.add('hidden');
+  }
+
+  if (spouse > 0) {
+    document.getElementById('spouse-salary-takeHome').classList.remove('hidden');
+    document.getElementById('spouse-salary-takeHome').textContent = takeHomeLabels(spouse, spouseEmpType);
+  } else {
+    document.getElementById('spouse-salary-takeHome').classList.add('hidden');
+  }
 
   // Show existing loan impact on DSR headroom
   const impactEl = document.getElementById('existing-loans-impact');
@@ -2729,7 +2757,7 @@ function onEmpTypeChange() {
   const msgs = {
     employed: '',
     'self-employed': 'Self-employed borrowers: banks require 2 years of ITR (Income Tax Return) and audited financials. Enter your average monthly income — we assume the 8% flat tax option (most common for straightforward filers) rather than graduated rates, since we don\'t collect business expenses. Banks use your declared taxable income, not your actual cash flow — if your ITR shows less than what you earn, your approved loan may be smaller.',
-    ofw: 'OFW borrowers: banks require POEA documentation, valid contract, and 2–3 months of remittance slips. Most banks apply a 20–30% haircut on foreign-sourced income. Consider entering 70–80% of your actual remittance for a more realistic approval estimate.',
+    ofw: 'OFW borrowers: banks require POEA documentation, valid contract, and 2–3 months of remittance slips. Enter what you actually take home after your host country\'s own income tax and deductions — the Philippines doesn\'t tax OFW foreign income, but your host country\'s tax law is separate and still applies (Gulf countries are often tax-free; Japan, the US, and most of the EU withhold significant income tax and social insurance). Banks also apply their own 20–30% haircut on top of that for approval purposes — consider entering 70–80% of your real take-home for a more realistic estimate.',
   };
   if (msgs[type]) {
     note.textContent = msgs[type];
@@ -2737,6 +2765,54 @@ function onEmpTypeChange() {
   } else {
     note.classList.add('hidden');
   }
+
+  const label = document.getElementById('salary-label');
+  const hint = document.getElementById('salary-hint');
+  if (type === 'ofw') {
+    label.textContent = 'Your Monthly Take-Home Pay';
+    hint.textContent = "After your host country's tax — not PH tax";
+  } else {
+    label.textContent = 'Your Monthly Gross Salary';
+    hint.textContent = 'Before tax & deductions';
+  }
+
+  step2Update();
+  step3Update();
+}
+
+function onSpouseSalaryInput() {
+  const spouse = parseVal('spouse-salary');
+  document.getElementById('spouse-emp-type-field').classList.toggle('hidden', spouse <= 0);
+  step2Update();
+}
+
+function onSpouseEmpTypeChange() {
+  const type = getSelectedPill('spouse-emp-type-group') || 'employed';
+  const note = document.getElementById('spouse-emp-type-note');
+  const msgs = {
+    employed: '',
+    'self-employed': 'Self-employed co-borrowers: banks require 2 years of ITR and audited financials. We assume the 8% flat tax option rather than graduated rates, since we don\'t collect business expenses.',
+    ofw: 'OFW co-borrowers: banks require POEA documentation and remittance slips. Enter what your spouse/co-borrower actually takes home after their host country\'s own income tax and deductions — the Philippines doesn\'t tax OFW foreign income, but the host country\'s tax law is separate and still applies (Gulf countries are often tax-free; Japan, the US, and most of the EU withhold significant income tax and social insurance). Banks also apply their own 20–30% haircut on top of that for approval purposes.',
+  };
+  if (msgs[type]) {
+    note.textContent = msgs[type];
+    note.classList.remove('hidden');
+  } else {
+    note.classList.add('hidden');
+  }
+
+  const label = document.getElementById('spouse-salary-label');
+  const hint = document.getElementById('spouse-salary-hint');
+  if (type === 'ofw') {
+    label.textContent = "Spouse / Co-borrower's Monthly Take-Home Pay";
+    hint.textContent = "After their host country's tax — not PH tax";
+  } else {
+    label.textContent = 'Spouse / Co-borrower Monthly Salary';
+    hint.textContent = 'Optional — leave 0 if none';
+  }
+
+  step2Update();
+  step3Update();
 }
 
 function brokerCTAClick() {
@@ -2861,10 +2937,11 @@ function step3Update() {
   const other = parseVal('other-income');
   const totalGross = salary + spouse + other;
   const empType = getSelectedPill('emp-type-group') || 'employed';
+  const spouseEmpType = getSelectedPill('spouse-emp-type-group') || 'employed';
   // Net take-home — must match the final bank-approval-gate calc in calculate(),
   // otherwise this live preview can show "borderline" right before the final
   // verdict flips to "declined" against the same numbers.
-  const totalNet = netTakeHome(salary, empType) + netTakeHome(spouse) + other;
+  const totalNet = netTakeHome(salary, empType) + netTakeHome(spouse, spouseEmpType) + other;
 
   if (loan <= 0 || totalGross <= 0) {
     document.getElementById('step3-derived').classList.add('hidden');
@@ -3058,9 +3135,10 @@ function calculate() {
   const existingLoans = parseVal('existing-loans') || 0;
   const rent = parseVal('current-rent') || price * 0.004;
   const empType = getSelectedPill('emp-type-group') || 'employed';
+  const spouseEmpType = getSelectedPill('spouse-emp-type-group') || 'employed';
 
   const totalGross = salary + spouse + other;
-  const totalNet = netTakeHome(salary, empType) + netTakeHome(spouse) + other;
+  const totalNet = netTakeHome(salary, empType) + netTakeHome(spouse, spouseEmpType) + other;
 
   // Accurate closing costs
   const cc = computeClosingCosts(price, loan, loanType);
@@ -3122,7 +3200,7 @@ function calculate() {
     const gMonthlySalary = monthlySalaryBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
     const gMonthlySpouse = monthlySpouseBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
     const gMonthlyOther = monthlyOtherBase * Math.pow(1 + SALARY_GROWTH * 0.5, yr - 1);
-    const netMonthly = netTakeHome(gMonthlySalary, empType) + netTakeHome(gMonthlySpouse) + gMonthlyOther;
+    const netMonthly = netTakeHome(gMonthlySalary, empType) + netTakeHome(gMonthlySpouse, spouseEmpType) + gMonthlyOther;
     // Annual equivalents for the schedule display
     const gSalary = gMonthlySalary * 12;
     const gSpouse = gMonthlySpouse * 12;
@@ -4461,6 +4539,7 @@ function buildShareURL() {
     sp: parseVal('spouse-salary'),
     oi: parseVal('other-income'),
     et: getSelectedPill('emp-type-group'),
+    set: getSelectedPill('spouse-emp-type-group'),
     el: parseVal('existing-loans'),
     lv: parseVal('living-exp'),
     cr: parseVal('current-rent'),
@@ -4544,6 +4623,8 @@ function loadFromURL() {
   setFmt('savings', p.sv);
   if (p.ag) document.getElementById('age').value = p.ag;
   if (p.et) { const pill = document.querySelector(`#emp-type-group .pill[data-val="${p.et}"]`); if (pill) { selectPill(pill, 'emp-type-group'); onEmpTypeChange(); } }
+  if (p.sp > 0) { document.getElementById('spouse-emp-type-field').classList.remove('hidden'); }
+  if (p.set) { const pill = document.querySelector(`#spouse-emp-type-group .pill[data-val="${p.set}"]`); if (pill) { selectPill(pill, 'spouse-emp-type-group'); onSpouseEmpTypeChange(); } }
 
   // Trigger live updates
   step1Update(); step2Update(); step3Update();
