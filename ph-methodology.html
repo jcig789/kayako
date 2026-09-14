@@ -409,7 +409,20 @@ h4:first-child { margin-top: 0; }
       </table>
       <p>Net effect: an OFW earning ₱200,000/month nets about <strong>₱189,550</strong> take-home under this treatment, versus ₱153,343 if (incorrectly) taxed as a local employee — a ~24% difference that materially affects DSR and approval odds for exactly the demographic Pag-IBIG serves most (see the OFW loan guidance in Section 9).</p>
 
-      <div class="note-box"><strong>Important limitation:</strong> This OFW treatment only applies to income entered in the "Monthly Gross Salary" field with Employment Type set to OFW. Self-employed income, and any OFW/freelance/rental/business income entered in the separate "Other Income" field, is treated as already net of tax — documentation requirements and tax treatment vary too much to model precisely there. For self-employed borrowers, banks use 2-year ITR averages — your actual qualifying income may differ from what is entered here.</div>
+      <h4>Self-Employed Income — 8% Flat Tax, Not Employee Brackets</h4>
+      <p>Selecting <strong>Self-Employed</strong> also changes how "Monthly Gross Salary" is taxed (fixed 2026-09-14 — previously treated identically to a local employee's salary, overstating the tax burden):</p>
+      <table class="source-table">
+        <thead><tr><th>Item</th><th>Locally employed</th><th>Self-employed</th></tr></thead>
+        <tbody>
+          <tr><td>PH income tax</td><td>TRAIN Law graduated brackets on gross</td><td><strong>8% flat tax</strong> on annual gross receipts over ₱250,000 — the standard simplified option for filers under the ₱3M VAT threshold, replacing both graduated rates and the 3% percentage tax. We use this because we only collect one income number, not business expenses (which the graduated-rate alternative requires to compute net taxable income).</td></tr>
+          <tr><td>SSS</td><td>5% of MSC (employee share only)</td><td><strong>Full 15% of MSC</strong> — self-employed/voluntary members pay both shares. Same ₱5,000–₱35,000 MSC band as locally employed.</td></tr>
+          <tr><td>PhilHealth</td><td>2.5% (employee share only)</td><td><strong>Full 5%</strong> — same reason. Same ₱10,000–₱100,000 floor/ceiling.</td></tr>
+          <tr><td>Pag-IBIG</td><td>2%, capped ₱200/mo</td><td>Same — 2%, capped ₱200/mo.</td></tr>
+        </tbody>
+      </table>
+      <p>Net effect grows with income, since 8% flat increasingly beats climbing graduated brackets: at ₱200,000/month, self-employed take-home is now ₱175,217 (was ₱153,343) — about 14% higher; at ₱400,000/month the gap widens to about 22%.</p>
+
+      <div class="note-box"><strong>Important limitation:</strong> The OFW and self-employed treatments above only apply to income entered in the "Monthly Gross Salary" field, matched to whichever Employment Type is selected. Any OFW/freelance/rental/business income entered in the separate "Other Income" field is treated as already net of tax with no deductions applied — documentation requirements and tax treatment vary too much to model precisely there. There is currently no employment-type selector for a spouse/co-borrower — spouse income always uses the locally-employed treatment regardless of the primary borrower's selection, even if the spouse is also an OFW or self-employed. For self-employed borrowers, banks use 2-year ITR averages — your actual qualifying income may differ from what is entered here.</div>
     </div>
   </div>
 

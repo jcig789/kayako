@@ -503,7 +503,7 @@ body {
       </div>
       <div class="success-title" id="success-title">You're on the list.</div>
       <div class="success-desc" id="success-desc"></div>
-      <a class="back-btn" onclick="goBack()" href="#">Run another scenario</a>
+      <a class="back-btn" href="index.html">Run another scenario</a>
     </div>
 
     <!-- NEXT STEPS / WHAT WE'RE BUILDING -->
@@ -737,10 +737,21 @@ async function handleSubmit(e) {
       return;
     }
 
+    // Visible in DevTools console — lets us confirm exactly what's being sent if a
+    // field ever shows up missing/wrong in the Sheet again.
+    console.log('Lead submission — sending payload:', payload);
+
+    // text/plain (not application/json) — application/json isn't a CORS-safelisted
+    // content type, and combined with mode:'no-cors' that's a known-unreliable
+    // pattern for GAS webhooks (some fields silently failing to arrive server-side,
+    // found via testing 2026-09-14). Apps Script's doPost reads e.postData.contents
+    // as raw text and JSON.parses it manually regardless of declared content type,
+    // so this doesn't change how the script parses it — it just makes the browser
+    // send the request the way no-cors mode can do reliably.
     await fetch(APPS_SCRIPT_URL, {
       method:  'POST',
       mode:    'no-cors', // Apps Script requires no-cors
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body:    JSON.stringify(payload),
     });
 

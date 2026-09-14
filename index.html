@@ -2679,7 +2679,7 @@ function step2Update() {
   const other = parseVal('other-income');
   const living = parseVal('living-exp');
   const existingLoans = parseVal('existing-loans') || 0;
-  const isOFW = (getSelectedPill('emp-type-group') || 'employed') === 'ofw';
+  const empType = getSelectedPill('emp-type-group') || 'employed';
 
   if (salary < 5000) {
     document.getElementById('income-summary').classList.add('hidden');
@@ -2687,7 +2687,7 @@ function step2Update() {
     return;
   }
 
-  const net = netTakeHome(salary, isOFW) + netTakeHome(spouse) + other;
+  const net = netTakeHome(salary, empType) + netTakeHome(spouse) + other;
   const gross = salary + spouse + other;
   const disposable = net - living - existingLoans;
 
@@ -2698,9 +2698,12 @@ function step2Update() {
   document.getElementById('d-disposable').style.color = disposable < 0 ? 'var(--red)' : '';
 
   document.getElementById('salary-takeHome').classList.remove('hidden');
-  document.getElementById('salary-takeHome').textContent = isOFW
-    ? `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, true)))} / month (OFWs are exempt from PH income tax on foreign income — SSS/PhilHealth/Pag-IBIG still apply)`
-    : `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary)))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`;
+  const takeHomeLabels = {
+    ofw:            `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, 'ofw')))} / month (OFWs are exempt from PH income tax on foreign income — SSS/PhilHealth/Pag-IBIG still apply)`,
+    'self-employed':`Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, 'self-employed')))} / month (assumes the 8% flat tax option on gross receipts — SSS/PhilHealth/Pag-IBIG still apply)`,
+    employed:       `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, 'employed')))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`,
+  };
+  document.getElementById('salary-takeHome').textContent = takeHomeLabels[empType] || takeHomeLabels.employed;
 
   // Show existing loan impact on DSR headroom
   const impactEl = document.getElementById('existing-loans-impact');
@@ -2721,7 +2724,7 @@ function onEmpTypeChange() {
   const note = document.getElementById('emp-type-note');
   const msgs = {
     employed: '',
-    'self-employed': 'Self-employed borrowers: banks require 2 years of ITR (Income Tax Return) and audited financials. Enter your average monthly income — but note that banks use your declared taxable income, not your actual cash flow. If your ITR shows less than what you earn, your approved loan may be smaller.',
+    'self-employed': 'Self-employed borrowers: banks require 2 years of ITR (Income Tax Return) and audited financials. Enter your average monthly income — we assume the 8% flat tax option (most common for straightforward filers) rather than graduated rates, since we don\'t collect business expenses. Banks use your declared taxable income, not your actual cash flow — if your ITR shows less than what you earn, your approved loan may be smaller.',
     ofw: 'OFW borrowers: banks require POEA documentation, valid contract, and 2–3 months of remittance slips. Most banks apply a 20–30% haircut on foreign-sourced income. Consider entering 70–80% of your actual remittance for a more realistic approval estimate.',
   };
   if (msgs[type]) {
@@ -2853,11 +2856,11 @@ function step3Update() {
   const spouse = parseVal('spouse-salary');
   const other = parseVal('other-income');
   const totalGross = salary + spouse + other;
-  const isOFW = (getSelectedPill('emp-type-group') || 'employed') === 'ofw';
+  const empType = getSelectedPill('emp-type-group') || 'employed';
   // Net take-home — must match the final bank-approval-gate calc in calculate(),
   // otherwise this live preview can show "borderline" right before the final
   // verdict flips to "declined" against the same numbers.
-  const totalNet = netTakeHome(salary, isOFW) + netTakeHome(spouse) + other;
+  const totalNet = netTakeHome(salary, empType) + netTakeHome(spouse) + other;
 
   if (loan <= 0 || totalGross <= 0) {
     document.getElementById('step3-derived').classList.add('hidden');
@@ -2947,8 +2950,19 @@ function incomeTax(annualIncome) {
   return 2202500 + (annualIncome - 8000000) * 0.35;
 }
 
-function mandatoryDeductions(monthlySalary, isOFW) {
-  if (isOFW) {
+// 8% flat tax on gross receipts over ₱250,000/year — the standard simplified option
+// for self-employed/professionals with receipts under the ₱3M VAT threshold, in lieu
+// of graduated rates + percentage tax. We use this (not graduated) because KayaKo only
+// collects one gross-income number, not business expenses — graduated rates require
+// net-of-expense income we don't have. This is usually the LOWER-tax option for
+// straightforward filers, which is why applying employee-style graduated brackets to
+// self-employed gross income (the pre-2026-09-14 behavior) overstated their tax burden.
+function selfEmployedTax(annualGross) {
+  return Math.max(0, annualGross - 250000) * 0.08;
+}
+
+function mandatoryDeductions(monthlySalary, empType) {
+  if (empType === 'ofw') {
     // OFWs have no PH employer to split contributions with, so they pay the FULL
     // rate themselves — not the employee-only share a locally-employed person pays.
     // SSS: full 15% (SSS Circular 2024-006), min MSC ₱8,000 for land-based OFWs
@@ -2961,6 +2975,16 @@ function mandatoryDeductions(monthlySalary, isOFW) {
     const pi = Math.min(monthlySalary * 0.02, 200);
     return sss + ph + pi;
   }
+  if (empType === 'self-employed') {
+    // Self-employed/voluntary members also pay the full rate — no employer to split
+    // with. Same ₱5,000 MSC floor as locally-employed (no self-employed-specific
+    // floor found), same ₱35,000 ceiling.
+    const msc = Math.min(Math.max(monthlySalary, 5000), 35000);
+    const sss = msc * 0.15;
+    const ph = Math.min(Math.max(monthlySalary, 10000), 100000) * 0.05;
+    const pi = Math.min(monthlySalary * 0.02, 200);
+    return sss + ph + pi;
+  }
   // SSS per Circular No. 2024-006 effective January 2025:
   // Employee rate: 5% of MSC | Min MSC: ₱5,000 | Max MSC: ₱35,000
   const msc = Math.min(Math.max(monthlySalary, 5000), 35000);
@@ -2970,15 +2994,23 @@ function mandatoryDeductions(monthlySalary, isOFW) {
   return sss + ph + pi;
 }
 
-function netTakeHome(grossMonthly, isOFW) {
+function netTakeHome(grossMonthly, empType) {
   if (grossMonthly <= 0) return 0;
-  const deductions = mandatoryDeductions(grossMonthly, isOFW);
-  if (isOFW) {
+  const deductions = mandatoryDeductions(grossMonthly, empType);
+  if (empType === 'ofw') {
     // OFWs are non-resident citizens — exempt from PH income tax on foreign-sourced
     // income (NIRC Sec. 23(C); BIR RR 1-2011). Only mandatory contributions apply,
     // no TRAIN Law brackets. (Fixed 2026-09-13 — was previously taxing OFW income
     // as if it were a local PH salary, materially understating take-home.)
     return grossMonthly - deductions;
+  }
+  if (empType === 'self-employed') {
+    // 8% flat tax on annual gross over ₱250,000 (see selfEmployedTax) — not the
+    // employee TRAIN brackets. (Fixed 2026-09-14 — was previously taxed identically
+    // to a local employee's gross salary, overstating the tax burden.)
+    const annualGross = grossMonthly * 12;
+    const tax = selfEmployedTax(annualGross);
+    return grossMonthly - deductions - tax / 12;
   }
   const annualBasic = grossMonthly * 12;
   const taxable = Math.max(0, annualBasic - deductions * 12);
@@ -3022,10 +3054,9 @@ function calculate() {
   const existingLoans = parseVal('existing-loans') || 0;
   const rent = parseVal('current-rent') || price * 0.004;
   const empType = getSelectedPill('emp-type-group') || 'employed';
-  const isOFW = empType === 'ofw';
 
   const totalGross = salary + spouse + other;
-  const totalNet = netTakeHome(salary, isOFW) + netTakeHome(spouse) + other;
+  const totalNet = netTakeHome(salary, empType) + netTakeHome(spouse) + other;
 
   // Accurate closing costs
   const cc = computeClosingCosts(price, loan, loanType);
@@ -3087,7 +3118,7 @@ function calculate() {
     const gMonthlySalary = monthlySalaryBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
     const gMonthlySpouse = monthlySpouseBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
     const gMonthlyOther = monthlyOtherBase * Math.pow(1 + SALARY_GROWTH * 0.5, yr - 1);
-    const netMonthly = netTakeHome(gMonthlySalary, isOFW) + netTakeHome(gMonthlySpouse) + gMonthlyOther;
+    const netMonthly = netTakeHome(gMonthlySalary, empType) + netTakeHome(gMonthlySpouse) + gMonthlyOther;
     // Annual equivalents for the schedule display
     const gSalary = gMonthlySalary * 12;
     const gSpouse = gMonthlySpouse * 12;
