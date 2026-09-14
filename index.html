@@ -48,7 +48,11 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-HPH7ELYNKG');
+  // cookie_domain pinned to the exact hostname — github.io is a public suffix
+  // (shared by every github.io site), so gtag's default 'auto' domain-guessing
+  // tries to set the cookie broadly across .github.io and gets rejected by the
+  // browser. Explicit hostname keeps it a valid host-only cookie.
+  gtag('config', 'G-HPH7ELYNKG', { cookie_domain: location.hostname });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
