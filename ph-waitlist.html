@@ -741,18 +741,21 @@ async function handleSubmit(e) {
     // field ever shows up missing/wrong in the Sheet again.
     console.log('Lead submission — sending payload:', payload);
 
-    // text/plain (not application/json) — application/json isn't a CORS-safelisted
-    // content type, and combined with mode:'no-cors' that's a known-unreliable
-    // pattern for GAS webhooks (some fields silently failing to arrive server-side,
-    // found via testing 2026-09-14). Apps Script's doPost reads e.postData.contents
-    // as raw text and JSON.parses it manually regardless of declared content type,
-    // so this doesn't change how the script parses it — it just makes the browser
-    // send the request the way no-cors mode can do reliably.
+    // Form-encoded, not JSON (fixed 2026-09-14 — a text/plain JSON body was tried
+    // first and did NOT fix it, confirmed via Network tab: the actual request was
+    // a GET to script.googleusercontent.com/macros/echo, not a POST, meaning
+    // something in the JSON-body request wasn't surviving Apps Script's internal
+    // redirect). URLSearchParams as the fetch body is the standard, most reliable
+    // way to POST to a GAS Web App — the doPost() side must be updated to match:
+    // read e.parameter.<field> instead of JSON.parse(e.postData.contents). See the
+    // updated Apps Script setup instructions below.
+    const formBody = new URLSearchParams();
+    Object.entries(payload).forEach(([key, val]) => formBody.append(key, String(val)));
+
     await fetch(APPS_SCRIPT_URL, {
-      method:  'POST',
-      mode:    'no-cors', // Apps Script requires no-cors
-      headers: { 'Content-Type': 'text/plain' },
-      body:    JSON.stringify(payload),
+      method: 'POST',
+      mode:   'no-cors', // Apps Script requires no-cors
+      body:   formBody,  // fetch sets Content-Type: application/x-www-form-urlencoded automatically
     });
 
     // no-cors means we can't read the response — assume success if no error thrown
@@ -802,11 +805,16 @@ function goBack() {
 ──────────────────────────────────────────────────────────────────────────────
 GOOGLE SHEETS SETUP
 
-NOTE: if you already deployed an Apps Script for this page, its doPost() needs
-to be UPDATED to the version below — the payload now carries lead-qualification
-fields (preferred bank, timeline, blocker, consent) that the old columns don't
-have. Old submissions aren't affected; new fields just won't be captured until
-you redeploy.
+IMPORTANT — 2026-09-14: switched from a JSON body to form-encoded POST, because
+a JSON body was confirmed (via browser DevTools Network tab) to sometimes not
+survive Apps Script's internal redirect intact — the request that actually left
+the browser showed up as a GET to script.googleusercontent.com/macros/echo
+instead of a POST, even though the client-side payload was verified correct via
+console.log. Form-encoded + e.parameter is the standard, most reliable way to
+POST to a GAS Web App. If you already deployed an OLDER doPost() (either the
+original 8-field version, or the JSON.parse(e.postData.contents) version from
+earlier today), it MUST be replaced with the version below — e.parameter is a
+different API than e.postData, not just a different column layout.
 
 1. Sheet columns (in this order):
    Timestamp | Name | Email | Path | Property Price | Monthly Income | Loan Type
@@ -814,11 +822,12 @@ you redeploy.
 
 2. Go to Extensions → Apps Script
 
-3. Paste this code:
+3. Paste this code (replacing ALL existing code in the file, including any old
+   doPost() — don't leave two doPost() functions in the same file):
 
 function doPost(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const data = JSON.parse(e.postData.contents);
+  const data = e.parameter; // form-encoded fields — Apps Script parses these natively
   sheet.appendRow([
     data.timestamp,
     data.name,
@@ -845,6 +854,13 @@ function doPost(e) {
    → Execute as: Me → Who has access: Anyone → Deploy → copy the Web App URL)
 
 5. Paste/confirm the URL in APPS_SCRIPT_URL at the top of this file.
+
+6. To confirm it's actually working this time: submit a test, then in the Apps
+   Script editor go to Executions (left sidebar) and open the most recent
+   doPost execution — it shows the real e.parameter values the server received,
+   which is the definitive way to check (don't rely on the Sheet alone; if a
+   value is wrong, this tells you whether it's a server-parsing problem or a
+   client-sending problem).
 
 Every submission now lands in your Sheet with full lead-qualification context —
 approved/marginal leads arrive with preferred bank or blocker + timeline already
