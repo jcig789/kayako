@@ -263,7 +263,7 @@ h4:first-child { margin-top: 0; }
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     Back to simulator
   </a>
-  <div class="header-kayako">KayaKo.ph</div>
+  <div class="header-kayako">KayaKo</div>
 </div>
 
 <div class="page">
@@ -275,7 +275,7 @@ h4:first-child { margin-top: 0; }
     <div class="hero-desc">Every number this simulator produces is based on publicly available Philippine regulations, official government rates, and standard financial formulas. This page explains exactly what we use, where we got it, and what assumptions we make.</div>
     <div class="hero-updated">
       <span class="dot"></span>
-      Last reviewed: September 2026 — bank rates updated to reflect BSP 5.00% policy rate (Aug 27, 2026)
+      Last reviewed: September 2026 — corrected Real Property Tax (was understated), Pag-IBIG 3-year rate, closing-cost figures, and bank base-case rate (lowered from 8.5% to 7.25% after direct multi-bank verification) after a full sourcing audit; softened the DSR citation
     </div>
   </div>
 
@@ -309,18 +309,32 @@ h4:first-child { margin-top: 0; }
     </div>
     <div class="section-body">
       <h4>Bank Loans</h4>
-      <p>Bank home loan rates in the Philippines are set individually by each bank and move with BSP (Bangko Sentral ng Pilipinas) policy rate adjustments. The BSP raised its overnight rate to <strong>5.00%</strong> on August 27, 2026 (third consecutive hike in 2026). We use indicative rates reflecting a typical bank spread of 3.0–4.0% over the BSP rate.</p>
+      <p>Bank home loan rates in the Philippines are set individually by each bank and move with BSP (Bangko Sentral ng Pilipinas) policy rate adjustments. The BSP raised its overnight rate to <strong>5.00%</strong> on August 27, 2026 (third consecutive hike in 2026). Rather than deriving bank rates from a generic "BSP + spread" heuristic, we checked actual published rates for a 3-year fixed period directly against multiple banks:</p>
+      <table class="source-table">
+        <thead><tr><th>Bank</th><th>Rate near 3yr fixing</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>BDO</td><td>~7.25% (interpolated: 1yr 6.00% / 2yr 6.50% / 4yr 7.00%)</td><td>Official BDO rate PDF, dated 28 Jan 2026</td></tr>
+          <tr><td>EastWest Bank</td><td>7.75% (2–3yr)</td><td>eastwestbanker.com/rates — fetched live, Sep 2026</td></tr>
+          <tr><td>China Bank</td><td>7.50% (1–3yr)</td><td>Chinabank HomePlus bundle page, 2026</td></tr>
+          <tr><td>Security Bank</td><td>~6.99–7.5% (promo as low as 6.25%, 1–3yr)</td><td>Bank-linked rate comparison, 2026</td></tr>
+          <tr><td>RCBC</td><td>6.5–7% (promo, developer-tier dependent)</td><td>RCBC CNY 2026 promo page</td></tr>
+          <tr><td>BPI</td><td>~7% (1yr), up to 7.25%</td><td>Bank-linked rate comparison, mid-2026</td></tr>
+          <tr><td>Metrobank</td><td>"as low as 6.50%" (promo, period-dependent)</td><td>Metrobank Home Loan promo page, 2026</td></tr>
+        </tbody>
+      </table>
+      <p>7 of 11 major banks checked (BDO and EastWest verified against their own official rate pages directly; China Bank, Security Bank, RCBC, BPI, and Metrobank via their promo/rate pages rather than a full standard rate card). PNB and UnionBank could not be verified in this pass; Landbank and PSBank were not checked. Real 3-year-fixed rates cluster <strong>6.25%–7.75%</strong> — meaningfully below what an "BSP 5.00% + 3–4% spread" heuristic would suggest (8–9%).</p>
       <table class="source-table">
         <thead><tr><th>Scenario</th><th>Initial Rate</th><th>Repriced Rate</th><th>Basis</th></tr></thead>
         <tbody>
-          <tr><td>Optimistic</td><td>8.0%</td><td>7.5%</td><td>BSP cuts, rates ease from current level</td></tr>
-          <tr><td>Base Case</td><td>8.5%</td><td>9.0%</td><td>Rates stable near Sep 2026 market</td></tr>
-          <tr><td>Stress Test</td><td>8.5%</td><td>11.0%</td><td>Further BSP hikes, extended tight cycle</td></tr>
+          <tr><td>Optimistic</td><td>6.5%</td><td>6.0%</td><td>Matches the low end of the verified bank cluster (RCBC/Security Bank promo tier); rates ease further after the fixed period</td></tr>
+          <tr><td>Base Case</td><td>7.25%</td><td>7.75%</td><td>Centers the BDO/China Bank/EastWest/BPI cluster; modest uptick on repricing, typical of bank behavior</td></tr>
+          <tr><td>Stress Test</td><td>8.5%</td><td>11.0%</td><td>Above every directly-sourced current rate (~8.0% ceiling) as the stress starting point, with a sharp BSP-hike spike on repricing</td></tr>
         </tbody>
       </table>
-      <p><strong>Source:</strong> BSP policy rate from Trading Economics / BSP press release, August 27, 2026. Individual bank fixed-period rates are indicative — Metrobank confirmed rates "updated as of June 16, 2026" but specific figures require contacting the bank directly.</p>
+      <div class="note-box"><strong>Confidence note:</strong> this is real multi-bank verification, not a single blog roundup — but it leans on promotional/marketing rate pages for several banks rather than a full non-promo rate card for every one. Treat these as a well-supported cluster, not decimal-point-exact figures. We'll tighten this further as more banks' standard (non-promo) rate cards become available.</div>
       <p>After the fixed period ends, rates are repriced annually. We model the repriced rate as fixed for the remainder of the term to simplify projections — in reality, repricing happens every 1–5 years depending on the bank.</p>
       <h4>Pag-IBIG (HDMF) Loans</h4>
+      <p>Unlike a bank loan, Pag-IBIG lets the member choose their own <strong>repricing period</strong> — 1 to 30 years — independently of the loan term itself (e.g. a 15-year loan can still use a 3-year repricing period). The chosen period sets the rate for that period; after it elapses, the rate reprices for the remainder of the term. The simulator now exposes this as its own selector (previously hardcoded to always price a 3-year repricing period regardless of what was selected — fixed 2026-09-13).</p>
       <p>Pag-IBIG rates confirmed directly from <a href="https://www.pagibigfund.gov.ph" target="_blank" rel="noopener">pagibigfund.gov.ph</a> as displayed on the housing loan page. These rates are valid until <strong>December 31, 2026</strong>. The site also shows promo rates (4.5% and 5.75%) for specific loan brackets — these are promotional and not used in our base calculations.</p>
       <table class="source-table">
         <thead><tr><th>Repricing Period</th><th>Annual Rate</th><th>Status</th></tr></thead>
@@ -331,10 +345,12 @@ h4:first-child { margin-top: 0; }
           <tr><td>20 years</td><td>8.500%</td><td>Confirmed</td></tr>
           <tr><td>25 years</td><td>9.125%</td><td>Confirmed</td></tr>
           <tr><td>30 years</td><td>9.750%</td><td>Confirmed</td></tr>
-          <tr><td>1 year / 3 years</td><td>5.75% / 6.375%</td><td>Not shown on current page — kept from Circular No. 460 (2024)</td></tr>
+          <tr><td>1 year</td><td>5.75%</td><td>Not shown on current page — promo rate bracket used as proxy</td></tr>
+          <tr><td>3 years</td><td>6.25%</td><td>Updated per HDMF's July 2024 rate cut — 6.375% is now the Special Housing Loan Restructuring Program rate only</td></tr>
         </tbody>
       </table>
       <p><strong>Maximum loan: ₱10,000,000</strong> — confirmed from the official Pag-IBIG Fund housing loan page (Sep 2026 banner: "UP TO P10M NA!"). Loan must mature before the borrower turns 70. Source: pagibigfund.gov.ph, verified September 2026.</p>
+      <p><strong>At repricing, the rate is capped:</strong> for 3-year and 5-year repricing periods, HDMF policy sets the new rate to the lower of the then-prevailing FRBP-framework rate or the prior rate plus 2 percentage points — a real consumer protection against rate shocks. We model a smaller, conservative +0.5% delta for the Stress Test scenario, which sits comfortably inside that cap.</p>
       <p><strong>Promo rates (valid until Dec 31, 2026):</strong> 4.5% for loans up to ₱4.9M (socialized/affordable housing, first 3 years), 5.75% for loans ₱4.9M–₱10M (first 3 years). After the promo period the standard repricing rates above apply.</p>
 
       <h4>In-House / Developer Financing</h4>
@@ -378,9 +394,22 @@ h4:first-child { margin-top: 0; }
       <p><strong>2.5% of monthly basic salary</strong> (5% total, split 50/50 with employer), with a floor of ₱10,000 (minimum ₱250 employee share) and ceiling of ₱100,000 (maximum ₱2,500 employee share) per month. This is the final scheduled rate under <strong>RA 11223 (Universal Health Care Law)</strong>, confirmed effective 2026.</p>
 
       <h4>Pag-IBIG (Member Contribution)</h4>
-      <p><strong>2% of monthly salary, capped at ₱200</strong> per month employee contribution (on salaries above ₱10,000). Per <strong>Republic Act No. 9679</strong> (Home Development Mutual Fund Law of 2009).</p>
+      <p><strong>2% of monthly salary, capped at ₱200</strong> per month employee contribution (on salaries above ₱10,000). Per <strong>Republic Act No. 9679</strong> (Home Development Mutual Fund Law of 2009). Same rate and cap whether or not the borrower is an OFW.</p>
 
-      <div class="note-box"><strong>Important limitation:</strong> This simulator applies PAYE (Pay As You Earn) deductions to salary inputs only. Self-employed and OFW income entered in the "Other Income" field is treated as net of tax since documentation requirements and tax treatment vary significantly. For self-employed borrowers, banks use 2-year ITR averages — your actual qualifying income may differ from what is entered here.</div>
+      <h4>OFW Income — Different Tax &amp; Contribution Treatment</h4>
+      <p>Selecting <strong>OFW</strong> as employment type changes how the "Monthly Gross Salary" field is treated (fixed 2026-09-13 — previously the simulator taxed OFW salary exactly like a local employee's, understating take-home by roughly 20%):</p>
+      <table class="source-table">
+        <thead><tr><th>Item</th><th>Locally employed</th><th>OFW</th></tr></thead>
+        <tbody>
+          <tr><td>PH income tax</td><td>TRAIN Law brackets apply</td><td><strong>0% — exempt.</strong> OFWs are non-resident citizens, taxed only on PH-sourced income (NIRC Sec. 23(C); BIR Revenue Regulations No. 1-2011).</td></tr>
+          <tr><td>SSS</td><td>5% of MSC (employee share only; employer pays the other 10%)</td><td><strong>Full 15% of MSC</strong> — no PH employer to split with. Minimum MSC ₱8,000 (vs. ₱5,000 for locally employed), same ₱35,000 ceiling.</td></tr>
+          <tr><td>PhilHealth</td><td>2.5% (employee share only)</td><td><strong>Full 5%</strong> — same reason. Same ₱10,000–₱100,000 floor/ceiling.</td></tr>
+          <tr><td>Pag-IBIG</td><td>2%, capped ₱200/mo</td><td>Same — 2%, capped ₱200/mo.</td></tr>
+        </tbody>
+      </table>
+      <p>Net effect: an OFW earning ₱200,000/month nets about <strong>₱189,550</strong> take-home under this treatment, versus ₱153,343 if (incorrectly) taxed as a local employee — a ~24% difference that materially affects DSR and approval odds for exactly the demographic Pag-IBIG serves most (see the OFW loan guidance in Section 9).</p>
+
+      <div class="note-box"><strong>Important limitation:</strong> This OFW treatment only applies to income entered in the "Monthly Gross Salary" field with Employment Type set to OFW. Self-employed income, and any OFW/freelance/rental/business income entered in the separate "Other Income" field, is treated as already net of tax — documentation requirements and tax treatment vary too much to model precisely there. For self-employed borrowers, banks use 2-year ITR averages — your actual qualifying income may differ from what is entered here.</div>
     </div>
   </div>
 
@@ -400,17 +429,17 @@ h4:first-child { margin-top: 0; }
       <table class="source-table">
         <thead><tr><th>Cost Item</th><th>Rate / Amount</th><th>Base</th><th>Who Pays</th><th>Source</th></tr></thead>
         <tbody>
-          <tr><td>Documentary Stamp Tax (DST)</td><td>0.5% (bank) / 1.0% (Pag-IBIG)</td><td>Loan amount</td><td>Buyer</td><td>BIR — Section 195, NIRC; HDMF schedule</td></tr>
-          <tr><td>Transfer Tax</td><td>0.5% (average)</td><td>Selling price</td><td>Buyer</td><td>LGU — varies 0.5–0.75% by city/municipality</td></tr>
-          <tr><td>Registration Fee (RD)</td><td>₱8K–₱25K (tiered)</td><td>Property value</td><td>Buyer</td><td>Land Registration Authority tiered schedule</td></tr>
+          <tr><td>Documentary Stamp Tax (DST)</td><td>0.4% (bank) / 0.75% (Pag-IBIG)</td><td>Loan amount</td><td>Buyer</td><td>BIR — NIRC Sec 195 (bank, graduated schedule ≈0.4% effective); NIRC Sec 179 (Pag-IBIG debt instrument, TRAIN-doubled ≈0.75%)</td></tr>
+          <tr><td>Transfer Tax</td><td>0.75%</td><td>Selling price</td><td>Buyer</td><td>LGC Sec 135, as amended by RA 9640 — Metro Manila ceiling; provinces are capped lower at 0.5%</td></tr>
+          <tr><td>Registration Fee (RD)</td><td>₱8K–₱25K (tiered)</td><td>Property value</td><td>Buyer</td><td>Approximates LRA Circular 35-2019 / Rule 141 basic fee for BOTH title transfer and mortgage annotation combined</td></tr>
           <tr><td>Notarial / DOAS Fee</td><td>1% of price, max ₱50,000</td><td>Selling price</td><td>Split (negotiable)</td><td>Market standard; IBP Schedule of Fees</td></tr>
           <tr><td>Bank / Processing Fee</td><td>₱20,000 (bank) / ₱5,000 (Pag-IBIG)</td><td>Flat</td><td>Buyer</td><td>Indicative — varies by lender</td></tr>
           <tr><td>Capital Gains Tax (CGT)</td><td>6% of higher of price or zonal value</td><td>Property value</td><td><strong>Seller</strong></td><td>BIR — Section 24(D), NIRC</td></tr>
         </tbody>
       </table>
       <p><strong>CGT is a seller cost and is excluded from our calculations.</strong> The simulator only models buyer closing costs.</p>
-      <p>LRA Registration Fee tiers used: &lt;₱1.75M = ₱8,000 | ₱1.75M–₱3.5M = ₱12,000 | ₱3.5M–₱7M = ₱20,000 | &gt;₱7M = ₱25,000. These are approximations — actual fees depend on the property's assessed value.</p>
-      <div class="note-box"><strong>Note:</strong> Transfer tax rates vary by LGU. Metro Manila cities typically charge 0.5–0.75%. We use 0.5% as a conservative estimate. Verify with your target LGU.</div>
+      <p>LRA Registration Fee tiers used: &lt;₱1.75M = ₱8,000 | ₱1.75M–₱3.5M = ₱12,000 | ₱3.5M–₱7M = ₱20,000 | &gt;₱7M = ₱25,000. The LRA's actual basic-fee formula (0.25% of value up to ₱1M + 0.20% of the excess, plus a 1% Legal Research Fund surcharge) produces a lower number for a <em>single</em> registration than these tiers — but a real purchase typically requires two separate registrations (the title transfer, and a separate annotation of the bank's/Pag-IBIG's mortgage on the title), which roughly doubles the cost and lands close to these tiers. Treat these as an approximation of the combined cost, not one official fee schedule.</p>
+      <div class="note-box"><strong>Note:</strong> Transfer tax rates vary by LGU — LGC Sec 135 caps provinces at 0.5% and Metro Manila cities/municipalities at up to 0.75%. Most Metro Manila LGUs charge at or near that 0.75% ceiling, so we now use 0.75% as the default rather than the province-level 0.5% figure. If your target property is in a province, your actual transfer tax may be lower — verify with your target LGU.</div>
     </div>
   </div>
 
@@ -430,14 +459,14 @@ h4:first-child { margin-top: 0; }
       <table class="source-table">
         <thead><tr><th>Cost</th><th>Rate Used</th><th>Applied To</th><th>Basis</th></tr></thead>
         <tbody>
-          <tr><td>MRI (Mortgage Redemption Insurance)</td><td>0.07% per year</td><td>Outstanding loan balance (declining)</td><td>HDMF/bank standard; age-banded in practice — we use mid-range approximation</td></tr>
-          <tr><td>Fire Insurance</td><td>0.10% per year</td><td>Property market value (growing)</td><td>Industry standard for residential properties; required by all Philippine lenders</td></tr>
-          <tr><td>Real Property Tax (RPT)</td><td>0.40% per year (effective)</td><td>Property market value (growing)</td><td>Assessment level 20% × basic RPT 1% + SEF 1% = 0.4% effective. Per LGC Section 218.</td></tr>
+          <tr><td>MRI (Mortgage Redemption Insurance)</td><td>0.07% per year</td><td>Outstanding loan balance (declining)</td><td>Mid-range placeholder — real quotes we found ranged from ~0.02% to ~1% per year depending on age/insurer; no single authoritative rate exists</td></tr>
+          <tr><td>Fire Insurance</td><td>0.10% per year</td><td>Property market value (growing)</td><td>Confirmed against industry premium calculators (~₱1,000 premium per ₱1M coverage/year); excludes ~2% Fire Code Tax + ~26.7% documentary/other tax load added on a real policy</td></tr>
+          <tr><td>Real Property Tax (RPT)</td><td>0.60% per year (effective)</td><td>Property market value (growing)</td><td>Assessment level 20% (LGC Sec 218) × basic RPT ceiling 2% for Metro Manila (Sec 233) + SEF ceiling 1% (Sec 235) = 0.6% effective</td></tr>
           <tr><td>HOA / Condo Dues</td><td>₱500–₱4,000/mo</td><td>Flat (inflated annually at 4%)</td><td>Indicative: Pag-IBIG/affordable ₱500, house & lot ₱1,000, condo ₱4,000</td></tr>
         </tbody>
       </table>
-      <p>RPT basis: Metro Manila LGUs assess residential property at 20% of fair market value and apply a 2% rate (1% basic + 1% Special Education Fund). This produces an effective rate of 0.40% of market value. Rates vary outside Metro Manila.</p>
-      <div class="note-box"><strong>MRI rate note:</strong> MRI is technically age-banded (older borrowers pay more). We apply a flat 0.07% approximation which is representative for borrowers aged 25–45. Your actual MRI premium will be specified by your lender.</div>
+      <p>RPT basis: Metro Manila LGUs assess residential property at 20% of fair market value (LGC Sec 218) and may charge up to 2% basic RPT (Sec 233 — note provinces are capped lower, at 1%, which we previously conflated with the Metro Manila rate) plus up to 1% Special Education Fund (Sec 235). At the ceiling, that's 3% of assessed value = 0.6% of market value. Actual RPT is set per LGU ordinance within these caps and can be lower — this figure represents the upper end most Metro Manila cities assess near.</p>
+      <div class="note-box"><strong>MRI rate note:</strong> MRI is technically age-banded (older borrowers pay more), and published rates vary far more than most cost items on this page — we found real-world quotes spanning roughly 0.02% to 1% per year. We apply a flat 0.07% approximation as a rough mid-range placeholder, not a cited rate. Your actual MRI premium will be specified by your lender.</div>
     </div>
   </div>
 
@@ -541,7 +570,7 @@ Total interest = ₱7,442,880 − ₱4,000,000 = ₱3,442,880 (86% of principal)
       <div class="section-toggle">▾</div>
     </div>
     <div class="section-body">
-      <p>Philippine banks assess home loan applications primarily on <strong>Debt Service Ratio (DSR)</strong> — the percentage of net take-home pay consumed by all loan obligations. Our thresholds are based on published BSP guidelines and industry practice:</p>
+      <p>Philippine banks assess home loan applications primarily on some form of <strong>Debt Service Ratio (DSR)</strong> — the percentage of income consumed by all loan obligations. Our thresholds are our own house methodology, built from industry rule-of-thumb figures rather than one single regulatory table:</p>
       <table class="source-table">
         <thead><tr><th>Check</th><th>Threshold</th><th>Result</th></tr></thead>
         <tbody>
@@ -555,9 +584,9 @@ Total interest = ₱7,442,880 − ₱4,000,000 = ₱3,442,880 (86% of principal)
           <tr><td>Age at maturity (Pag-IBIG)</td><td>&gt;70 years</td><td>Declined — HDMF hard cap</td></tr>
         </tbody>
       </table>
-      <p>Net DSR uses <strong>net take-home pay</strong> (after income tax, SSS, PhilHealth, Pag-IBIG) as the denominator — this is what banks actually use, not gross income. All existing loan obligations are added to the new amortization in the numerator.</p>
-      <p>Sources: <a href="https://www.bsp.gov.ph" target="_blank" rel="noopener">BSP Circular No. 855</a> (bank risk management guidelines), <a href="https://www.pagibigfund.gov.ph" target="_blank" rel="noopener">HDMF Housing Loan Guidelines</a>.</p>
-      <div class="note-box"><strong>Disclaimer:</strong> Our approval assessment is indicative only. Individual bank policies differ. A borrower shown as "declined" here may still qualify at a bank with more flexible underwriting. A borrower shown as "approved" may still be declined for reasons this tool cannot assess (credit history, employment stability, property appraisal, etc.).</div>
+      <p>We compute DSR against <strong>net take-home pay</strong> (after income tax, SSS, PhilHealth, Pag-IBIG) rather than gross income. This is a deliberate, conservative modeling choice, not a universal rule — <strong>Pag-IBIG's own published qualification rule actually uses a 35% cap on GROSS monthly income</strong>, not net, which is a meaningfully easier bar to clear than what this tool models. Individual bank policies aren't published in enough detail to confirm whether they use net or gross, or exactly where they draw the line. We use the stricter net-income basis so an "approved" result here is a conservative signal, at the cost of sometimes rating a Pag-IBIG-eligible borrower as "marginal." All existing loan obligations are added to the new amortization in the numerator.</p>
+      <p>The 35%/40% thresholds themselves reflect commonly-cited industry rules of thumb, corroborated by Pag-IBIG's own published policy and general Philippine real estate finance guidance — not a single BSP-mandated number. <a href="https://www.bsp.gov.ph" target="_blank" rel="noopener">BSP Circular No. 855</a> covers general bank credit-risk-management practices but does not itself specify a numeric DSR cap, so we no longer cite it as the source of these percentages. See also: <a href="https://www.pagibigfund.gov.ph" target="_blank" rel="noopener">HDMF Housing Loan Guidelines</a>.</p>
+      <div class="note-box"><strong>Disclaimer:</strong> Our approval assessment is indicative only. Individual bank policies differ. A borrower shown as "declined" here may still qualify at a bank with more flexible underwriting, or at Pag-IBIG under its gross-income-based rule. A borrower shown as "approved" may still be declined for reasons this tool cannot assess (credit history, employment stability, property appraisal, etc.).</div>
     </div>
   </div>
 
@@ -638,6 +667,8 @@ Total interest = ₱7,442,880 − ₱4,000,000 = ₱3,442,880 (86% of principal)
   <!-- Footer note -->
   <div class="footer-note">
     <strong>This tool is for educational purposes only.</strong> It does not constitute financial, legal, or tax advice. Calculations are based on public information and standard models. Actual loan terms, rates, tax treatment, and property values depend on your specific circumstances and will be determined by your lender.
+    <br><br>
+    <strong>KayaKo is an independent calculator — not a bank, broker, or lending institution, and not affiliated with or endorsed by Pag-IBIG Fund or any bank.</strong> We don't approve or decline loans; every "approval" result is our own estimate of what a typical lender might decide, based on the public rules described on this page. Only your actual bank, Pag-IBIG, or developer can approve a loan.
     <br><br>
     We review this methodology page when significant regulatory changes occur (new BSP circulars, TRAIN Law amendments, Pag-IBIG circular updates). If you believe a rate or rule has changed, please flag it to us.
     <br><br>

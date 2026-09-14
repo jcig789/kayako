@@ -115,6 +115,17 @@ body {
 .header-sub    { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 1px; }
 .header-kayako { color: rgba(255,255,255,0.22); font-size: 11px; letter-spacing: 0.5px; }
 
+/* ── TRUST STRIP ── */
+.trust-strip {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  padding: 6px 24px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+
 /* ── PAGE WRAP ── */
 .page {
   max-width: 1200px;
@@ -326,6 +337,7 @@ select {
 .verdict-banner.danger .vb-tag { color: var(--red); }
 .verdict-banner .vb-title { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 5px; }
 .verdict-banner .vb-body  { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+.verdict-banner .vb-caption { font-size: 11px; color: var(--ink-4); margin-top: 6px; line-height: 1.4; }
 
 /* ── METRICS ── */
 .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
@@ -817,6 +829,12 @@ select {
   font-weight: 700;
   color: var(--ink);
   line-height: 1.2;
+}
+.svm-caption {
+  font-size: 11px;
+  color: var(--ink-4);
+  margin-top: 6px;
+  line-height: 1.4;
 }
 
 @media (max-width: 640px) {
@@ -1338,6 +1356,8 @@ select {
   <div class="header-kayako">KayaKo</div>
 </div>
 
+<div class="trust-strip">KayaKo is an independent calculator — not a bank, broker, or Pag-IBIG. We don't approve loans; this estimates what a typical lender might decide.</div>
+
 <div class="page">
 
   <!-- PROGRESS -->
@@ -1638,6 +1658,25 @@ select {
         </div>
       </div>
 
+      <div class="field hidden" id="pagibig-period-field">
+        <div class="field-label">
+          <label>Repricing Period</label>
+          <span class="field-hint">Your chosen rate — locked until it reprices</span>
+        </div>
+        <div class="pill-group" id="pagibig-period-group">
+          <div class="pill" data-val="1" onclick="selectPill(this,'pagibig-period-group'); step3Update()">1 yr</div>
+          <div class="pill" data-val="2" onclick="selectPill(this,'pagibig-period-group'); step3Update()">2 yrs</div>
+          <div class="pill selected" data-val="3" onclick="selectPill(this,'pagibig-period-group'); step3Update()">3 yrs</div>
+          <div class="pill" data-val="5" onclick="selectPill(this,'pagibig-period-group'); step3Update()">5 yrs</div>
+          <div class="pill" data-val="10" onclick="selectPill(this,'pagibig-period-group'); step3Update()">10 yrs</div>
+          <div class="pill" data-val="15" onclick="selectPill(this,'pagibig-period-group'); step3Update()">15 yrs</div>
+          <div class="pill" data-val="20" onclick="selectPill(this,'pagibig-period-group'); step3Update()">20 yrs</div>
+          <div class="pill" data-val="25" onclick="selectPill(this,'pagibig-period-group'); step3Update()">25 yrs</div>
+          <div class="pill" data-val="30" onclick="selectPill(this,'pagibig-period-group'); step3Update()">30 yrs</div>
+        </div>
+        <div class="field-note">Shorter periods start cheaper but reprice sooner. Loan term is separate from this — e.g. a 15-year loan can still use 3-year repricing.</div>
+      </div>
+
       <div class="field">
         <div class="field-label">
           <label>Interest Rate Scenario</label>
@@ -1646,17 +1685,17 @@ select {
         <div class="rate-options" id="rate-scenario-group">
           <div class="rate-option" data-scenario="optimistic" onclick="selectRateScenario(this)">
             <div class="ro-name">Optimistic</div>
-            <div class="ro-rate" id="ropt-rate">8.0%</div>
+            <div class="ro-rate" id="ropt-rate">6.5%</div>
             <div class="ro-desc">Rates drop after fixed period</div>
           </div>
           <div class="rate-option selected" data-scenario="base" onclick="selectRateScenario(this)">
             <div class="ro-name">Base Case</div>
-            <div class="ro-rate" id="rbase-rate">8.5%</div>
+            <div class="ro-rate" id="rbase-rate">7.25%</div>
             <div class="ro-desc">Stable — stays near current</div>
           </div>
           <div class="rate-option" data-scenario="stress" onclick="selectRateScenario(this)">
             <div class="ro-name">Stress Test</div>
-            <div class="ro-rate" id="rstress-rate">9.5%</div>
+            <div class="ro-rate" id="rstress-rate">8.5%</div>
             <div class="ro-desc">BSP hikes, rate spikes after fix</div>
           </div>
         </div>
@@ -1676,7 +1715,7 @@ select {
           </div>
           <div class="info-chip">
             <div class="ic-val" id="d-dti-preview">—</div>
-            <div class="ic-label" id="step3-dti-label">DTI Ratio</div>
+            <div class="ic-label" id="step3-dti-label">Net DSR</div>
           </div>
         </div>
         <div id="step3-callout" class="hidden"></div>
@@ -1782,7 +1821,7 @@ select {
       <!-- Decision Engine — 3 KPIs -->
       <div id="decision-engine" class="decision-engine hidden">
         <div class="de-kpi" id="de-approval">
-          <div class="de-label">Bank Approval</div>
+          <div class="de-label">Est. Bank Approval</div>
           <div class="de-val" id="de-approval-val">—</div>
           <div class="de-note" id="de-approval-note"></div>
         </div>
@@ -1821,6 +1860,7 @@ select {
             <div class="vb-tag" id="vb-tag"></div>
             <div class="vb-title" id="vb-title"></div>
             <div class="vb-body" id="vb-body"></div>
+            <div class="vb-caption">Estimate based on your numbers — not a bank decision.</div>
           </div>
         </div>
       </div>
@@ -2208,6 +2248,7 @@ select {
         <div class="svm-text">
           <div class="svm-label" id="svm-label">—</div>
           <div class="svm-verdict" id="svm-verdict">—</div>
+          <div class="svm-caption">Estimate based on your numbers — not a bank decision.</div>
         </div>
       </div>
       <div class="syn-header">
@@ -2236,6 +2277,7 @@ select {
       <div class="rsb-card rsb-verdict" id="rsb-verdict-card">
         <div class="rsb-verdict-tag" id="rsb-verdict-tag">—</div>
         <div class="rsb-verdict-title" id="rsb-verdict-title">—</div>
+        <div style="font-size:10px;color:var(--ink-4);margin-top:5px;line-height:1.3">Estimate, not a bank decision</div>
       </div>
 
       <!-- Monthly payment -->
@@ -2250,7 +2292,7 @@ select {
         <div class="rsb-section-label">At a Glance</div>
         <div class="rsb-kpi-row">
           <div class="rsb-kpi">
-            <span class="rsb-kpi-label" id="rsb-approval-label">Bank Approval</span>
+            <span class="rsb-kpi-label" id="rsb-approval-label">Est. Bank Approval</span>
             <span class="rsb-kpi-val" id="rsb-approval">—</span>
           </div>
           <div class="rsb-kpi">
@@ -2310,7 +2352,8 @@ const PAGIBIG_MAX = 10000000;
 const PAGIBIG_RATES_BY_PERIOD = {
   1:  5.750, // promo rate bracket (≤₱4.9M socialized/affordable) — use 5.75 as proxy
   2:  6.000, // interpolated
-  3:  6.375, // not confirmed on current page — kept from Circular 460
+  3:  6.25,  // per HDMF's July 2024 rate cut — 6.375% is now the Special Housing
+             // Loan Restructuring Program rate only, not new 3yr loans
   5:  6.500, // confirmed from live screenshot Dec 2026
   10: 7.125, // confirmed
   15: 7.750, // confirmed
@@ -2329,10 +2372,14 @@ function getPagibigRate(repricingYears) {
   return PAGIBIG_RATES_BY_PERIOD[closest];
 }
 
-// Bank rates updated September 2026 — BSP policy rate at 5.00% (Aug 27, 2026)
-// Typical bank spread: 3.0–4.0% over BSP rate. Fixed period rates Aug 2026 indicative.
+// Bank rates — updated Sept 2026 from direct multi-bank verification (7 of 11 major
+// PH banks checked: BDO official rate PDF, EastWest live rate page, China Bank/RCBC/
+// Security Bank/BPI/Metrobank promo & rate pages). Real 3yr-fixed rates cluster
+// 6.25–7.75%, not the 8–9% a flat "BSP + 3-4% spread" heuristic would suggest —
+// we now anchor directly on observed bank rates rather than that heuristic.
+// See ph-methodology.html Section 1 for the per-bank source table.
 const DEFAULT_RATES = {
-  bank:    { optimistic: [8.0, 7.5], base: [8.5, 9.0], stress: [8.5, 11.0] },
+  bank:    { optimistic: [6.5, 6.0], base: [7.25, 7.75], stress: [8.5, 11.0] },
   // Pag-IBIG: rates are derived from repricing period, not scenario — see getPagibigRate()
   // These scenario values are fallbacks only; actual rate is set dynamically
   pagibig: { optimistic: [6.5, 6.5], base: [6.5, 6.5], stress: [6.5, 7.0] }, // 5yr repricing as default base
@@ -2340,19 +2387,31 @@ const DEFAULT_RATES = {
 };
 
 // ─── ACCURATE PH CLOSING COSTS ───────────────────────────────────────────────
-// DST: 0.5% of LOAN AMOUNT (BIR RR, not of price) for bank mortgages
-//      1.0% of LOAN AMOUNT for Pag-IBIG (HDMF schedule)
-// Transfer Tax: 0.5% of selling price (LGU-dependent, 0.5–0.75%)
-// Registration Fee: tiered per Registry of Deeds, ~₱8k–₱25k on ₱3M–₱10M
-// Notarial/DOAS fee: ~0.5–1% of price, standard 1%
-// Bank appraisal + processing: ~₱10k–₱30k
-// CGT 6%: SELLER cost — excluded from buyer calculation
+// DST on the mortgage instrument (NIRC Sec 195, TRAIN-doubled): graduated
+//      ₱40 for the first ₱5,000 of the secured amount + ₱20 per additional ₱5,000,
+//      which converges to ~0.40% of loan amount at typical home-loan sizes.
+//      Pag-IBIG's DST is charged on a different statutory basis (debt instrument,
+//      Sec 179, TRAIN-doubled to ₱1.50/₱200 ≈ 0.75% of principal) — genuinely
+//      higher than a bank's, not just an arbitrary round number.
+// Transfer Tax: LGC Sec 135 (as amended by RA 9640) caps provinces at 0.5% but
+//      cities/municipalities within Metro Manila at up to 0.75% — most Metro
+//      Manila LGUs (the bulk of this tool's users) charge at or near that ceiling,
+//      so 0.75% is the more representative default, not a worst case.
+// Registration Fee: tiered flat approximation of LRA Circular 35-2019 / Rule 141
+//      basic fees. A single basic-fee computation is lower than these tiers, but a
+//      real purchase typically triggers TWO registration events — title transfer
+//      AND a separate mortgage annotation — which roughly doubles the single-fee
+//      total and lands close to these tiers.
+// Notarial/DOAS fee: ~1% of price, capped at ₱50k — within the commonly-quoted
+//      1–2% market range for a Deed of Absolute Sale (no fixed statutory rate).
+// Bank appraisal + processing: ~₱10k–₱30k, lender-set, no statutory basis to cite.
+// CGT 6%: SELLER cost — excluded from buyer calculation.
 function computeClosingCosts(price, loan, loanType) {
-  const dst        = loan * (loanType === 'pagibig' ? 0.01 : 0.005);
-  const transferTx = price * 0.005;                                    // 0.5% LGU average
+  const dst        = loan * (loanType === 'pagibig' ? 0.0075 : 0.004);
+  const transferTx = price * 0.0075;                                   // Metro Manila LGU ceiling
   const regFee     = price < 1750000 ? 8000 :
                      price < 3500000 ? 12000 :
-                     price < 7000000 ? 20000 : 25000;                  // RD tiered schedule
+                     price < 7000000 ? 20000 : 25000;                  // RD tiered schedule (title transfer + mortgage annotation, combined)
   const notarial   = Math.min(price * 0.01, 50000);                    // 1% capped at ₱50k
   const bankFees   = loanType === 'bank' ? 20000 : 5000;              // appraisal + processing
   return { dst, transferTx, regFee, notarial, bankFees,
@@ -2360,13 +2419,20 @@ function computeClosingCosts(price, loan, loanType) {
 }
 
 // ─── ACCURATE ONGOING COSTS ──────────────────────────────────────────────────
-// MRI: ~0.07% of outstanding balance/yr (HDMF/bank standard)
-// Fire insurance: ~0.1–0.15% of property value/yr (required by all lenders)
-// RPT: Metro Manila — assessed value = 20% of market, rate = 2% (1% basic + 1% SEF)
-//      Effective: price × 0.20 × 0.02 = 0.4% of market value per year
+// MRI: ~0.07% of outstanding balance/yr — HDMF/bank mid-range approximation.
+//      Real quotes range roughly 0.02%–1%/yr depending on age/insurer; no single
+//      authoritative rate exists. Treat this as a rough placeholder, not a citation.
+// Fire insurance: ~0.1% of property value/yr — confirmed against industry premium
+//      calculators (~₱1,000 premium per ₱1M coverage/yr). Excludes the ~2% Fire Code
+//      Tax + ~26.7% doc-stamp/other tax load added on top in a real policy.
+// RPT: Metro Manila cities/municipalities — assessed value = 20% of market (LGC Sec 218),
+//      basic rate ceiling 2% for Metro Manila (Sec 233 — provinces are capped at 1%,
+//      a common source of confusion) + SEF up to 1% (Sec 235) = 3% ceiling on assessed value.
+//      Effective: price × 0.20 × 0.03 = 0.6% of market value per year (most MM LGUs
+//      assess at or near this ceiling). Actual RPT is set per LGU ordinance and can be lower.
 const MRI_RATE   = 0.0007;   // per year of outstanding balance
 const FIRE_RATE  = 0.001;    // per year of property value
-const RPT_RATE   = 0.004;    // effective rate on market value (Metro Manila typical)
+const RPT_RATE   = 0.006;    // effective rate on market value (Metro Manila ceiling)
 
 // ─── GLOBAL STATE ─────────────────────────────────────────────────────────────
 let chartBalance = null, chartCashflow = null;
@@ -2475,6 +2541,17 @@ function goStep(n) {
   if (spyObserver) { spyObserver.disconnect(); spyObserver = null; }
   currentStep = n;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Refresh the step being landed on — its own derived preview can depend on
+  // values changed on an earlier step (e.g. Step 3's rate/DSR preview depends on
+  // Step 1's price and Step 2's income). Without this, navigating straight to a
+  // step you don't edit anything on shows stale numbers from the last time its
+  // own inputs changed, not the current combined state. (Found via user testing
+  // 2026-09-13: editing Step 1 + 2 then landing on Step 3 without touching any
+  // Step 3 control kept showing the previous scenario's payment/DSR figures.)
+  if (n === 1) step1Update();
+  else if (n === 2) step2Update();
+  else if (n === 3) step3Update();
 }
 
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
@@ -2602,6 +2679,7 @@ function step2Update() {
   const other = parseVal('other-income');
   const living = parseVal('living-exp');
   const existingLoans = parseVal('existing-loans') || 0;
+  const isOFW = (getSelectedPill('emp-type-group') || 'employed') === 'ofw';
 
   if (salary < 5000) {
     document.getElementById('income-summary').classList.add('hidden');
@@ -2609,7 +2687,7 @@ function step2Update() {
     return;
   }
 
-  const net = netTakeHome(salary) + netTakeHome(spouse) + other;
+  const net = netTakeHome(salary, isOFW) + netTakeHome(spouse) + other;
   const gross = salary + spouse + other;
   const disposable = net - living - existingLoans;
 
@@ -2620,8 +2698,9 @@ function step2Update() {
   document.getElementById('d-disposable').style.color = disposable < 0 ? 'var(--red)' : '';
 
   document.getElementById('salary-takeHome').classList.remove('hidden');
-  document.getElementById('salary-takeHome').textContent =
-    `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary)))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`;
+  document.getElementById('salary-takeHome').textContent = isOFW
+    ? `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary, true)))} / month (OFWs are exempt from PH income tax on foreign income — SSS/PhilHealth/Pag-IBIG still apply)`
+    : `Estimated take-home: ₱${fmt(Math.round(netTakeHome(salary)))} / month (after income tax + SSS/PhilHealth/Pag-IBIG)`;
 
   // Show existing loan impact on DSR headroom
   const impactEl = document.getElementById('existing-loans-impact');
@@ -2661,6 +2740,7 @@ function brokerCTAClick() {
   const verdict = verdictEl ? verdictEl.textContent : '';
   const dtiEl   = document.getElementById('r-dti');
   const dsr     = dtiEl ? dtiEl.textContent.replace('%','').trim() : '';
+  const loanType = getSelectedPill('loan-type-group') || 'bank';
 
   // Determine path from current verdict class
   const banner  = document.getElementById('verdict-banner');
@@ -2673,7 +2753,7 @@ function brokerCTAClick() {
   // GA4 — track CTA click with context
   if (typeof gtag !== 'undefined') {
     gtag('event', 'cta_click', {
-      event_category: 'waitlist',
+      event_category: 'lead',
       event_label:    path,
       approval_path:  path,
       property_price: Math.round(price) || 0,
@@ -2687,6 +2767,7 @@ function brokerCTAClick() {
     v: price   ? Math.round(price)   : 0,       // property value
     i: income  ? Math.round(income)  : 0,       // monthly income
     r: dsr     ? parseFloat(dsr)     : 0,       // dsr ratio
+    lt: loanType,                               // loan type: bank | pagibig | inhouse
     t: Date.now(),                              // timestamp
   };
 
@@ -2697,13 +2778,15 @@ function brokerCTAClick() {
 function onLoanTypeChange() {
   const type = getSelectedPill('loan-type-group');
   const fixedField = document.getElementById('fixed-period-field');
+  const pagibigPeriodField = document.getElementById('pagibig-period-field');
   const notes = {
-    bank: 'Bank loans reprice after the fixed period. Indicative rates as of Sep 2026 (BSP rate 5.00%): 8.0–9.0% fixed. Verify with your bank before applying.',
-    pagibig: 'Pag-IBIG rates (valid until Dec 31, 2026): 6.5% (5yr) to 9.75% (30yr). Promo rates: 4.5% and 5.75% for select brackets. Max loan: ₱10M. Must mature before age 70.',
+    bank: 'Bank loans reprice after the fixed period. Indicative rates as of Sep 2026, verified across BDO, EastWest, China Bank, RCBC, Security Bank, BPI, and Metrobank: 6.5–8.5% fixed. Verify with your bank before applying.',
+    pagibig: 'Pag-IBIG lets you choose your own repricing period below — shorter periods start cheaper but reprice sooner. Promo rates: 4.5% and 5.75% for select brackets. Max loan: ₱10M. Must mature before age 70.',
     inhouse: 'In-house financing is easier to qualify for but significantly more expensive — typically 14–18% p.a.',
   };
   document.getElementById('loan-type-note').textContent = notes[type] || '';
   fixedField.classList.toggle('hidden', type !== 'bank');
+  pagibigPeriodField.classList.toggle('hidden', type !== 'pagibig');
   updateRateDisplays();
   step3Update();
   // Update closing cost breakdown in Step 1 — DST rate differs for Pag-IBIG
@@ -2727,7 +2810,9 @@ function resolveRates(type, scen, term, fixedPeriod) {
 function updateRateDisplays() {
   const type = getSelectedPill('loan-type-group') || 'bank';
   const term = parseInt(getSelectedPill('loan-term-group') || '20');
-  const fixedPeriod = parseInt(getSelectedPill('fixed-period-group') || '3');
+  const fixedPeriod = type === 'pagibig'
+    ? parseInt(getSelectedPill('pagibig-period-group') || '3')
+    : parseInt(getSelectedPill('fixed-period-group') || '3');
   const scen = getSelectedScenario();
 
   if (type === 'pagibig') {
@@ -2737,12 +2822,17 @@ function updateRateDisplays() {
     document.getElementById('rbase-rate').textContent = optRate + '%';
     document.getElementById('rstress-rate').textContent = (optRate + 0.5).toFixed(3) + '%';
     document.getElementById('rate-scenario-note').textContent =
-      `Pag-IBIG rate for ${fixedPeriod}-year repricing period: ${optRate}% (per Circular No. 460, 2024)`;
+      `Pag-IBIG rate for ${fixedPeriod}-year repricing period: ${optRate}% — see Methodology for sourcing per period`;
   } else {
     const rates = DEFAULT_RATES[type] || DEFAULT_RATES.bank;
+    // All three cards show the INITIAL/fixed-period rate as their headline number,
+    // consistently — the repricing trajectory is explained in the note text below,
+    // not mixed into the headline (previously Base/Stress showed the repriced rate
+    // here while Optimistic showed initial, which understated how close the three
+    // scenarios' starting rates actually are).
     document.getElementById('ropt-rate').textContent = rates.optimistic[0] + '%';
-    document.getElementById('rbase-rate').textContent = rates.base[1] + '%';
-    document.getElementById('rstress-rate').textContent = rates.stress[1] + '%';
+    document.getElementById('rbase-rate').textContent = rates.base[0] + '%';
+    document.getElementById('rstress-rate').textContent = rates.stress[0] + '%';
     const scen_rates = rates[scen] || rates.base;
     const notes = {
       optimistic: `Initial: ${scen_rates[0]}% fixed → ${scen_rates[1]}% after repricing (rates improve)`,
@@ -2763,6 +2853,11 @@ function step3Update() {
   const spouse = parseVal('spouse-salary');
   const other = parseVal('other-income');
   const totalGross = salary + spouse + other;
+  const isOFW = (getSelectedPill('emp-type-group') || 'employed') === 'ofw';
+  // Net take-home — must match the final bank-approval-gate calc in calculate(),
+  // otherwise this live preview can show "borderline" right before the final
+  // verdict flips to "declined" against the same numbers.
+  const totalNet = netTakeHome(salary, isOFW) + netTakeHome(spouse) + other;
 
   if (loan <= 0 || totalGross <= 0) {
     document.getElementById('step3-derived').classList.add('hidden');
@@ -2774,34 +2869,46 @@ function step3Update() {
   const term = parseInt(getSelectedPill('loan-term-group') || '20');
   const fixedPeriod = type === 'bank'
     ? parseInt(getSelectedPill('fixed-period-group') || '3')
-    : type === 'pagibig' ? 3 : term;
+    : type === 'pagibig' ? parseInt(getSelectedPill('pagibig-period-group') || '3') : term;
   const [initRate, repricedRate] = resolveRates(type, scen, term, fixedPeriod);
 
   const existingLoans = parseVal('existing-loans') || 0;
   const fixedAmort = monthlyPayment(loan, initRate, term);
-  const repricedAmort = monthlyPayment(loan, repricedRate, term);
-  // Total DSR = (new amort + existing loans) / gross — what banks actually check
+  // Bank AND Pag-IBIG loans reprice on the REMAINING balance after the fixed/
+  // repricing period, not the original principal — pricing it on the full
+  // original loan overstates the repriced payment (by 10%+ for longer periods)
+  // versus what the actual amortization schedule charges. In-house never
+  // reprices (rate is fixed for the full term), so it keeps the full-term calc.
+  const repricedAmort = (type === 'bank' || type === 'pagibig')
+    ? monthlyPayment(remainingBalanceAfterYears(loan, initRate, fixedAmort, fixedPeriod), repricedRate, term - fixedPeriod)
+    : monthlyPayment(loan, repricedRate, term);
+  // Net DSR = (new amort + existing loans) / net take-home — matches the
+  // bank-approval-gate calc in calculate() exactly (35% guideline / 40% cap / 45% decline)
   const totalDSI = fixedAmort + existingLoans;
-  const dti = totalDSI / totalGross * 100;
+  const dti = totalNet > 0 ? totalDSI / totalNet * 100 : 0;
 
   document.getElementById('d-amort-fixed').textContent = '₱' + fmt(Math.round(fixedAmort));
   document.getElementById('d-amort-repriced').textContent = '₱' + fmt(Math.round(repricedAmort));
 
   const dtiEl = document.getElementById('d-dti-preview');
   dtiEl.textContent = dti.toFixed(1) + '%' + (existingLoans > 0 ? ' (combined)' : '');
-  dtiEl.style.color = dti > 40 ? 'var(--red)' : dti > 30 ? 'var(--orange)' : 'var(--green)';
+  dtiEl.style.color = dti > 40 ? 'var(--red)' : dti > 35 ? 'var(--orange)' : 'var(--green)';
 
   document.getElementById('step3-derived').classList.remove('hidden');
 
   const callout = document.getElementById('step3-callout');
   const existingNote = existingLoans > 0 ? ` (includes ₱${fmtM(existingLoans)}/mo in existing loans)` : '';
-  if (dti > 40) {
+  if (dti > 45) {
     callout.className = 'callout danger';
-    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Total debt too high:</strong> Combined obligations are ${dti.toFixed(0)}% of gross income${existingNote}. Banks cap this at 40%. Reduce loan size, increase down payment, or pay off existing loans first.</span>`;
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Likely decline:</strong> Net DSR is ${dti.toFixed(0)}% of take-home pay${existingNote} — well above the 40% cap most banks enforce. Reduce loan size, increase down payment, or pay off existing loans first.</span>`;
     callout.classList.remove('hidden');
-  } else if (dti > 30) {
+  } else if (dti > 40) {
+    callout.className = 'callout danger';
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>At the limit:</strong> Net DSR is ${dti.toFixed(0)}%${existingNote} — most banks cap this at 40%. A few may still process it, but approval is unlikely.</span>`;
+    callout.classList.remove('hidden');
+  } else if (dti > 35) {
     callout.className = 'callout warn';
-    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Borderline:</strong> ${dti.toFixed(0)}% total debt ratio${existingNote}. Manageable but tight.</span>`;
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Borderline:</strong> Net DSR is ${dti.toFixed(0)}% of take-home pay${existingNote} — above the 35% guideline. Some banks accept this with strong credit history.</span>`;
     callout.classList.remove('hidden');
   } else {
     callout.classList.add('hidden');
@@ -2817,6 +2924,20 @@ function monthlyPayment(principal, annualRate, termYears) {
   return principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
 }
 
+// Balance remaining after paying `monthlyPmt` at `annualRate` for `years` — used to
+// price the repriced payment on what's ACTUALLY still owed, not the original principal.
+function remainingBalanceAfterYears(principal, annualRate, monthlyPmt, years) {
+  let balance = principal;
+  for (let yr = 0; yr < years; yr++) {
+    for (let m = 0; m < 12 && balance > 0.01; m++) {
+      const mi = balance * annualRate / 100 / 12;
+      const mp = Math.max(0, Math.min(monthlyPmt - mi, balance));
+      balance -= mp;
+    }
+  }
+  return Math.max(0, balance);
+}
+
 function incomeTax(annualIncome) {
   if (annualIncome <= 250000) return 0;
   if (annualIncome <= 400000) return (annualIncome - 250000) * 0.15;
@@ -2826,7 +2947,20 @@ function incomeTax(annualIncome) {
   return 2202500 + (annualIncome - 8000000) * 0.35;
 }
 
-function mandatoryDeductions(monthlySalary) {
+function mandatoryDeductions(monthlySalary, isOFW) {
+  if (isOFW) {
+    // OFWs have no PH employer to split contributions with, so they pay the FULL
+    // rate themselves — not the employee-only share a locally-employed person pays.
+    // SSS: full 15% (SSS Circular 2024-006), min MSC ₱8,000 for land-based OFWs
+    // (vs ₱5,000 for everyone else), max MSC ₱35,000.
+    const msc = Math.min(Math.max(monthlySalary, 8000), 35000);
+    const sss = msc * 0.15;
+    // PhilHealth: full 5% (mandatory OFW coverage), same ₱10,000–₱100,000 band.
+    const ph = Math.min(Math.max(monthlySalary, 10000), 100000) * 0.05;
+    // Pag-IBIG: same 2%/₱200 cap either way.
+    const pi = Math.min(monthlySalary * 0.02, 200);
+    return sss + ph + pi;
+  }
   // SSS per Circular No. 2024-006 effective January 2025:
   // Employee rate: 5% of MSC | Min MSC: ₱5,000 | Max MSC: ₱35,000
   const msc = Math.min(Math.max(monthlySalary, 5000), 35000);
@@ -2836,13 +2970,20 @@ function mandatoryDeductions(monthlySalary) {
   return sss + ph + pi;
 }
 
-function netTakeHome(grossMonthly) {
+function netTakeHome(grossMonthly, isOFW) {
   if (grossMonthly <= 0) return 0;
+  const deductions = mandatoryDeductions(grossMonthly, isOFW);
+  if (isOFW) {
+    // OFWs are non-resident citizens — exempt from PH income tax on foreign-sourced
+    // income (NIRC Sec. 23(C); BIR RR 1-2011). Only mandatory contributions apply,
+    // no TRAIN Law brackets. (Fixed 2026-09-13 — was previously taxing OFW income
+    // as if it were a local PH salary, materially understating take-home.)
+    return grossMonthly - deductions;
+  }
   const annualBasic = grossMonthly * 12;
-  const deductions = mandatoryDeductions(grossMonthly) * 12;
-  const taxable = Math.max(0, annualBasic - deductions);
+  const taxable = Math.max(0, annualBasic - deductions * 12);
   const tax = incomeTax(taxable);
-  return grossMonthly - mandatoryDeductions(grossMonthly) - tax / 12;
+  return grossMonthly - deductions - tax / 12;
 }
 
 // ─── MAIN CALCULATE ──────────────────────────────────────────────────────────
@@ -2858,11 +2999,13 @@ function calculate() {
   const propType = getSelectedPill('prop-type-group') || 'condo';
   const term = parseInt(getSelectedPill('loan-term-group') || '20');
   const scen = getSelectedScenario();
-  // Bank: use selected fixed period. Pag-IBIG: default 3yr (standard repricing). In-house: full term (no repricing).
+  // Bank: use selected fixed period. Pag-IBIG: uses the borrower's chosen repricing
+  // period (real HDMF loans let members pick 1–30yr; was hardcoded to 3 before
+  // 2026-09-13). In-house: full term (no repricing).
   const fixedPeriod = loanType === 'bank'
     ? parseInt(getSelectedPill('fixed-period-group') || '3')
     : loanType === 'pagibig'
-    ? 3
+    ? parseInt(getSelectedPill('pagibig-period-group') || '3')
     : term;
 
   // Lender name — used throughout calculate() for user-facing text
@@ -2878,16 +3021,26 @@ function calculate() {
   const living = parseVal('living-exp');
   const existingLoans = parseVal('existing-loans') || 0;
   const rent = parseVal('current-rent') || price * 0.004;
+  const empType = getSelectedPill('emp-type-group') || 'employed';
+  const isOFW = empType === 'ofw';
 
   const totalGross = salary + spouse + other;
-  const totalNet = netTakeHome(salary) + netTakeHome(spouse) + other;
+  const totalNet = netTakeHome(salary, isOFW) + netTakeHome(spouse) + other;
 
   // Accurate closing costs
   const cc = computeClosingCosts(price, loan, loanType);
   const closingCosts = cc.total;
 
   const fixedAmort = monthlyPayment(loan, initRate, term);
-  const repricedAmort = monthlyPayment(loan, repricedRate, term);
+  // Reprice on the REMAINING balance after the fixed/repricing period, matching
+  // what the year-by-year schedule below actually charges — not the original
+  // principal (see remainingBalanceAfterYears). Pag-IBIG loans genuinely reprice
+  // at their chosen period just like bank loans (2026-09-13: previously only
+  // bank did this in the schedule, which contradicted the Pag-IBIG repriced-rate
+  // figure shown elsewhere on the page). In-house never reprices.
+  const repricedAmort = (loanType === 'bank' || loanType === 'pagibig')
+    ? monthlyPayment(remainingBalanceAfterYears(loan, initRate, fixedAmort, fixedPeriod), repricedRate, term - fixedPeriod)
+    : monthlyPayment(loan, repricedRate, term);
   // DTI includes existing loan obligations — this is what banks actually compute
   const dti         = (fixedAmort + existingLoans) / totalGross * 100;
   const dtiRepriced = (repricedAmort + existingLoans) / totalGross * 100;
@@ -2925,13 +3078,16 @@ function calculate() {
   for (let yr = 1; yr <= horizon; yr++) {
     const age = AGE_BASE + yr - 1;
     const loanActive = balance > 1;
-    const isRepriced = loanType === 'bank' && yr > fixedPeriod && loanActive;
+    // Pag-IBIG loans reprice at their chosen period just like bank loans do —
+    // both use the [initRate, repricedRate] pair resolved above. In-house never
+    // reprices (repricedRate === initRate for that loan type).
+    const isRepriced = (loanType === 'bank' || loanType === 'pagibig') && yr > fixedPeriod && loanActive;
 
     // All salary figures stay monthly; grow by salary growth rate each year
     const gMonthlySalary = monthlySalaryBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
     const gMonthlySpouse = monthlySpouseBase * Math.pow(1 + SALARY_GROWTH, yr - 1);
     const gMonthlyOther = monthlyOtherBase * Math.pow(1 + SALARY_GROWTH * 0.5, yr - 1);
-    const netMonthly = netTakeHome(gMonthlySalary) + netTakeHome(gMonthlySpouse) + gMonthlyOther;
+    const netMonthly = netTakeHome(gMonthlySalary, isOFW) + netTakeHome(gMonthlySpouse) + gMonthlyOther;
     // Annual equivalents for the schedule display
     const gSalary = gMonthlySalary * 12;
     const gSpouse = gMonthlySpouse * 12;
@@ -3234,7 +3390,7 @@ function calculate() {
 
   // Approval KPI — update label to reflect lender type
   const deApprovalLabel = document.getElementById('de-approval')?.querySelector('.de-label');
-  if (deApprovalLabel) deApprovalLabel.textContent = `${lenderName} Approval`;
+  if (deApprovalLabel) deApprovalLabel.textContent = `Est. ${lenderName} Approval`;
 
   const approvalLabels = { approved: 'Likely Approved', marginal: 'Borderline', declined: 'Likely Declined' };
   const approvalCls    = { approved: 'ok', marginal: 'warn', declined: 'danger' };
@@ -3337,21 +3493,21 @@ function calculate() {
   if (approvalStatus === 'declined' || verdictClass === 'danger') {
     ctaEl.classList.add('redirect-cta');
     document.getElementById('bc-title').textContent = 'Not quite yet — but you\'re closer than you think';
-    document.getElementById('bc-sub').textContent   = 'A broker can show you properties within your actual budget and help you plan the path to your dream home.';
+    document.getElementById('bc-sub').textContent   = 'Join the list and we\'ll help you find a property within your actual budget as we build out the next steps.';
     document.getElementById('bc-btn').textContent   = 'Show me what I can afford';
   } else if (approvalStatus === 'marginal' || verdictClass === 'warn') {
     ctaEl.classList.add('warn-cta');
-    document.getElementById('bc-title').textContent = 'You\'re close — a broker can help you cross the line';
-    document.getElementById('bc-sub').textContent   = 'The right bank and loan structure can make the difference. Get a free consultation with a verified PH real estate broker.';
+    document.getElementById('bc-title').textContent = 'You\'re close — a broker could help you cross the line';
+    document.getElementById('bc-sub').textContent   = 'The right bank and loan structure can make the difference. We\'re building our broker network now — join the list and we\'ll reach out personally as soon as we can connect you with one.';
     document.getElementById('bc-btn').textContent   = 'Talk to a Broker';
   } else {
     document.getElementById('bc-title').textContent = 'Your numbers qualify — take the next step';
     document.getElementById('bc-sub').textContent   = loanType === 'pagibig'
-      ? 'Connect with a Pag-IBIG accredited broker to submit your application. Pag-IBIG typically processes within 2–3 weeks.'
+      ? 'Pag-IBIG applications go directly through Pag-IBIG — we\'ll point you to the right branch and documents once you\'re on the list. Typical processing is 2–3 weeks, per Pag-IBIG\'s published guidelines.'
       : loanType === 'inhouse'
       ? 'Connect with the developer\'s in-house sales team to start the application process.'
-      : 'Connect with a verified broker to get pre-approved and start viewing properties. Most banks respond within 5 business days.';
-    document.getElementById('bc-btn').textContent   = 'Get Pre-Approved';
+      : 'We\'re building our bank and broker partner network now — join the list and we\'ll reach out personally as soon as we can connect you with one.';
+    document.getElementById('bc-btn').textContent   = 'Request Pre-Approval';
   }
 
   // ⑤ What Would It Take?
@@ -3479,7 +3635,7 @@ function calculate() {
     `Rate is fixed for the full ${term}-year term`;
   const repricedDiff = Math.round(repricedAmort - fixedAmort);
   document.getElementById('r-amort-repriced-explain').textContent =
-    loanType !== 'bank' ? `Your rate is fixed for the full loan — no surprise increases.` :
+    loanType === 'inhouse' ? `Your rate is fixed for the full loan — no surprise increases.` :
     repricedDiff > 0
       ? `Your payment goes up by ₱${fmt(repricedDiff)}/mo after year ${fixedPeriod}. Plan for this.`
       : `Your payment actually decreases after repricing — a good scenario.`;
@@ -3726,8 +3882,8 @@ function calculate() {
 
   const svmData = {
     ok: {
-      label:   'Yes — you can do this',
-      verdict: 'This is a sound financial decision based on your numbers.',
+      label:   'Yes — your numbers support this',
+      verdict: 'Your income, DTI, and cash flow all check out. Final approval is up to your bank or Pag-IBIG.',
       color:   '#16a34a',
       // Large checkmark in circle
       svg: `<circle cx="40" cy="40" r="36" stroke="#16a34a" stroke-width="3" fill="#f0fdf4"/>
@@ -3783,7 +3939,7 @@ function calculate() {
 
   // Conclusion paragraph
   const synConclusionMap = {
-    ok:     `<strong>Overall: a well-structured decision.</strong> Your income supports this loan, the equity builds over time, and your cash flow stays positive. The main thing to manage is the rate repricing in year ${fixedPeriod} — make sure you have a plan for when the payment changes.`,
+    ok:     `<strong>Overall: the math works in your favor.</strong> Your income supports this loan, the equity builds over time, and your cash flow stays positive. The main thing to manage is the rate repricing in year ${fixedPeriod} — make sure you have a plan for when the payment changes.`,
     warn:   `<strong>Overall: possible, but needs attention.</strong> The loan is approvable but the margins are tight. Before you commit, increase your down payment if you can, or explore a longer term to lower the monthly payment. Talk to a broker about structuring this for the best rate.`,
     danger: `<strong>Overall: not ready yet — but not far off.</strong> The biggest blocker is ${
       approvalStatus === 'declined' && loanType === 'pagibig' && loan > PAGIBIG_MAX
@@ -3799,9 +3955,9 @@ function calculate() {
   const synBtn = document.getElementById('syn-cta');
   const synNote = document.getElementById('syn-cta-note');
   if (verdictClass === 'ok') {
-    synBtn.textContent = 'Get Pre-Approved';
+    synBtn.textContent = 'Request Pre-Approval';
     synBtn.className   = 'syn-cta';
-    synNote.textContent = 'Connect with a verified broker — free, no obligation';
+    synNote.textContent = 'Free, no obligation — join the list and we\'ll follow up personally';
   } else if (verdictClass === 'warn') {
     synBtn.textContent = 'Talk to a Broker';
     synBtn.className   = 'syn-cta warn';
@@ -3860,11 +4016,11 @@ function calculate() {
   document.getElementById('rsb-payment-val').textContent = '₱' + fmt(Math.round(fixedAmort));
   document.getElementById('rsb-payment-sub').textContent =
     `${initRate}% fixed · ${term} yrs` +
-    (loanType === 'bank' ? ` · ₱${fmt(Math.round(repricedAmort))} after yr ${fixedPeriod}` : '');
+    ((loanType === 'bank' || loanType === 'pagibig') ? ` · ₱${fmt(Math.round(repricedAmort))} after yr ${fixedPeriod}` : '');
 
   // KPIs — update lender label in sidebar too
   const rsbApprovalLabel = document.getElementById('rsb-approval-label');
-  if (rsbApprovalLabel) rsbApprovalLabel.textContent = `${lenderName} Approval`;
+  if (rsbApprovalLabel) rsbApprovalLabel.textContent = `Est. ${lenderName} Approval`;
 
   const rsbApproval = document.getElementById('rsb-approval');
   rsbApproval.textContent = approvalStatus === 'approved' ? 'Likely Approved' : approvalStatus === 'marginal' ? 'Borderline' : 'Likely Declined';
@@ -3900,9 +4056,9 @@ function calculate() {
     rsbBtn.className = 'rsb-cta warn-cta';
     rsbSub.textContent = 'A broker can help you structure this loan to qualify';
   } else {
-    rsbBtn.textContent = 'Get Pre-Approved';
+    rsbBtn.textContent = 'Request Pre-Approval';
     rsbBtn.className = 'rsb-cta';
-    rsbSub.textContent = 'Most banks respond within 5 business days';
+    rsbSub.textContent = 'Free, no obligation — join the list';
   }
 
   // ─── STICKY MOBILE ACTION BAR ─────────────────────────────────────────────
@@ -3930,7 +4086,7 @@ function calculate() {
     mabCta.textContent  = 'Talk to a Broker';
     mabCta.className    = 'mab-cta warn';
   } else {
-    mabCta.textContent  = 'Get Pre-Approved';
+    mabCta.textContent  = 'Request Pre-Approval';
     mabCta.className    = 'mab-cta';
   }
 
@@ -4264,6 +4420,7 @@ function buildShareURL() {
     lt: getSelectedPill('loan-type-group'),
     tm: getSelectedPill('loan-term-group'),
     fp: getSelectedPill('fixed-period-group'),
+    pfp: getSelectedPill('pagibig-period-group'),
     sc: getSelectedScenario(),
     sl: parseVal('salary'),
     sp: parseVal('spouse-salary'),
@@ -4340,6 +4497,7 @@ function loadFromURL() {
   if (p.lt) { const pill = document.querySelector(`#loan-type-group .pill[data-val="${p.lt}"]`); if (pill) { selectPill(pill, 'loan-type-group'); onLoanTypeChange(); } }
   if (p.tm) { const pill = document.querySelector(`#loan-term-group .pill[data-val="${p.tm}"]`); if (pill) selectPill(pill, 'loan-term-group'); }
   if (p.fp) { const pill = document.querySelector(`#fixed-period-group .pill[data-val="${p.fp}"]`); if (pill) selectPill(pill, 'fixed-period-group'); }
+  if (p.pfp) { const pill = document.querySelector(`#pagibig-period-group .pill[data-val="${p.pfp}"]`); if (pill) selectPill(pill, 'pagibig-period-group'); }
 
   // Rate scenario
   if (p.sc) { const opt = document.querySelector(`#rate-scenario-group .rate-option[data-scenario="${p.sc}"]`); if (opt) selectRateScenario(opt); }
@@ -4371,7 +4529,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inject jargon tooltips into static HTML labels
   const staticJargon = [
     { id: 'label-dti',       word: 'Debt-to-Income Ratio', key: 'DTI' },
-    { id: 'step3-dti-label', word: 'DTI Ratio',            key: 'DTI' },
+    { id: 'step3-dti-label', word: 'Net DSR',              key: 'DSR' },
   ];
   staticJargon.forEach(({ id, word, key }) => {
     const el = document.getElementById(id);

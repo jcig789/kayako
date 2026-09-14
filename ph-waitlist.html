@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Join the Waitlist — KayaKo Home Loan Simulator Philippines</title>
-<meta name="description" content="Join the KayaKo waitlist. Be first to access verified broker matching, bank pre-qualification, and OFW-specific home loan guidance in the Philippines.">
+<meta name="description" content="Join the KayaKo waitlist. Be first to know as we build broker matching, bank pre-qualification, and OFW-specific home loan guidance in the Philippines.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jcig789.github.io/kayako/ph-waitlist.html">
 <meta property="og:title" content="Join the Waitlist — KayaKo">
-<meta property="og:description" content="Be first in line for verified broker matching and bank pre-qualification for Philippine home loans.">
+<meta property="og:description" content="Be first in line as we build broker matching and bank pre-qualification for Philippine home loans.">
 <meta property="og:site_name" content="KayaKo">
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HPH7ELYNKG"></script>
@@ -63,6 +63,15 @@ body {
 }
 .header-brand  { color: #fff; font-weight: 600; font-size: 14px; }
 .header-kayako { color: rgba(255,255,255,0.22); font-size: 11px; letter-spacing: 0.5px; }
+.trust-strip {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  padding: 6px 24px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
 .header-back {
   color: rgba(255,255,255,0.6);
   font-size: 12px;
@@ -158,7 +167,8 @@ body {
   color: var(--ink-2);
   margin-bottom: 5px;
 }
-.form-field input {
+.form-field input,
+.form-field select {
   width: 100%;
   padding: 11px 14px;
   border: 1px solid var(--line);
@@ -169,11 +179,22 @@ body {
   outline: none;
   transition: border-color 0.12s, box-shadow 0.12s;
 }
-.form-field input:focus {
+.form-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+.form-field input:focus,
+.form-field select:focus {
   border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(30,58,95,0.08);
 }
-.form-field input.error { border-color: var(--red); }
+.form-field input.error,
+.form-field select.error { border-color: var(--red); }
+.form-field[hidden] { display: none; }
 .field-error {
   font-size: 12px;
   color: var(--red);
@@ -181,6 +202,30 @@ body {
   display: none;
 }
 .field-error.visible { display: block; }
+
+/* Consent checkbox row */
+.consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.consent-row[hidden] { display: none; }
+.consent-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+.consent-row label {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.consent-row .field-error { margin-top: 2px; }
 
 .submit-btn {
   width: 100%;
@@ -336,12 +381,14 @@ body {
   <div>
     <div class="header-brand">Home Loan Simulator</div>
   </div>
-  <div class="header-kayako">KayaKo.ph</div>
+  <div class="header-kayako">KayaKo</div>
   <button class="header-back" onclick="goBack()">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
     Back to simulator
   </button>
 </div>
+
+<div class="trust-strip">KayaKo is an independent calculator — not a bank, broker, or Pag-IBIG.</div>
 
 <div class="main">
   <div class="card">
@@ -366,6 +413,7 @@ body {
         <input type="hidden" id="f-property" name="property_price">
         <input type="hidden" id="f-income"   name="monthly_income">
         <input type="hidden" id="f-dsr"      name="net_dsr">
+        <input type="hidden" id="f-loantype" name="loan_type">
 
         <div class="form-field">
           <label for="f-name">Your Name</label>
@@ -379,10 +427,70 @@ body {
           <div class="field-error" id="err-email">Please enter a valid email</div>
         </div>
 
+        <!-- Approved path only — preferred bank -->
+        <div class="form-field" id="field-bank" data-path="approved" hidden>
+          <label for="f-bank">Preferred Bank</label>
+          <select id="f-bank" name="preferred_bank">
+            <option value="">Any / not sure yet</option>
+            <option value="bdo">BDO</option>
+            <option value="bpi">BPI</option>
+            <option value="metrobank">Metrobank</option>
+            <option value="pagibig">Pag-IBIG Fund</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <!-- Marginal path only — what's blocking them -->
+        <div class="form-field" id="field-blocker" data-path="marginal" hidden>
+          <label for="f-blocker">What's mainly holding you back?</label>
+          <select id="f-blocker" name="blocker">
+            <option value="">Select one</option>
+            <option value="savings">Savings gap for down payment</option>
+            <option value="income">Income too low for the loan amount</option>
+            <option value="existing_loans">Existing loans / debt</option>
+            <option value="rate">Interest rate concern</option>
+            <option value="exploring">Just exploring for now</option>
+          </select>
+          <div class="field-error" id="err-blocker">Please select an option</div>
+        </div>
+
+        <!-- Approved + marginal — buying timeline -->
+        <div class="form-field" id="field-timeline" data-path="approved,marginal" hidden>
+          <label for="f-timeline">Buying Timeline</label>
+          <select id="f-timeline" name="buying_timeline">
+            <option value="">Select one</option>
+            <option value="1-3mo">1–3 months</option>
+            <option value="3-6mo">3–6 months</option>
+            <option value="6-12mo">6–12 months</option>
+            <option value="exploring">Just exploring</option>
+          </select>
+        </div>
+
+        <!-- Declined path only — optional target date, feeds re-engagement cadence -->
+        <div class="form-field" id="field-targetdate" data-path="declined" hidden>
+          <label for="f-targetdate">When are you hoping to buy? <span style="font-weight:400;color:var(--ink-4)">(optional)</span></label>
+          <select id="f-targetdate" name="target_date">
+            <option value="">Not sure yet</option>
+            <option value="3mo">In about 3 months</option>
+            <option value="6mo">In about 6 months</option>
+            <option value="12mo">In about a year</option>
+            <option value="12mo+">More than a year</option>
+          </select>
+        </div>
+
+        <!-- Approved + marginal — consent -->
+        <div class="consent-row" id="field-consent" data-path="approved,marginal" hidden>
+          <input type="checkbox" id="f-consent" name="consent">
+          <div>
+            <label for="f-consent" id="consent-label">I agree to be contacted about this inquiry.</label>
+            <div class="field-error" id="err-consent">Please confirm consent to be contacted</div>
+          </div>
+        </div>
+
         <button type="submit" class="submit-btn" id="submit-btn">
           Join the Waitlist
         </button>
-        <div class="submit-note">No spam. No commitments. Just a heads-up when we're ready.</div>
+        <div class="submit-note" id="submit-note">No spam. No commitments. Just a heads-up when we're ready.</div>
       </form>
     </div>
 
@@ -393,15 +501,15 @@ body {
           <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="success-title">You're on the list.</div>
+      <div class="success-title" id="success-title">You're on the list.</div>
       <div class="success-desc" id="success-desc"></div>
       <a class="back-btn" onclick="goBack()" href="#">Run another scenario</a>
     </div>
 
-    <!-- WHAT WE'RE BUILDING -->
+    <!-- NEXT STEPS / WHAT WE'RE BUILDING -->
     <div class="building-strip" id="building-strip">
-      <div class="building-label">What we're building</div>
-      <div class="building-items">
+      <div class="building-label" id="building-label">What we're building</div>
+      <div class="building-items" id="building-items">
         <div class="building-item"><span class="building-dot"></span>Verified broker matching</div>
         <div class="building-item"><span class="building-dot"></span>Bank pre-qualification</div>
         <div class="building-item"><span class="building-dot"></span>Property search tools</div>
@@ -428,6 +536,7 @@ let path          = 'approved';
 let propertyPrice = '';
 let monthlyIncome = '';
 let netDSR        = '';
+let loanType      = '';
 let verdict       = '';
 
 try {
@@ -438,6 +547,7 @@ try {
     propertyPrice = decoded.v ? decoded.v.toString() : '';
     monthlyIncome = decoded.i ? decoded.i.toString() : '';
     netDSR        = decoded.r ? decoded.r.toString() : '';
+    loanType      = decoded.lt || '';
     // verdict not passed — keeps URL clean, we derive messaging from path
   }
 } catch (e) {
@@ -447,31 +557,66 @@ try {
 // ─── CONTENT BY PATH ──────────────────────────────────────────────────────────
 const content = {
   approved: {
-    label:   'Approved',
-    title:   "You're ready. Be first in line.",
-    desc:    "Your numbers qualify. <strong>We're building the platform</strong> that connects Filipinos with the right broker for their exact financial profile. Join the waitlist and be first to know when we're ready.",
-    icon:    '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>',
-    success: "We'll reach out as soon as the platform is ready. Your spot is reserved.",
+    label:      'Likely Approved',
+    title:      "You're ready. Request pre-approval.",
+    desc:       "Your numbers qualify. Tell us your preferred bank and timeline — <strong>we're building our bank and broker partner network now</strong>, and we'll reach out personally as soon as we can connect you with one. No cost, no commitment.",
+    icon:       '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>',
+    btnLabel:   'Request Pre-Approval',
+    note:       'No live partner network yet — you\'re joining an early list, and we\'ll email you personally once it\'s ready.',
+    success:    "We'll reach out to get your pre-approval started.",
+    successTitle: "Your request is in.",
+    gaEvent:    'preapproval_request',
+    stepsLabel: 'What to prepare while you wait',
+    steps: [
+      'Valid government ID',
+      'Certificate of employment / income',
+      'Latest 3 months payslips or bank statements',
+      'Proof of billing address',
+    ],
   },
   marginal: {
-    label:   'Almost there',
-    title:   "You're closer than you think.",
-    desc:    "The numbers are borderline but workable. <strong>We're building tools</strong> to help Filipinos navigate exactly this situation — structuring the right loan, finding the right partner. Join the waitlist and be first to know when we're ready.",
-    icon:    '<circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01" stroke-linecap="round"/>',
-    success: "You're on the list. We'll let you know when the platform launches.",
+    label:      'Almost there',
+    title:      "You're closer than you think. Talk to a broker.",
+    desc:       "The numbers are borderline but workable. Tell us what's holding you back — <strong>we're building our broker network now</strong>, and a broker can help structure the right loan to get you qualified once we connect you.",
+    icon:       '<circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01" stroke-linecap="round"/>',
+    btnLabel:   'Talk to a Broker',
+    note:       'No live broker network yet — you\'re joining an early list, and we\'ll email you personally once it\'s ready.',
+    success:    "We'll reach out personally as soon as we can connect you with a broker.",
+    successTitle: "Your request is in.",
+    gaEvent:    'broker_request',
+    stepsLabel: 'Tips while you wait',
+    steps: [
+      'Gather proof of all income sources, including side income',
+      'List existing loans and monthly payments',
+      'Think about how much extra down payment you could add',
+      'Have your last 6 months of bank statements ready',
+    ],
   },
   declined: {
-    label:   'Not yet',
-    title:   "The numbers change. Come back ready.",
-    desc:    "Right now the loan doesn't work — but that's a current snapshot, not a verdict on your future. <strong>We're building a platform</strong> to guide Filipinos step by step toward homeownership. Join the list and we'll be here when your situation has improved.",
-    icon:    '<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-7v2m0-10v6" stroke-linecap="round"/>',
-    success: "You're on the list. Run the simulator again anytime your numbers change — it's always free.",
+    label:      'Not yet',
+    title:      "The numbers change. Come back ready.",
+    desc:       "Right now the loan doesn't work — but that's a current snapshot, not a verdict on your future. <strong>We're building a platform</strong> to guide Filipinos step by step toward homeownership. Join the list and we'll be here when your situation has improved.",
+    icon:       '<path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-7v2m0-10v6" stroke-linecap="round"/>',
+    btnLabel:   'Join the Waitlist',
+    note:       "No spam. No commitments. Just a heads-up when we're ready.",
+    success:    "You're on the list. Run the simulator again anytime your numbers change — it's always free.",
+    successTitle: "You're on the list.",
+    gaEvent:    'waitlist_signup',
+    stepsLabel: "What we're building",
+    steps: [
+      'Verified broker matching',
+      'Bank pre-qualification',
+      'Property search tools',
+      'OFW-specific guidance',
+    ],
   },
 };
 
 const c = content[path] || content.approved;
+const bankDefault = { pagibig: 'pagibig' }[loanType] || '';
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
+document.title = c.btnLabel + ' — KayaKo';
 document.getElementById('card-accent').className = 'card-accent ' + path;
 document.getElementById('card-icon').className   = 'card-icon ' + path;
 document.getElementById('card-icon-svg').innerHTML = c.icon;
@@ -479,12 +624,35 @@ document.getElementById('card-label').className  = 'card-label ' + path;
 document.getElementById('card-label').textContent = c.label;
 document.getElementById('card-title').textContent = c.title;
 document.getElementById('card-desc').innerHTML    = c.desc;
+document.getElementById('submit-btn').textContent = c.btnLabel;
+document.getElementById('submit-note').textContent = c.note;
+
+// Show/hide fields that are specific to this path.
+// field-bank and field-targetdate are always optional — everything else
+// shown for the active path is required.
+const OPTIONAL_FIELDS = ['field-bank', 'field-targetdate'];
+document.querySelectorAll('[data-path]').forEach(el => {
+  const paths = el.dataset.path.split(',');
+  const show = paths.includes(path);
+  el.hidden = !show;
+  const requiredInput = el.querySelector('select, input[type="checkbox"]');
+  if (requiredInput && !OPTIONAL_FIELDS.includes(el.id)) requiredInput.required = show;
+});
+
+if (bankDefault) document.getElementById('f-bank').value = bankDefault;
+
+// Next-steps strip (replaces generic "what we're building" for approved/marginal)
+document.getElementById('building-label').textContent = c.stepsLabel;
+document.getElementById('building-items').innerHTML = c.steps
+  .map(s => `<div class="building-item"><span class="building-dot"></span>${s}</div>`)
+  .join('');
 
 // Pre-fill hidden context fields
 document.getElementById('f-path').value     = path;
 document.getElementById('f-property').value = propertyPrice;
 document.getElementById('f-income').value   = monthlyIncome;
 document.getElementById('f-dsr').value      = netDSR;
+document.getElementById('f-loantype').value = loanType;
 
 // ─── FORM SUBMIT ──────────────────────────────────────────────────────────────
 async function handleSubmit(e) {
@@ -514,12 +682,33 @@ async function handleSubmit(e) {
     document.getElementById('f-email').classList.remove('error');
   }
 
+  // Marginal path — "what's holding you back" is required
+  const blockerEl = document.getElementById('f-blocker');
+  const blocker = blockerEl.value;
+  if (path === 'marginal' && !blocker) {
+    document.getElementById('err-blocker').classList.add('visible');
+    blockerEl.classList.add('error');
+    valid = false;
+  } else {
+    document.getElementById('err-blocker').classList.remove('visible');
+    blockerEl.classList.remove('error');
+  }
+
+  // Approved + marginal — consent required
+  const consentEl = document.getElementById('f-consent');
+  if ((path === 'approved' || path === 'marginal') && !consentEl.checked) {
+    document.getElementById('err-consent').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('err-consent').classList.remove('visible');
+  }
+
   if (!valid) return;
 
   // Loading state
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Joining...';
+  btn.innerHTML = '<span class="spinner"></span>Sending...';
   document.getElementById('error-banner').classList.remove('visible');
 
   try {
@@ -527,17 +716,23 @@ async function handleSubmit(e) {
       name,
       email,
       path,
-      property_price: propertyPrice,
-      monthly_income: monthlyIncome,
-      net_dsr:        netDSR,
-      timestamp:      new Date().toISOString(),
-      source:         'ph-home-loan-simulator',
+      property_price:  propertyPrice,
+      monthly_income:  monthlyIncome,
+      net_dsr:         netDSR,
+      loan_type:       loanType,
+      preferred_bank:  document.getElementById('f-bank').value,
+      buying_timeline: document.getElementById('f-timeline').value,
+      blocker,
+      target_date:     document.getElementById('f-targetdate').value,
+      consent:         consentEl.checked,
+      timestamp:       new Date().toISOString(),
+      source:          'ph-home-loan-simulator',
     };
 
     // Check if Apps Script URL is configured
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
       // Dev mode — log to console and show success anyway
-      console.log('Waitlist submission (no endpoint configured):', payload);
+      console.log('Lead submission (no endpoint configured):', payload);
       showSuccess(name);
       return;
     }
@@ -555,27 +750,31 @@ async function handleSubmit(e) {
   } catch (err) {
     console.error('Submission error:', err);
     btn.disabled = false;
-    btn.innerHTML = 'Join the Waitlist';
+    btn.innerHTML = c.btnLabel;
     document.getElementById('error-banner').classList.add('visible');
   }
 }
 
 function showSuccess(name) {
   document.getElementById('card-body').classList.add('hidden');
-  document.getElementById('building-strip').style.display = 'none';
+  // building-strip stays visible after success — for approved/marginal it's now
+  // the "what to prepare / tips while you wait" checklist, most useful post-submit
   const successEl = document.getElementById('success-state');
   successEl.classList.add('visible');
+  document.getElementById('success-title').textContent = c.successTitle;
   document.getElementById('success-desc').textContent = c.success;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // GA4 — track waitlist signup
+  // GA4 — distinct conversion event per path so each can be marked
+  // as its own Key Event (preapproval_request / broker_request / waitlist_signup)
   if (typeof gtag !== 'undefined') {
-    gtag('event', 'waitlist_signup', {
-      event_category: 'waitlist',
+    gtag('event', c.gaEvent, {
+      event_category: 'lead',
       approval_path:  path,
       property_price: parseInt(propertyPrice) || 0,
       monthly_income: parseInt(monthlyIncome) || 0,
       net_dsr:        parseFloat(netDSR) || 0,
+      loan_type:      loanType,
     });
   }
 }
@@ -590,10 +789,17 @@ function goBack() {
 
 /*
 ──────────────────────────────────────────────────────────────────────────────
-GOOGLE SHEETS SETUP — one-time, ~5 minutes
+GOOGLE SHEETS SETUP
 
-1. Create a new Google Sheet (name it "PH Waitlist")
-   Columns: Timestamp | Name | Email | Path | Property Price | Monthly Income | Verdict | Net DSR | Source
+NOTE: if you already deployed an Apps Script for this page, its doPost() needs
+to be UPDATED to the version below — the payload now carries lead-qualification
+fields (preferred bank, timeline, blocker, consent) that the old columns don't
+have. Old submissions aren't affected; new fields just won't be captured until
+you redeploy.
+
+1. Sheet columns (in this order):
+   Timestamp | Name | Email | Path | Property Price | Monthly Income | Loan Type
+   | Net DSR | Preferred Bank | Buying Timeline | Blocker | Target Date | Consent | Source
 
 2. Go to Extensions → Apps Script
 
@@ -609,8 +815,13 @@ function doPost(e) {
     data.path,
     data.property_price,
     data.monthly_income,
-    data.verdict,
+    data.loan_type,
     data.net_dsr,
+    data.preferred_bank,
+    data.buying_timeline,
+    data.blocker,
+    data.target_date,
+    data.consent,
     data.source,
   ]);
   return ContentService
@@ -618,17 +829,16 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-4. Click Deploy → New Deployment
-   Type: Web App
-   Execute as: Me
-   Who has access: Anyone
-   → Deploy → Copy the Web App URL
+4. Click Deploy → Manage deployments → edit (pencil) → New version → Deploy
+   (if this is a brand-new sheet instead: Deploy → New Deployment → Type: Web App
+   → Execute as: Me → Who has access: Anyone → Deploy → copy the Web App URL)
 
-5. Paste the URL into APPS_SCRIPT_URL at the top of this file.
+5. Paste/confirm the URL in APPS_SCRIPT_URL at the top of this file.
 
-That's it. Every waitlist submission lands in your Google Sheet with full context
-(path, property price, income, approval verdict, DSR) — a qualified lead database
-from day one.
+Every submission now lands in your Sheet with full lead-qualification context —
+approved/marginal leads arrive with preferred bank or blocker + timeline already
+attached, ready to hand to a bank partner or broker without a follow-up call
+just to ask basic qualifying questions.
 ──────────────────────────────────────────────────────────────────────────────
 */
 </script>
