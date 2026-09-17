@@ -3036,15 +3036,15 @@ function step3Update() {
   const existingNote = existingLoans > 0 ? ` (includes ₱${fmtM(existingLoans)}/mo in existing loans)` : '';
   if (dti > 45) {
     callout.className = 'callout danger';
-    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Likely decline:</strong> Net DSR is ${dti.toFixed(0)}% of take-home pay${existingNote} — well above the 40% cap most banks enforce. Reduce loan size, increase down payment, or pay off existing loans first.</span>`;
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Likely decline:</strong> Net DSR is ${dti.toFixed(0)}% of take-home pay${existingNote} — well above the 40% cap most lenders enforce. Reduce loan size, increase down payment, or pay off existing loans first.</span>`;
     callout.classList.remove('hidden');
   } else if (dti > 40) {
     callout.className = 'callout danger';
-    callout.innerHTML = `<span class="co-icon">!</span><span><strong>At the limit:</strong> Net DSR is ${dti.toFixed(0)}%${existingNote} — most banks cap this at 40%. A few may still process it, but approval is unlikely.</span>`;
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>At the limit:</strong> Net DSR is ${dti.toFixed(0)}%${existingNote} — most lenders cap this at 40%. A few may still process it, but approval is unlikely.</span>`;
     callout.classList.remove('hidden');
   } else if (dti > 35) {
     callout.className = 'callout warn';
-    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Borderline:</strong> Net DSR is ${dti.toFixed(0)}% of take-home pay${existingNote} — above the 35% guideline. Some banks accept this with strong credit history.</span>`;
+    callout.innerHTML = `<span class="co-icon">!</span><span><strong>Borderline:</strong> Net DSR is ${dti.toFixed(0)}% of take-home pay${existingNote} — above the 35% guideline. Some lenders accept this with strong credit history.</span>`;
     callout.classList.remove('hidden');
   } else {
     callout.classList.add('hidden');
@@ -3355,10 +3355,10 @@ function calculate() {
     approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — well above the 40% cap. ${lenderFull} will likely decline.`, type: 'fail' });
     approvalStatus = 'declined';
   } else if (netDSR > 40) {
-    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — at the absolute limit. A few banks may process this but most will decline.`, type: 'fail' });
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — at the absolute limit. A few lenders may process this but most will decline.`, type: 'fail' });
     if (approvalStatus !== 'declined') approvalStatus = 'declined';
   } else if (netDSR > 35) {
-    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — above the 35% guideline. Some banks accept up to 40% with strong credit history.`, type: 'warn-item' });
+    approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — above the 35% guideline. Some lenders accept up to 40% with strong credit history.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else {
     approvalReasons.push({ text: `Total net DSR is ${netDSR.toFixed(0)}%${existingLoanNote} — within the 35% guideline.`, type: 'pass' });
@@ -3366,13 +3366,13 @@ function calculate() {
 
   // Check 2: Repriced DSR stress test
   if (netDSRRepriced > 45) {
-    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — banks doing stress tests will likely decline on this.`, type: 'fail' });
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — lenders doing stress tests will likely decline on this.`, type: 'fail' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else if (netDSRRepriced > 40) {
     approvalReasons.push({ text: `At repriced rate (${repricedRate}%), total DSR rises to ${netDSRRepriced.toFixed(0)}% — above the 40% cap after repricing. Consider a shorter fixed period.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else if (netDSRRepriced > 35) {
-    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), DSR rises to ${netDSRRepriced.toFixed(0)}% — still within most banks' tolerance.`, type: 'warn-item' });
+    approvalReasons.push({ text: `At repriced rate (${repricedRate}%), DSR rises to ${netDSRRepriced.toFixed(0)}% — still within most lenders' tolerance.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else {
     approvalReasons.push({ text: `Even after repricing to ${repricedRate}%, total DSR stays at ${netDSRRepriced.toFixed(0)}% — passes stress test.`, type: 'pass' });
@@ -3381,13 +3381,13 @@ function calculate() {
   // Check 3: Loan amount vs income — most banks require loan ≤ 80× monthly gross
   const loanToIncome = loan / totalGross;
   if (loanToIncome > 100) {
-    approvalReasons.push({ text: `Loan is ${loanToIncome.toFixed(0)}× your monthly income. Banks typically cap at 80–100×.`, type: 'fail' });
+    approvalReasons.push({ text: `Loan is ${loanToIncome.toFixed(0)}× your monthly income. Lenders typically cap at 80–100×.`, type: 'fail' });
     approvalStatus = 'declined';
   } else if (loanToIncome > 80) {
-    approvalReasons.push({ text: `Loan is ${loanToIncome.toFixed(0)}× your monthly income — at the upper limit banks allow.`, type: 'warn-item' });
+    approvalReasons.push({ text: `Loan is ${loanToIncome.toFixed(0)}× your monthly income — at the upper limit lenders allow.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else {
-    approvalReasons.push({ text: `Loan-to-income ratio is ${loanToIncome.toFixed(0)}× — well within bank guidelines.`, type: 'pass' });
+    approvalReasons.push({ text: `Loan-to-income ratio is ${loanToIncome.toFixed(0)}× — well within lender guidelines.`, type: 'pass' });
   }
 
   // Check 4b: Pag-IBIG eligibility
@@ -3403,13 +3403,13 @@ function calculate() {
 
   // Check 5: Down payment adequacy
   if (dpPct < 10) {
-    approvalReasons.push({ text: `Down payment below 10% — most banks require at least 10–20%.`, type: 'fail' });
+    approvalReasons.push({ text: `Down payment below 10% — most lenders require at least 10–20%.`, type: 'fail' });
     approvalStatus = 'declined';
   } else if (dpPct < 20) {
     approvalReasons.push({ text: `Down payment of ${dpPct}% is accepted but expect a slightly higher rate and mandatory MRI.`, type: 'warn-item' });
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
   } else {
-    approvalReasons.push({ text: `${dpPct}% down payment — meets standard bank requirements.`, type: 'pass' });
+    approvalReasons.push({ text: `${dpPct}% down payment — meets standard lender requirements.`, type: 'pass' });
   }
 
   // ─── ② SAVINGS ADEQUACY ──────────────────────────────────────────────────
@@ -3490,8 +3490,8 @@ function calculate() {
   if (hardDecline) {
     verdictClass = 'danger';
     if (approvalStatus === 'declined') {
-      tag   = 'BANK WILL LIKELY DECLINE';
-      title = 'This loan does not meet Philippine bank requirements';
+      tag   = `${lenderName.toUpperCase()} WILL LIKELY DECLINE`;
+      title = `This loan does not meet the requirements of ${lenderFull}`;
       body  = `Your net DSR is ${netDSR.toFixed(0)}% — ${lenderFull} approve loans where the monthly payment is at most 35% of take-home pay (₱${fmt(Math.round(totalNet))}). ` +
               `To qualify: reduce the loan amount, increase your down payment, or extend the loan term. See "What would it take?" below.`;
     } else {
@@ -3510,16 +3510,21 @@ function calculate() {
   } else if (approvalStatus === 'marginal' || netDSRRepriced > 40 || monthlyBuffer < totalNet * 0.15) {
     verdictClass = 'warn';
     tag   = 'APPROVABLE — BUT TIGHT';
-    title = 'A bank will likely process this, but the margin is slim';
+    title = 'Likely to be processed, but the margin is slim';
+    const brokerAdvice = loanType === 'pagibig'
+      ? 'A broker can help you structure your Pag-IBIG application to improve your approval odds.'
+      : loanType === 'inhouse'
+      ? 'The developer\'s in-house financing team may be able to adjust terms to fit your budget.'
+      : 'A broker can help you find the bank with the best rate for your profile.';
     body  = `Net DSR is ${netDSR.toFixed(0)}% — within limits (max 35%). ` +
             `After repricing to ${repricedRate}%, DSR rises to ${netDSRRepriced.toFixed(0)}%. ` +
             `Monthly buffer: ₱${fmt(Math.round(monthlyBuffer))}. ` +
-            (netDSR > 30 ? `Consider a larger down payment or longer term to improve your approval odds.` : `A broker can help you find the bank with the best rate for your profile.`);
+            (netDSR > 30 ? `Consider a larger down payment or longer term to improve your approval odds.` : brokerAdvice);
   } else {
     verdictClass = 'ok';
     tag   = 'APPROVABLE AND AFFORDABLE';
     title = 'This loan is within your means';
-    body  = `Net DSR is ${netDSR.toFixed(0)}% — well within the 35% bank guideline. Monthly buffer: ₱${fmt(Math.round(monthlyBuffer))}. ` +
+    body  = `Net DSR is ${netDSR.toFixed(0)}% — well within the 35% guideline. Monthly buffer: ₱${fmt(Math.round(monthlyBuffer))}. ` +
             `Even at repriced rate (${repricedRate}%), DSR stays at ${netDSRRepriced.toFixed(0)}%.` +
             (savingsRunwayMonths >= 6 ? ` Your savings cover ${savingsRunwayMonths} months of full expenses.` : '');
   }
@@ -3663,7 +3668,11 @@ function calculate() {
   } else if (approvalStatus === 'marginal' || verdictClass === 'warn') {
     ctaEl.classList.add('warn-cta');
     document.getElementById('bc-title').textContent = 'You\'re close — a broker could help you cross the line';
-    document.getElementById('bc-sub').textContent   = 'The right bank and loan structure can make the difference. We\'re building our broker network now — join the list and we\'ll reach out personally as soon as we can connect you with one.';
+    document.getElementById('bc-sub').textContent   = loanType === 'pagibig'
+      ? 'The right loan structure can make the difference. We\'re building our broker network now — join the list and we\'ll reach out personally as soon as we can help you strengthen your Pag-IBIG application.'
+      : loanType === 'inhouse'
+      ? 'The right loan structure can make the difference — talk to the developer\'s in-house sales team about adjusting your terms.'
+      : 'The right bank and loan structure can make the difference. We\'re building our broker network now — join the list and we\'ll reach out personally as soon as we can connect you with one.';
     document.getElementById('bc-btn').textContent   = 'Talk to a Broker';
   } else {
     document.getElementById('bc-title').textContent = 'Your numbers qualify — take the next step';
@@ -3747,7 +3756,7 @@ function calculate() {
     extraReason.textContent = `At age ${AGE_BASE} with a ${term}-year term, you would be ${ageAtMaturity} at loan maturity. ` +
       (loanType === 'pagibig'
         ? `Pag-IBIG requires the loan to mature before age 70.`
-        : `Most banks cap borrower age at loan end to 65.`) +
+        : `Most lenders cap borrower age at loan end to 65.`) +
       ` Consider a shorter term.`;
     document.getElementById('bg-reasons').appendChild(extraReason);
     if (approvalStatus === 'approved') approvalStatus = 'marginal';
@@ -3778,9 +3787,9 @@ function calculate() {
   amortEl.className = 'm-val ' + fixedClass;
   document.getElementById('r-amort-fixed-sub').textContent = `${initRate}% rate, ${term} yrs`;
   document.getElementById('r-amort-fixed-explain').textContent =
-    dti > 40 ? `That's more than 40% of your income — banks will likely decline this loan.` :
+    dti > 40 ? `That's more than 40% of your income — lenders will likely decline this loan.` :
     dti > 30 ? `That's ${dti.toFixed(0)}% of your gross income. Manageable, but leaves little room if anything changes.` :
-    `That's ${dti.toFixed(0)}% of your gross income — a comfortable amount most banks will approve.`;
+    `That's ${dti.toFixed(0)}% of your gross income — a comfortable amount most lenders will approve.`;
 
   const repricedClass = dtiRepriced > 40 ? 'danger' : dtiRepriced > 30 ? 'warn' : 'ok';
   setMetricBar('mb-repriced', repricedClass);
@@ -3814,9 +3823,9 @@ function calculate() {
   dtiBar.style.background = dti > 40 ? 'var(--red)' : dti > 30 ? 'var(--orange)' : 'var(--green)';
   document.getElementById('r-dti-explain').textContent =
     `For every ₱100 you earn, ₱${dti.toFixed(0)} goes to your loan payment. ` +
-    (dti <= 30 ? `Banks want this below 35% — you're in good shape.` :
+    (dti <= 30 ? `Lenders want this below 35% — you're in good shape.` :
      dti <= 40 ? `This is borderline. A larger down payment or longer term would help.` :
-     `This is too high. Most banks require below 40%.`);
+     `This is too high. Most lenders require below 40%.`);
 
   const bufClass = monthlyBuffer < 0 ? 'danger' : monthlyBuffer < totalGross * 0.1 ? 'warn' : 'ok';
   setMetricBar('mb-buffer', bufClass);
