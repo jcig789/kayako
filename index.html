@@ -9,14 +9,19 @@
 <meta name="description" content="Free Philippine home loan calculator. Check if you can afford a property — Bank, Pag-IBIG, or In-House. Computes TRAIN Law taxes, DSR, closing costs, and 25-year cash flow in 3 steps.">
 <meta name="keywords" content="home loan calculator Philippines, Pag-IBIG loan simulator, can I afford a house Philippines, DSR calculator, Philippine mortgage calculator, housing loan affordability">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://jcig789.github.io/kayako/">
+<link rel="canonical" href="https://kayakoph.com/">
+
+<!-- Favicon -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.png" sizes="180x180" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
 
 <!-- Open Graph (Facebook, Messenger, Viber link previews) -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://jcig789.github.io/kayako/">
+<meta property="og:url" content="https://kayakoph.com/">
 <meta property="og:title" content="Can you afford this home loan? — KayaKo">
 <meta property="og:description" content="Free PH home loan simulator. Enter property price, income, and loan type — get a full affordability report in 3 steps. Bank, Pag-IBIG, In-House.">
-<meta property="og:image" content="https://jcig789.github.io/kayako/og-image.png">
+<meta property="og:image" content="https://kayakoph.com/og-image.png">
 <meta property="og:locale" content="en_PH">
 <meta property="og:site_name" content="KayaKo">
 
@@ -24,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Can you afford this home loan? — KayaKo">
 <meta name="twitter:description" content="Free PH home loan simulator. Bank, Pag-IBIG, In-House. TRAIN Law taxes, DSR, closing costs — full 25-year projection.">
-<meta name="twitter:image" content="https://jcig789.github.io/kayako/og-image.png">
+<meta name="twitter:image" content="https://kayakoph.com/og-image.png">
 
 <!-- Structured Data — WebApplication -->
 <script type="application/ld+json">
@@ -32,7 +37,7 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "KayaKo Home Loan Simulator",
-  "url": "https://jcig789.github.io/kayako/",
+  "url": "https://kayakoph.com/",
   "description": "Free Philippine home loan affordability simulator. Computes bank approval likelihood, DSR, closing costs, and 25-year cash flow for Bank, Pag-IBIG, and In-House financing.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Any",
@@ -128,6 +133,35 @@ body {
   font-size: 11px;
   color: var(--ink-3);
   line-height: 1.4;
+}
+
+/* ── SITE FOOTER ── */
+.site-footer {
+  border-top: 1px solid var(--line);
+  background: var(--bg-2);
+  padding: 28px 20px 32px;
+  margin-top: 8px;
+}
+.sf-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.sf-brand { font-weight: 700; color: var(--ink); font-size: 14px; }
+.sf-tagline { color: var(--ink-3); font-size: 12px; margin-top: 2px; }
+.sf-links { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; }
+.sf-links a { color: var(--ink-2); text-decoration: none; }
+.sf-links a:hover { text-decoration: underline; }
+.sf-note {
+  max-width: 1200px;
+  margin: 16px auto 0;
+  font-size: 11px;
+  color: var(--ink-4);
+  line-height: 1.5;
 }
 
 /* ── PAGE WRAP ── */
@@ -2342,6 +2376,24 @@ select {
   </div><!-- /results -->
 
 </div><!-- /page -->
+
+<footer class="site-footer">
+  <div class="sf-inner">
+    <div>
+      <div class="sf-brand">KayaKo</div>
+      <div class="sf-tagline">Home loan affordability simulator for the Philippines</div>
+    </div>
+    <div class="sf-links">
+      <a href="ph-methodology.html">Methodology &amp; Sources</a>
+      <a href="mailto:hello@kayakoph.com">hello@kayakoph.com</a>
+    </div>
+  </div>
+  <div class="sf-note">
+    &copy; 2026 KayaKo. For educational purposes only — not financial, legal, or tax advice.
+    KayaKo is an independent calculator, not a bank, broker, or lending institution, and is not
+    affiliated with or endorsed by Pag-IBIG Fund or any bank.
+  </div>
+</footer>
 
 <!-- ── STICKY MOBILE ACTION BAR ── -->
 <div class="mobile-action-bar hidden-bar" id="mobile-action-bar">
