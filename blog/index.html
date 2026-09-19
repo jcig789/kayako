@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Blog — KayaKo Home Loan Simulator Philippines</title>
+<meta name="description" content="Guides on Philippine home loans, Pag-IBIG, DSR, and buying property — from the team behind the KayaKo affordability simulator.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://kayakoph.com/blog/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kayakoph.com/blog/">
+<meta property="og:title" content="KayaKo Blog — Philippine Home Loan Guides">
+<meta property="og:description" content="Guides on Philippine home loans, Pag-IBIG, DSR, and buying property.">
+<meta property="og:site_name" content="KayaKo">
+<!-- Favicon -->
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon.png" sizes="180x180" type="image/png">
+<link rel="apple-touch-icon" href="../favicon.png">
+<link rel="stylesheet" href="shared.css">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HPH7ELYNKG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // cookie_domain pinned to the exact hostname — see index.html for why.
+  gtag('config', 'G-HPH7ELYNKG', { cookie_domain: location.hostname });
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">Blog</div>
+  <a class="header-back" href="../index.html">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back to simulator
+  </a>
+  <div class="header-kayako">KayaKo</div>
+</div>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-label">KayaKo Blog</div>
+    <div class="hero-title">Guides on Philippine home loans &amp; buying property</div>
+    <div class="hero-desc">Plain-language explanations of how banks, Pag-IBIG, and lenders actually decide — sourced the same way the simulator is.</div>
+    <div class="pill-group" id="category-filter">
+      <div class="pill selected" data-val="all" onclick="selectCategory(this)">All</div>
+      <div class="pill" data-val="home" onclick="selectCategory(this)">Home &amp; Condo</div>
+    </div>
+  </div>
+
+  <div class="post-grid" id="post-grid"></div>
+
+  <div class="footer-note">
+    <strong>New guides added periodically.</strong> Have a topic you want covered, or spotted something inaccurate? Email <a href="mailto:hello@kayakoph.com">hello@kayakoph.com</a>.
+    <br><br>
+    <a class="footer-cta" href="../index.html">Run the simulator</a>
+  </div>
+
+</div>
+
+<script>
+// ─── POSTS (single source of truth for this listing) ──────────────────────────
+// category is metadata only — never a folder. Add "car", "insurance", etc. here
+// later without moving any files. When you add a post file, add its entry here
+// too (and to /sitemap.xml).
+const POSTS = [
+  {
+    title: "How Philippine Banks Actually Compute Your DSR",
+    slug: "how-banks-compute-your-dsr",
+    category: "home",
+    date: "2026-09-19",
+    excerpt: "The single number that decides loan approval more than anything else — what Net DSR actually is, why banks use net income not gross, and the 35%/40% thresholds that matter.",
+  },
+];
+
+const CATEGORY_LABELS = { home: "Home & Condo" };
+
+function renderPosts(filter) {
+  const grid = document.getElementById('post-grid');
+  const posts = POSTS
+    .filter(p => filter === 'all' || p.category === filter)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  if (posts.length === 0) {
+    grid.innerHTML = '<div class="post-empty">No posts in this category yet.</div>';
+    return;
+  }
+
+  grid.innerHTML = posts.map(p => `
+    <a class="post-card" href="${p.slug}.html">
+      <div class="post-card-meta">
+        <span class="category-badge">${CATEGORY_LABELS[p.category] || p.category}</span>
+        <span>${new Date(p.date + 'T00:00:00').toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      </div>
+      <div class="post-card-title">${p.title}</div>
+      <div class="post-card-excerpt">${p.excerpt}</div>
+    </a>
+  `).join('');
+}
+
+function selectCategory(el) {
+  document.querySelectorAll('#category-filter .pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  renderPosts(el.dataset.val);
+}
+
+renderPosts('all');
+</script>
+
+</body>
+</html>

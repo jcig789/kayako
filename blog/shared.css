@@ -1,0 +1,202 @@
+/* KayaKo blog — shared design tokens + base patterns.
+   Only /blog/*.html pages link to this. The 3 core app pages
+   (index.html, ph-methodology.html, ph-waitlist.html) keep their own
+   embedded copy — not retrofitted, to avoid touching working pages. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:        #1e3a5f;
+  --ink-2:      #334e6e;
+  --ink-3:      #64748b;
+  --ink-4:      #94a3b8;
+  --line:       #dde3ea;
+  --surface:    #ffffff;
+  --bg:         #f0f4f8;
+  --bg-2:       #f8fafc;
+  --navy-pale:  #e8f0fe;
+  --green:      #16a34a;
+  --green-pale: #f0fdf4;
+  --amber:      #d97706;
+  --amber-pale: #fffbeb;
+  --red:        #dc2626;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(30,58,95,0.06);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-brand { color: #fff; font-weight: 600; font-size: 14px; }
+.header-kayako { color: rgba(255,255,255,0.22); font-size: 11px; letter-spacing: 0.5px; }
+.header-back {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  transition: color 0.12s;
+}
+.header-back:hover { color: #fff; }
+
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 16px 56px;
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+/* ── PILL FILTER (matches index.html's Property Type / Employment Type pills) ── */
+.pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-2);
+  cursor: pointer;
+  background: var(--surface);
+  transition: all 0.12s;
+  user-select: none;
+}
+.pill:hover  { border-color: var(--ink); color: var(--ink); background: var(--navy-pale); }
+.pill.selected { border-color: var(--ink); background: var(--ink); color: #fff; font-weight: 500; }
+.pill.selected:hover { background: #163050; }
+
+/* ── HERO (post/listing title block) ── */
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 28px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.hero-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-3); margin-bottom: 8px; }
+.hero-title { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.25; }
+.hero-desc  { font-size: 14px; color: var(--ink-3); line-height: 1.7; margin-bottom: 20px; }
+.hero-meta { font-size: 12px; color: var(--ink-4); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--navy-pale);
+  color: var(--ink);
+  border-radius: 20px;
+  padding: 3px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── POST CONTENT ── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+p { color: var(--ink-2); line-height: 1.7; margin-bottom: 10px; font-size: 13px; }
+p:last-child { margin-bottom: 0; }
+ul, ol { padding-left: 18px; margin-bottom: 10px; }
+li { color: var(--ink-2); line-height: 1.7; font-size: 13px; margin-bottom: 3px; }
+h2 { font-size: 17px; font-weight: 700; color: var(--ink); margin: 4px 0 6px; }
+h4 { font-size: 13px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+h4:first-child { margin-top: 0; }
+
+.formula-box {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin: 10px 0;
+  line-height: 1.8;
+}
+.note-box {
+  background: var(--amber-pale);
+  border: 1px solid #fde68a;
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin-top: 12px;
+}
+.note-box strong { color: var(--ink); font-weight: 600; }
+
+/* ── BLOG INDEX CARDS ── */
+.post-grid { display: flex; flex-direction: column; gap: 12px; }
+.post-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  transition: border-color 0.12s;
+}
+.post-card:hover { border-color: var(--ink); }
+.post-card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; color: var(--ink-4); }
+.post-card-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; line-height: 1.3; }
+.post-card-excerpt { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+.post-empty { color: var(--ink-3); font-size: 13px; padding: 24px; text-align: center; }
+
+/* ── FOOTER (matches ph-methodology.html's footer-note/footer-cta) ── */
+.footer-note {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+.footer-note strong { color: var(--ink-2); font-weight: 600; }
+.footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 9px 18px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+.footer-cta:hover { background: #163050; }
+
+@media (max-width: 600px) {
+  .hero { padding: 20px; }
+}
